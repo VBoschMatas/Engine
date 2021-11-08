@@ -14,26 +14,26 @@ ModuleProgram::~ModuleProgram()
 // Called before render is available
 bool ModuleProgram::Init()
 {
-	
+	return true;
 }
 
 // Called every draw update
 update_status ModuleProgram::Update()
 {
-
+	return UPDATE_CONTINUE;
 }
 
 // Called before quitting
 bool ModuleProgram::CleanUp()
 {
-
+	return true;
 }
 
 char* ModuleProgram::LoadSource(const char* file_name)
 {
 	char* data = nullptr;
 	FILE* file = nullptr;
-	fopen_s(&file, file_name, “rb”);
+	//fopen_s(&file, file_name, “rb”);
 	if (file)
 	{
 		fseek(file, 0, SEEK_END);
