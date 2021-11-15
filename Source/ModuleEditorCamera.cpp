@@ -1,6 +1,7 @@
 #include "ModuleEditorCamera.h"
 #include "Application.h"
 #include "Geometry/Frustum.h"
+#include "GL/glew.h"
 
 #define DEGTORAD 57.29578
 
@@ -28,6 +29,9 @@ bool ModuleEditorCamera::Init()
 
 	float4x4 projectionGL = frustum.ProjectionMatrix().Transposed();
 
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(*projectionGL.v);
+
 	return true;
 }
 
@@ -49,4 +53,14 @@ update_status ModuleEditorCamera::PostUpdate()
 bool ModuleEditorCamera::CleanUp()
 {
 	return true;
+}
+
+void ModuleEditorCamera::InitPerspectiveMatrix()
+{
+
+}
+
+void ModuleEditorCamera::InitViewMatrix()
+{
+
 }

@@ -13,5 +13,9 @@ public:
 	update_status Update();
 	update_status PostUpdate();
 	bool CleanUp();
+
+private:
+	void InitPerspectiveMatrix();
+	void InitViewMatrix();
 };
 
