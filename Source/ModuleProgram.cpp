@@ -15,16 +15,6 @@ ModuleProgram::~ModuleProgram()
 // Called before render is available
 bool ModuleProgram::Init()
 {
-	//shader_1 = glCreateShader(GL_VERTEX_SHADER);
-	//shader_2 = glCreateShader(GL_FRAGMENT_SHADER);
-
-	unsigned vbo_triangle = CreateVBO();
-
-
-
-	//RenderVBO(vbo_triangle);
-
-	//LoadSource();
 	return true;
 }
 
@@ -50,30 +40,54 @@ bool ModuleProgram::CleanUp()
 	return true;
 }
 
-unsigned ModuleProgram::CreateVBO()
+GLuint ModuleProgram::CompileShader(GLuint type, const char* source)
 {
-	float vertices[] = {
-		-1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		1.0f, 1.0f, 0.0f
-	};
-	unsigned vbo;
+	GLuint shader_id = glCreateShader(type);
+	glShaderSource(shader_id, 1, &source, 0);
+	glCompileShader(shader_id);
 
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	return vbo;
+	int result = GL_FALSE;
+	glGetShaderiv(shader_id, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int len = 0;
+		glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &len);
+		if (len > 0)
+		{
+			int written = 0;
+			char* info = (char*) malloc(len);
+			glGetShaderInfoLog(shader_id, len, &written, info);
+			LOG("Log Info: %s", info);
+			free(info);
+		}
+	}
+	return shader_id;
 }
 
-void ModuleProgram::RenderVBO(unsigned vbo)
+GLuint ModuleProgram::CreateProgram(GLuint vtx_shader, GLuint frg_shader)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	GLuint program_id = glCreateProgram();
+	glAttachShader(program_id, vtx_shader);
+	glAttachShader(program_id, frg_shader);
+	glLinkProgram(program_id);
+	int result;
+	glGetProgramiv(program_id, GL_LINK_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int len = 0;
+		glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &len);
+		if (len > 0)
+		{
+			int written = 0;
+			char* info = (char*)malloc(len);
+			glGetProgramInfoLog(program_id, len, &written, info);
+			LOG("Log Info: %s", info);
+			free(info);
+		}
+	}
+	glDeleteShader(vtx_shader);
+	glDeleteShader(frg_shader);
+	return program_id;
 }
 
 char* ModuleProgram::LoadSource(const char* file_name)
@@ -92,4 +106,17 @@ char* ModuleProgram::LoadSource(const char* file_name)
 		fclose(file);
 	}
 	return data;
+}
+
+GLuint ModuleProgram::CreateProgram(const char* source_vertex, const char* source_fragment)
+{
+	char* vtx_source = LoadSource(source_vertex);
+	char* frg_source = LoadSource(source_fragment);
+
+	GLuint vtx_shader = CompileShader(GL_VERTEX_SHADER, vtx_source);
+	GLuint frg_shader = CompileShader(GL_FRAGMENT_SHADER, frg_source);
+
+	program = CreateProgram(vtx_shader, frg_shader);
+
+	return program; // If you want to store the program in an other var for some reason
 }

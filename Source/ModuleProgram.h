@@ -1,7 +1,8 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
-#include "glew-2.1.0/include/GL/glew.h"
+#include "GL/glew.h"
+
 
 struct SDL_Texture;
 struct SDL_Renderer;
@@ -19,14 +20,17 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
-	char* LoadSource(const char* source_file);
+	GLuint program;
+
+	GLuint CreateProgram(const char* source_1, const char* source_2);
 
 private:
-	GLuint shader_1, shader_2;
+	GLuint vbo_triangle;
 	void* context;
 	float vertices[];
 
 private:
-	unsigned CreateVBO();
-	void RenderVBO(unsigned vbo);
+	GLuint CompileShader(GLuint type, const char* source);
+	char* LoadSource(const char* source_file);
+	GLuint CreateProgram(GLuint vtx_shader, GLuint frg_shader);
 };
