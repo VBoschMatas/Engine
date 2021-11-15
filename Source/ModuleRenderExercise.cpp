@@ -37,6 +37,7 @@ update_status ModuleRenderExercise::Update()
 {
 	try {
 		RenderVBO(vbo_tris, program_hello_world);
+		LOG("ASDHUASHIDUIHUIHSADUIAHUHSUDHUHASUIDHI");
 	}
 	catch (const char* e) {
 		return UPDATE_STOP;
@@ -59,7 +60,7 @@ GLuint ModuleRenderExercise::CreateVBO()
 	float vertices[] = {
 		-1.0f, -1.0f, 0.0f,
 		1.0f, -1.0f, 0.0f,
-		1.0f, 1.0f, 0.0f
+		0.0f, 1.0f, 0.0f
 	};
 
 	GLuint vbo;
