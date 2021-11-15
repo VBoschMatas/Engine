@@ -37,7 +37,6 @@ update_status ModuleRenderExercise::Update()
 {
 	try {
 		RenderVBO(vbo_tris, program_hello_world);
-		LOG("ASDHUASHIDUIHUIHSADUIAHUHSUDHUHASUIDHI");
 	}
 	catch (const char* e) {
 		return UPDATE_STOP;

@@ -1,10 +1,8 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include "SDL.h"
 
-#include "imGui/imgui.h"
-#include "imGui/imgui_impl_sdl.h"
-#include "imGui/imgui_impl_opengl3.h"
 
 class ModuleEditor : public Module
 {
