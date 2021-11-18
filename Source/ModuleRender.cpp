@@ -53,12 +53,12 @@ bool ModuleRender::Init()
 
 	try {
 		vbo_tris = CreateVBO();
-		program_tris = App->program->CreateProgram("shaders/default_vertex.glsl", "shaders/default_fragment.glsl");
+		program_tris = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
 	}
 	catch (const char* e) {
 		return false;
 	}
-	unsigned int img_id = App->textures->LoadTexture("textures/Lanna.png");
+	unsigned int img_id = App->textures->LoadTexture("textures/Lenna.png");
 
 	// Generate
 	unsigned int texid = App->textures->getTexId();
