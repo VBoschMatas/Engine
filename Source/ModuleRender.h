@@ -19,4 +19,13 @@ public:
 	bool CleanUp();
 	void WindowResized(unsigned width, unsigned height);
 	void* context;
+
+private:
+	unsigned int vbo_tris;
+	unsigned int program_tris;
+
+	unsigned int CreateVBO();
+	void RenderVBO(unsigned int vbo, unsigned int program);
+	void RenderVBOTexture(unsigned int vbo, unsigned int program);
+	void DeleteVBO(unsigned int vbo);
 };

@@ -59,7 +59,10 @@ GLuint ModuleRenderExercise::CreateVBO()
 	float vertices[] = {
 		-1.0f, -1.0f, 0.0f,
 		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, //text
+		1.0f, 0.0f, //text
+		0.5f, 1.0f  //text
 	};
 
 	GLuint vbo;
@@ -81,6 +84,16 @@ void ModuleRenderExercise::RenderVBO(GLuint vbo, GLuint program)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glUseProgram(program);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void ModuleRenderExercise::RenderVBOTexture(GLuint vbo, GLuint program)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float)*3*3));
 
 	glUseProgram(program);
 	glDrawArrays(GL_TRIANGLES, 0, 3);

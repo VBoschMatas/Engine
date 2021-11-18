@@ -158,6 +158,7 @@
     <ClCompile Include="MathGeoLib\Time\Clock.cpp">
       <Filter>MathGeoLib</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -420,6 +421,7 @@
     <ClInclude Include="MathGeoLib\MathGeoLibFwd.h">
       <Filter>MathGeoLib</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imGui">

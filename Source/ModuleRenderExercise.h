@@ -21,6 +21,7 @@ private:
 
 	GLuint CreateVBO();
 	void RenderVBO(GLuint vbo, GLuint program);
+	void RenderVBOTexture(GLuint vbo, GLuint program);
 	void DeleteVBO(GLuint vbo);
 };
 

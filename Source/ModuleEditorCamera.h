@@ -17,5 +17,6 @@ public:
 private:
 	void InitPerspectiveMatrix();
 	void InitViewMatrix();
+
 };
 

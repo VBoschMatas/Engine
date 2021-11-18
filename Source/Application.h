@@ -12,6 +12,7 @@ class ModuleTextures;
 class ModuleInput;
 class ModuleEditor;
 class ModuleEditorCamera;
+class ModuleTexture;
 
 class Application
 {
@@ -32,6 +33,7 @@ public:
 	ModuleInput* input = nullptr;
 	ModuleEditor* editor = nullptr;
 	ModuleEditorCamera* editorcamera = nullptr;
+	ModuleTexture* textures = nullptr;
 
 private:
 
