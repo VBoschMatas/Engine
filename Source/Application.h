@@ -13,6 +13,8 @@ class ModuleInput;
 class ModuleEditor;
 class ModuleEditorCamera;
 class ModuleTexture;
+class MicroTimer;
+class Timer;
 
 class Application
 {
@@ -36,7 +38,8 @@ public:
 	ModuleTexture* textures = nullptr;
 
 private:
-
+	Timer* timer = nullptr;
+	MicroTimer* micro_timer = nullptr;
 	std::list<Module*> modules;
 
 };

@@ -25,9 +25,7 @@ public:
 	GLuint CreateProgram(const char* source_1, const char* source_2);
 
 private:
-	GLuint vbo_triangle;
 	void* context;
-	float vertices[];
 
 private:
 	GLuint CompileShader(GLuint type, const char* source);

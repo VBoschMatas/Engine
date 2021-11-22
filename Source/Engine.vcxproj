@@ -194,6 +194,7 @@
     <ClCompile Include="MathGeoLib\Math\SSEMath.cpp" />
     <ClCompile Include="MathGeoLib\Math\TransformOps.cpp" />
     <ClCompile Include="MathGeoLib\Time\Clock.cpp" />
+    <ClCompile Include="MicroTimer.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
     <ClCompile Include="ModuleEditorCamera.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
@@ -201,6 +202,7 @@
     <ClCompile Include="ModuleRender.cpp" />
     <ClCompile Include="ModuleRenderExercise.cpp" />
     <ClCompile Include="ModuleTexture.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -290,6 +292,7 @@
     <ClInclude Include="MathGeoLib\Math\TransformOps.h" />
     <ClInclude Include="MathGeoLib\Math\vec2d.h" />
     <ClInclude Include="MathGeoLib\Time\Clock.h" />
+    <ClInclude Include="MicroTimer.h" />
     <ClInclude Include="Module.h" />
     <ClInclude Include="ModuleEditor.h" />
     <ClInclude Include="ModuleEditorCamera.h" />
@@ -298,6 +301,7 @@
     <ClInclude Include="ModuleRender.h" />
     <ClInclude Include="ModuleRenderExercise.h" />
     <ClInclude Include="ModuleTexture.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="ModuleWindow.h" />
   </ItemGroup>
   <ItemGroup>

@@ -88,13 +88,9 @@ bool ModuleRender::Init()
 	SDL_GetWindowSize(App->window->window, &w, &h);
 	glViewport(0, 0, w, h);
 
-	try {
-		vbo = CreateVBO();
-		program = App->program->CreateProgram("shaders/default_vertex.glsl", "shaders/default_fragment.glsl");
-	}
-	catch (const char* e) {
-		return false;
-	}
+	vbo = CreateVBO();
+	program = App->program->CreateProgram("shaders/default_vertex.glsl", "shaders/default_fragment.glsl");
+
 	unsigned int img_id = App->textures->LoadTexture("textures/Lenna.png");
 
 	// Generate
@@ -130,7 +126,7 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update()
 {
-	unsigned int texid = 0;
+	//unsigned int texid = 0;
 
 	//RenderVBOTexture(vbo, program, texid);
 	RenderVBO(vbo, program);
@@ -169,15 +165,15 @@ unsigned int ModuleRender::CreateVBO()
 		0.5f,  0.5f, 0.0f,		/*0.0f, 0.0f,*/
 		0.5f, -0.5f, 0.0f,		/*0.0f, 1.0f,*/
 		-0.5f, -0.5f, 0.0f,		/*1.0f, 1.0f,*/
-		-0.5f,  0.5f, 0.0f,		/*1.0f, 1.0f*/
+		-0.5f,  0.5f, 0.0f		/*1.0f, 1.0f */
 	};
 
 	unsigned int vbo;
 
-	glGenBuffers(1, &vbo);
-
 	vao = CreateVAO();
+	LOG("VAO %d", vao);
 
+	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -206,8 +202,8 @@ unsigned int ModuleRender::CreateVAO()
 unsigned int ModuleRender::CreateEBO()
 {
 	unsigned int indices[] = {
-	0, 1, 3,
-	1, 2, 3 
+		0, 1, 3,
+		1, 2, 3 
 	};
 
 	unsigned int ebo;
@@ -218,7 +214,7 @@ unsigned int ModuleRender::CreateEBO()
 	return ebo;
 }
 
-void ModuleRender::DeleteVBO(unsigned int vbo)
+void ModuleRender::DeleteVBO(unsigned int vbo) //SDL_GetTicks();
 {
 	glDeleteBuffers(1, &vbo);
 }
@@ -240,7 +236,7 @@ void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program, unsi
 	glBindVertexArray(vao);
 
 	glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, texid);
+	glBindTexture(GL_TEXTURE_2D, texid);
 	glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
 
 
