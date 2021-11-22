@@ -50,14 +50,14 @@ bool ModuleTexture::CleanUp()
 
 unsigned int ModuleTexture::LoadTexture(const char *path)
 {
-	unsigned int textid;
-	ilGenImages(1, &textid);
-	ilBindImage(textid);
+	unsigned int texid;
+	ilGenImages(1, &texid);
+	ilBindImage(texid);
 	ilLoadImage(path);
 	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 	iluRotate(180.0f);
 
-	return textid;
+	return texid;
 }
 
 void ModuleTexture::UnloadTexture(int i, const unsigned int* texture)

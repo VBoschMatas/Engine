@@ -21,11 +21,16 @@ public:
 	void* context;
 
 private:
-	unsigned int vbo_tris;
-	unsigned int program_tris;
+	unsigned int vao;
+	unsigned int vbo;
+	unsigned int ebo;
+
+	unsigned int program;
 
 	unsigned int CreateVBO();
+	unsigned int CreateVAO();
+	unsigned int CreateEBO();
 	void RenderVBO(unsigned int vbo, unsigned int program);
-	void RenderVBOTexture(unsigned int vbo, unsigned int program);
+	void RenderVBOTexture(unsigned int vbo, unsigned int program, unsigned int texid);
 	void DeleteVBO(unsigned int vbo);
 };
