@@ -202,9 +202,12 @@ unsigned int ModuleRender::CreateVAO()
 unsigned int ModuleRender::CreateEBO()
 {
 	unsigned int indices[] = {
-		0, 1, 3,
-		1, 2, 3 
+		0, 3, 2,
+		0, 2, 1 
 	};
+	/*unsigned int indices[] = {
+		2, 1, 0
+	};*/
 
 	unsigned int ebo;
 
@@ -214,7 +217,7 @@ unsigned int ModuleRender::CreateEBO()
 	return ebo;
 }
 
-void ModuleRender::DeleteVBO(unsigned int vbo) //SDL_GetTicks();
+void ModuleRender::DeleteVBO(unsigned int vbo)
 {
 	glDeleteBuffers(1, &vbo);
 }

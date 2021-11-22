@@ -48,7 +48,7 @@ bool Application::Init()
 
 	LOG("INIT TIME: ms: %d,  micro: %f", timer->ReadTime(), micro_timer->ReadTime());
 
-	SDL_Delay(3 * 1000); // REMOVE THIS FOR 3s OF BETTER PERFORMANCE AT LOAD
+	//SDL_Delay(3 * 1000); // REMOVE THIS FOR 3s OF BETTER PERFORMANCE AT LOAD
 
 	LOG("POST-DELAY TIME: ms: %d,  micro: %f", timer->StopTime(), micro_timer->StopTime());
 	return ret;
