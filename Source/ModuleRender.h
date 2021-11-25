@@ -1,6 +1,8 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include "Math/float4x4.h"
+#include "MathGeoLib/Geometry/Frustum.h"
 
 struct SDL_Texture;
 struct SDL_Renderer;
@@ -25,6 +27,9 @@ private:
 	unsigned int vbo;
 	unsigned int ebo;
 
+	Frustum frustum;
+	float4x4 proj, view, model;
+
 	unsigned int texture_id;
 
 	unsigned int program;
@@ -32,6 +37,8 @@ private:
 	unsigned int CreateVBO();
 	unsigned int CreateVAO();
 	unsigned int CreateEBO();
+	void initFrustum();
+	void initTextures();
 	void RenderVBO(unsigned int vbo, unsigned int program);
 	void RenderVBOTexture(unsigned int vbo, unsigned int program, unsigned int texid);
 	void DeleteVBO(unsigned int vbo);

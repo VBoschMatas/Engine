@@ -33,7 +33,6 @@
 #include "Frustum.h"
 #include "GeometryAll.h"
 #include "HitInfo.h"
-#include "KDTree.h"
 #include "Line.h"
 #include "LineSegment.h"
 #include "OBB.h"

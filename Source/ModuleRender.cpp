@@ -7,6 +7,7 @@
 #include "GL/glew.h"
 #include "IL/il.h"
 #include "SDL.h"
+#include "MathGeoLib.h"
 
 ModuleRender::ModuleRender()
 {
@@ -47,13 +48,13 @@ void __stdcall OurOpenGLErrorFunction(GLenum source, GLenum type, GLuint id, GLe
 		// case GL_DEBUG_SEVERITY_NOTIFICATION: tmp_severity = "notification"; break;
 	default: return;
 	};
-	LOG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
+	DEBUG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
 }
 
 // Called before render is available
 bool ModuleRender::Init()
 {
-	LOG("Creating Renderer context");
+	DEBUG("Creating Renderer context");
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
@@ -65,16 +66,16 @@ bool ModuleRender::Init()
 
 	glewInit();
 	
-	LOG("Using Glew %s", glewGetString(GLEW_VERSION));
+	DEBUG("Using Glew %s", glewGetString(GLEW_VERSION));
 
-	LOG("Vendor: %s", glGetString(GL_VENDOR));
-	LOG("Renderer: %s", glGetString(GL_RENDERER));
-	LOG("OpenGL version supported %s", glGetString(GL_VERSION));
-	LOG("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	DEBUG("Vendor: %s", glGetString(GL_VENDOR));
+	DEBUG("Renderer: %s", glGetString(GL_RENDERER));
+	DEBUG("OpenGL version supported %s", glGetString(GL_VERSION));
+	DEBUG("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	LOG("Gl Options Initialized");
+	DEBUG("Gl Options Initialized");
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -93,6 +94,8 @@ bool ModuleRender::Init()
 	program = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
 	//program = App->program->CreateProgram("shaders/default_vertex.glsl", "shaders/default_fragment.glsl");
 
+	vbo = CreateVBO();
+
 	// Generate
 	glGenTextures(1, &texture_id);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -109,8 +112,6 @@ bool ModuleRender::Init()
 
 	glUseProgram(program);
 	glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
-
-	vbo = CreateVBO();
 
 	ilDeleteImages(1, &img_id);
 
@@ -152,7 +153,7 @@ bool ModuleRender::CleanUp()
 	glDeleteBuffers(1, &ebo);
 	glDeleteBuffers(1, &vbo);
 
-	LOG("Destroying renderer");
+	DEBUG("Destroying renderer");
 	SDL_GL_DeleteContext(context);
 	//Destroy window
 
@@ -161,6 +162,16 @@ bool ModuleRender::CleanUp()
 
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
+}
+
+void ModuleRender::initFrustum()
+{
+
+}
+
+void ModuleRender::initTextures()
+{
+
 }
 
 unsigned int ModuleRender::CreateVBO()
@@ -176,7 +187,7 @@ unsigned int ModuleRender::CreateVBO()
 	unsigned int vbo;
 
 	vao = CreateVAO();
-	LOG("VAO %d", vao);
+	DEBUG("VAO %d", vao);
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -241,11 +252,14 @@ void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program, unsi
 {
 	glUseProgram(program);
 
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &proj[0][0]);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 
 	glBindVertexArray(vao);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
