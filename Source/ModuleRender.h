@@ -25,6 +25,8 @@ private:
 	unsigned int vbo;
 	unsigned int ebo;
 
+	unsigned int texture_id;
+
 	unsigned int program;
 
 	unsigned int CreateVBO();

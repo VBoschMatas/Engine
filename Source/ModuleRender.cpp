@@ -83,20 +83,22 @@ bool ModuleRender::Init()
 
 	// Textures params
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	int w, h;
 	SDL_GetWindowSize(App->window->window, &w, &h);
 	glViewport(0, 0, w, h);
 
 	vbo = CreateVBO();
-	program = App->program->CreateProgram("shaders/default_vertex.glsl", "shaders/default_fragment.glsl");
+	program = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
+	//program = App->program->CreateProgram("shaders/default_vertex.glsl", "shaders/default_fragment.glsl");
 
 	unsigned int img_id = App->textures->LoadTexture("textures/Lenna.png");
 
 	// Generate
-	unsigned int texid;
-	glGenTextures(1, &texid);
-	glBindTexture(GL_TEXTURE_2D, texid);
+	glGenTextures(1, &texture_id);
+	glBindTexture(GL_TEXTURE_2D, texture_id);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -126,10 +128,10 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update()
 {
-	//unsigned int texid = 0;
+	unsigned int texid = App->textures->getTexId();
 
-	//RenderVBOTexture(vbo, program, texid);
-	RenderVBO(vbo, program);
+	RenderVBOTexture(vbo, program, texid);
+	//RenderVBO(vbo, program);
 
 	return UPDATE_CONTINUE;
 }
@@ -162,10 +164,10 @@ unsigned int ModuleRender::CreateVBO()
 {
 	float vertices[] = {
 		//Quad					//Texture
-		0.5f,  0.5f, 0.0f,		/*0.0f, 0.0f,*/
-		0.5f, -0.5f, 0.0f,		/*0.0f, 1.0f,*/
-		-0.5f, -0.5f, 0.0f,		/*1.0f, 1.0f,*/
-		-0.5f,  0.5f, 0.0f		/*1.0f, 1.0f */
+		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,
+		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,
+		0.5f, 0.5f, 0.0f,		1.0f, 1.0f,
+		-0.5f, 0.5f, 0.0f,		0.0f, 1.0f 
 	};
 
 	unsigned int vbo;
@@ -177,11 +179,11 @@ unsigned int ModuleRender::CreateVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	ebo = CreateEBO();
 
@@ -202,8 +204,8 @@ unsigned int ModuleRender::CreateVAO()
 unsigned int ModuleRender::CreateEBO()
 {
 	unsigned int indices[] = {
-		0, 3, 2,
-		0, 2, 1 
+		0, 1, 2,
+		2, 3, 0
 	};
 	/*unsigned int indices[] = {
 		2, 1, 0
@@ -236,12 +238,14 @@ void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program, unsi
 {
 	glUseProgram(program);
 
-	glBindVertexArray(vao);
+
+	glUniform1i(glGetUniformLocation(program, "texture_id"), 0);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texid);
-	glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
+	glBindTexture(GL_TEXTURE_2D, texture_id);
 
+	glBindVertexArray(vao);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-	glDrawArrays(GL_TRIANGLES, 1, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
