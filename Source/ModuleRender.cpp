@@ -93,7 +93,6 @@ bool ModuleRender::Init()
 	glViewport(0, 0, w, h);
 
 	program = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
-	//program = App->program->CreateProgram("shaders/default_vertex.glsl", "shaders/default_fragment.glsl");
 
 	vbo = CreateVBO();
 
@@ -133,9 +132,8 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update()
 {
-	unsigned int texid = App->textures->getTexId();
-
-	RenderVBOTexture(vbo, program, texid);
+	RenderVBOTexture(vbo, program);
+	RenderVBOBase(vbo, program);
 
 	//RenderVBO(vbo, program);
 
@@ -250,7 +248,7 @@ void ModuleRender::RenderVBO(unsigned int vbo, unsigned int program)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program, unsigned int texid)
+void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program)
 {
 	glUseProgram(program);
 
@@ -259,11 +257,24 @@ void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program, unsi
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->editorcamera->getView()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->editorcamera->getProjection()[0][0]);
-	//DEBUG("PROJECTION: %d, VIEW: %d, MODEL: %d", App->editorcamera->getProjection().x, App->editorcamera->getView().x, model.x);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 
 	glBindVertexArray(vao);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void ModuleRender::RenderVBOBase(unsigned int vbo, unsigned int program)
+{
+	glUseProgram(program);
+
+	float4x4 model = float4x4::FromTRS(float3(0.0f, 0.0f, 0.0f), float4x4::RotateZ(pi / 1.0f), float3(1.0f, 1.0f, 0.0f));
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->editorcamera->getView()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->editorcamera->getProjection()[0][0]);
+
+	
 }

@@ -118,25 +118,24 @@ void ModuleEditorCamera::InitViewMatrix()
 
 void ModuleEditorCamera::Controller()
 {
-	static const float move_speed = 15.0f;
-	static const float speed_modifier = 2.0f;
-	static const float rot_speed = 2.5f;
-	static const float zoom_speed = 3.0f;
+	static const float move_speed = 0.025f;
 
-		float effective_speed = move_speed;
+	float effective_speed = move_speed;
 
-		if (App->input->GetKey(SDL_SCANCODE_W))
-			position += frustum.Front() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_S))
-			position -= frustum.Front() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_A))
-			position -= frustum.WorldRight() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_D))
-			position += frustum.WorldRight() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_Q))
-			position += frustum.Up() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_E))
-			position -= frustum.Up() * effective_speed;
+	if (App->input->GetKey(SDL_SCANCODE_W))
+	{
+		position += frustum.Front() * effective_speed;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_S))
+		position -= frustum.Front() * effective_speed;
+	if (App->input->GetKey(SDL_SCANCODE_A))
+		position -= frustum.WorldRight() * effective_speed;
+	if (App->input->GetKey(SDL_SCANCODE_D))
+		position += frustum.WorldRight() * effective_speed;
+	if (App->input->GetKey(SDL_SCANCODE_Q))
+		position += frustum.Up() * effective_speed;
+	if (App->input->GetKey(SDL_SCANCODE_E))
+		position -= frustum.Up() * effective_speed;
 
 	frustum.SetPos(position);
 }

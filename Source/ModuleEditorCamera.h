@@ -41,7 +41,7 @@ private:
 	float3 position;
 
 public:
-	float4x4 getProjection() { return proj; };
-	float4x4 getView() { return view; };
+	float4x4 getProjection() { return frustum.ProjectionMatrix(); };
+	float4x4 getView() { return float4x4(frustum.ViewMatrix()); };
 };
 

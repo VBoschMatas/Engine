@@ -13,6 +13,7 @@ class ModuleInput;
 class ModuleEditor;
 class ModuleEditorCamera;
 class ModuleTexture;
+class ModuleDebugDraw;
 class MicroTimer;
 class Timer;
 
@@ -36,6 +37,7 @@ public:
 	ModuleEditor* editor = nullptr;
 	ModuleEditorCamera* editorcamera = nullptr;
 	ModuleTexture* textures = nullptr;
+	ModuleDebugDraw* dd = nullptr;
 
 private:
 	Timer* timer = nullptr;

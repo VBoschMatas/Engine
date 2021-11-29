@@ -161,6 +161,7 @@
     <ClCompile Include="ModuleTexture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="MicroTimer.cpp" />
+    <ClCompile Include="ModuleDebugDraw.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -426,6 +427,7 @@
     <ClInclude Include="ModuleTexture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="MicroTimer.h" />
+    <ClInclude Include="ModuleDebugDraw.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imGui">
