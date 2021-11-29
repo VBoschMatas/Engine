@@ -17,7 +17,13 @@ ModuleEditorCamera::~ModuleEditorCamera()
 
 bool ModuleEditorCamera::Init()
 {
-	Frustum frustum;
+	//Transform params
+	frustum.SetPerspective(math::pi / 4.0f, 2.f * atanf(tanf(frustum.VerticalFov() * 0.5f) * aspect));
+
+	frustum.Pos = float3::zero;
+	frustum.Front = -float3::unitZ;
+
+	proj = frustum.ProjectionMatrix();
 
 	return true;
 }

@@ -57,7 +57,7 @@ GLuint ModuleProgram::CompileShader(GLuint type, const char* source)
 			int written = 0;
 			char* info = (char*) malloc(len);
 			glGetShaderInfoLog(shader_id, len, &written, info);
-			LOG("Log Info: %s", info);
+			DEBUG("Log Info: %s", info);
 			free(info);
 		}
 	}
@@ -81,7 +81,7 @@ GLuint ModuleProgram::CreateProgram(GLuint vtx_shader, GLuint frg_shader)
 			int written = 0;
 			char* info = (char*)malloc(len);
 			glGetProgramInfoLog(program_id, len, &written, info);
-			LOG("Log Info: %s", info);
+			DEBUG("Log Info: %s", info);
 			free(info);
 		}
 	}

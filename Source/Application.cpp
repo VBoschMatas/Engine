@@ -46,11 +46,11 @@ bool Application::Init()
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end() && ret; ++it)
 		ret = (*it)->Init();
 
-	LOG("INIT TIME: ms: %d,  micro: %f", timer->ReadTime(), micro_timer->ReadTime());
+	DEBUG("INIT TIME: ms: %d,  micro: %f", timer->ReadTime(), micro_timer->ReadTime());
 
 	//SDL_Delay(3 * 1000); // REMOVE THIS FOR 3s OF BETTER PERFORMANCE AT LOAD
 
-	LOG("POST-DELAY TIME: ms: %d,  micro: %f", timer->StopTime(), micro_timer->StopTime());
+	DEBUG("POST-DELAY TIME: ms: %d,  micro: %f", timer->StopTime(), micro_timer->StopTime());
 	return ret;
 }
 

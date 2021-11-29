@@ -27,9 +27,6 @@ private:
 	unsigned int vbo;
 	unsigned int ebo;
 
-	Frustum frustum;
-	float4x4 proj, view, model;
-
 	unsigned int texture_id;
 
 	unsigned int program;

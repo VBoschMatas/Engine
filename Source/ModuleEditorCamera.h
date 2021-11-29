@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include "MathGeoLib.h"
 
 class ModuleEditorCamera: public Module
 {
@@ -18,5 +19,11 @@ private:
 	void InitPerspectiveMatrix();
 	void InitViewMatrix();
 
+	Frustum frustum;
+	float4x4 proj, view, model;
+
+public:
+	float4x4 getProjection() const;
+	float4x4 getView() const;
 };
 
