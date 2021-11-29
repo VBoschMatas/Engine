@@ -8,6 +8,7 @@
 #include "IL/il.h"
 #include "SDL.h"
 #include "MathGeoLib.h"
+#include "ModuleEditorCamera.h"
 
 ModuleRender::ModuleRender()
 {
@@ -103,7 +104,7 @@ bool ModuleRender::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-	unsigned int img_id = App->textures->LoadTexture("textures/sora.png");
+	unsigned int img_id = App->textures->LoadTexture("textures/Lenna.png");
 
 	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
 		ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
@@ -134,8 +135,9 @@ update_status ModuleRender::Update()
 {
 	unsigned int texid = App->textures->getTexId();
 
-	//RenderVBOTexture(vbo, program, texid);
-	RenderVBO(vbo, program);
+	RenderVBOTexture(vbo, program, texid);
+
+	//RenderVBO(vbo, program);
 
 	return UPDATE_CONTINUE;
 }
@@ -252,10 +254,12 @@ void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program, unsi
 {
 	glUseProgram(program);
 
-	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &view[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &proj[0][0]);
+	float4x4 model = float4x4::FromTRS(float3(2.0f, -2.0f, 0.0f), float4x4::RotateZ(pi / 20.0f), float3(10.0f, 10.0f, 0.0f));
 
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->editorcamera->getView()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->editorcamera->getProjection()[0][0]);
+	//DEBUG("PROJECTION: %d, VIEW: %d, MODEL: %d", App->editorcamera->getProjection().x, App->editorcamera->getView().x, model.x);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 

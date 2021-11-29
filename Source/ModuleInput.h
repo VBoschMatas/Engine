@@ -15,6 +15,17 @@ public:
 	update_status Update();
 	bool CleanUp();
 
+	// Check key states (includes mouse and joy buttons)
+	const unsigned GetKey(int id) const
+	{
+		return keyboard[id];
+	}
+
+	const unsigned GetMouseButtonDown(int id) const
+	{
+		//return mouse_buttons[id - 1];
+	}
+
 private:
 	const Uint8 *keyboard = NULL;
 };
