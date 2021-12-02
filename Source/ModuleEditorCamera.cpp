@@ -136,31 +136,43 @@ void ModuleEditorCamera::InitViewMatrix()
 void ModuleEditorCamera::Controller()
 {
 	static const float move_speed = 0.05f;
+	static const float rotation_speed = 0.005f;
 
 	float effective_speed = move_speed;
-	float rotating_speed = move_speed / 7.0f;
 
+	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT))
+	{
+		//Movement with WASD
+		if (App->input->GetKey(SDL_SCANCODE_W))
+			position += frustum.Front() * effective_speed;
+		if (App->input->GetKey(SDL_SCANCODE_S))
+			position -= frustum.Front() * effective_speed;
+		if (App->input->GetKey(SDL_SCANCODE_A))
+			position -= frustum.WorldRight() * effective_speed;
+		if (App->input->GetKey(SDL_SCANCODE_D))
+			position += frustum.WorldRight() * effective_speed;
+		if (App->input->GetKey(SDL_SCANCODE_Q))
+			position += frustum.Up() * effective_speed;
+		if (App->input->GetKey(SDL_SCANCODE_E))
+			position -= frustum.Up() * effective_speed;
+
+		// Mouse camera rotation
+		int mouse_x, mouse_y;
+		App->input->GetMouseMovement(mouse_x, mouse_y);
+		Rotate((float)mouse_y * -rotation_speed, (float)mouse_x * -rotation_speed);
+
+		App->input->CenterMouse();
+	}
+
+	//Movement & rotation with arrow keys
 	if (App->input->GetKey(SDL_SCANCODE_UP))
-		Rotate(rotating_speed, 0);
-	if (App->input->GetKey(SDL_SCANCODE_DOWN))
-		Rotate(-rotating_speed, 0);
-	if (App->input->GetKey(SDL_SCANCODE_LEFT))
-		Rotate(0, rotating_speed);
-	if (App->input->GetKey(SDL_SCANCODE_RIGHT))
-		Rotate(0, -rotating_speed);
-
-	if (App->input->GetKey(SDL_SCANCODE_W))
 		position += frustum.Front() * effective_speed;
-	if (App->input->GetKey(SDL_SCANCODE_S))
+	if (App->input->GetKey(SDL_SCANCODE_DOWN))
 		position -= frustum.Front() * effective_speed;
-	if (App->input->GetKey(SDL_SCANCODE_A))
-		position -= frustum.WorldRight() * effective_speed;
-	if (App->input->GetKey(SDL_SCANCODE_D))
-		position += frustum.WorldRight() * effective_speed;
-	if (App->input->GetKey(SDL_SCANCODE_Q))
-		position += frustum.Up() * effective_speed;
-	if (App->input->GetKey(SDL_SCANCODE_E))
-		position -= frustum.Up() * effective_speed;
+	if (App->input->GetKey(SDL_SCANCODE_LEFT))
+		Rotate(0, rotation_speed);
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT))
+		Rotate(0, -rotation_speed);
 
 	frustum.SetPos(position);
 }

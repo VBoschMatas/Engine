@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleRender.h"
+#include "ModuleWindow.h"
 #include "SDL/include/SDL.h"
 #include "imgui_impl_sdl.h"
 
@@ -44,10 +45,18 @@ update_status ModuleInput::Update()
                 if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED || sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
                     App->renderer->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                 break;
+			case SDL_MOUSEMOTION:
+				mouse_motion_x = sdlEvent.motion.xrel;
+				mouse_motion_y = sdlEvent.motion.yrel;
+				mouse_x = sdlEvent.motion.x;
+				mouse_y = sdlEvent.motion.y;
+				//DEBUG("MOUSE: %d, %d .... %d, %d", mouse_x, mouse_y, mouse_motion_x, mouse_motion_y);
+				break;
         }
     }
 
     keyboard = SDL_GetKeyboardState(NULL);
+	mouse_buttons = SDL_GetMouseState(NULL, NULL);
 
     return UPDATE_CONTINUE;
 }
@@ -58,4 +67,9 @@ bool ModuleInput::CleanUp()
 	DEBUG("Quitting SDL input event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 	return true;
+}
+
+void CenterMouse()
+{
+	SDL_WarpMouseInWindow(App->window->window, App->window->screen_surface->w / 2, App->window->screen_surface->h / 2);
 }
