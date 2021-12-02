@@ -21,11 +21,12 @@ public:
 		return keyboard[id];
 	}
 
-	const unsigned GetMouseButtonDown(int id) const
+	/*const unsigned GetMouseButtonDown(int id) const
 	{
-		//return mouse_buttons[id - 1];
-	}
+		return keyboard[id - 1];
+	}*/
 
 private:
 	const Uint8 *keyboard = NULL;
+	//const Uint32 mouse;
 };

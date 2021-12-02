@@ -79,9 +79,24 @@ void ModuleEditorCamera::LookAt(const float3& look_position)
 }
 
 
-void ModuleEditorCamera::Rotate(float pich, float yaw)
+void ModuleEditorCamera::Rotate(float pitch, float yaw)
 {
-	//Quat rotation = Quat::RotateAxisAngle
+	Quat rotation;
+	//Pitch
+	if (pitch != 0.0f)
+	{
+		rotation = Quat::RotateAxisAngle(frustum.WorldRight(), pitch);
+		frustum.SetUp(rotation.Mul(frustum.Up()).Normalized());
+		frustum.SetFront(rotation.Mul(frustum.Front()).Normalized());
+	}
+
+	//Yaw
+	if (yaw != 0.0f)
+	{
+		rotation = Quat::RotateY(yaw);
+		frustum.SetFront(rotation.Mul(frustum.Front()).Normalized());
+		frustum.SetUp(rotation.Mul(frustum.Up()).Normalized());
+	}
 }
 
 void ModuleEditorCamera::SetAspectRatio(unsigned int screen_width, unsigned int screen_height)
@@ -123,6 +138,16 @@ void ModuleEditorCamera::Controller()
 	static const float move_speed = 0.05f;
 
 	float effective_speed = move_speed;
+	float rotating_speed = move_speed / 7.0f;
+
+	if (App->input->GetKey(SDL_SCANCODE_UP))
+		Rotate(rotating_speed, 0);
+	if (App->input->GetKey(SDL_SCANCODE_DOWN))
+		Rotate(-rotating_speed, 0);
+	if (App->input->GetKey(SDL_SCANCODE_LEFT))
+		Rotate(0, rotating_speed);
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT))
+		Rotate(0, -rotating_speed);
 
 	if (App->input->GetKey(SDL_SCANCODE_W))
 		position += frustum.Front() * effective_speed;
@@ -136,8 +161,6 @@ void ModuleEditorCamera::Controller()
 		position += frustum.Up() * effective_speed;
 	if (App->input->GetKey(SDL_SCANCODE_E))
 		position -= frustum.Up() * effective_speed;
-	if (App->input->GetKey(SDL_SCANCODE_L))
-		lock_view != lock_view;
 
 	frustum.SetPos(position);
 }
