@@ -38,9 +38,11 @@ private:
 	float near_distance;
 	float far_distance;
 	float3 look_position;
+	bool lock_view;
 	float3 position;
 
 public:
+	void lockView() { lock_view != lock_view; };
 	float4x4 getProjection() { return frustum.ProjectionMatrix(); };
 	float4x4 getView() { return float4x4(frustum.ViewMatrix()); };
 };

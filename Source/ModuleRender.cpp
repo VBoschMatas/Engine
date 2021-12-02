@@ -89,9 +89,8 @@ bool ModuleRender::Init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	int w, h;
-	SDL_GetWindowSize(App->window->window, &w, &h);
-	glViewport(0, 0, w, h);
+	SDL_Surface* screen_surface = App->window->screen_surface;
+	glViewport(0, 0, screen_surface->w, screen_surface->h);
 
 	program = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
 
@@ -222,9 +221,6 @@ unsigned int ModuleRender::CreateEBO()
 		0, 1, 2,
 		2, 3, 0
 	};
-	/*unsigned int indices[] = {
-		2, 1, 0
-	};*/
 
 	unsigned int ebo;
 

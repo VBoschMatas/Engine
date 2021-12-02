@@ -33,6 +33,9 @@ update_status ModuleEditor::PreUpdate()
 	ImGui::NewFrame();
 
 	ImGui::ShowDemoWindow();
+
+	MenuBar(menu_items);
+
 	return UPDATE_CONTINUE;
 }
 
@@ -53,4 +56,17 @@ bool ModuleEditor::CleanUp() {
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 	return true;
+}
+
+void ModuleEditor::MenuBar(const char** items)
+{
+	ImGui::BeginMainMenuBar();
+	for (int i = 0; i < MENU_OPTIONS; ++i)
+		MenuOption(items[i]);
+	ImGui::EndMainMenuBar();
+}
+
+void ModuleEditor::MenuOption(const char* option)
+{
+	ImGui::Text(option);
 }

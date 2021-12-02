@@ -19,6 +19,7 @@ ModuleEditorCamera::~ModuleEditorCamera()
 
 bool ModuleEditorCamera::Init()
 {
+	lock_view = false;
 	InitPerspectiveMatrix();
 	LookAt(float3(0.0f, 0.0f, 0.0f));
 	return true;
@@ -33,6 +34,7 @@ update_status ModuleEditorCamera::Update()
 {
 	//LookAt(float3(0.0f, 0.0f, 0.0f));
 	Controller();
+	if (lock_view) LookAt(float3(0.0f, 0.0f, 0.0f));
 	return UPDATE_CONTINUE;
 }
 
@@ -79,7 +81,7 @@ void ModuleEditorCamera::LookAt(const float3& look_position)
 
 void ModuleEditorCamera::Rotate(float pich, float yaw)
 {
-	// TODO Rotation
+	//Quat rotation = Quat::RotateAxisAngle
 }
 
 void ModuleEditorCamera::SetAspectRatio(unsigned int screen_width, unsigned int screen_height)
@@ -118,7 +120,7 @@ void ModuleEditorCamera::InitViewMatrix()
 
 void ModuleEditorCamera::Controller()
 {
-	static const float move_speed = 0.025f;
+	static const float move_speed = 0.05f;
 
 	float effective_speed = move_speed;
 
@@ -134,6 +136,8 @@ void ModuleEditorCamera::Controller()
 		position += frustum.Up() * effective_speed;
 	if (App->input->GetKey(SDL_SCANCODE_E))
 		position -= frustum.Up() * effective_speed;
+	if (App->input->GetKey(SDL_SCANCODE_L))
+		lock_view != lock_view;
 
 	frustum.SetPos(position);
 }

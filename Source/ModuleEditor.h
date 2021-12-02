@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "SDL.h"
 
+#define MENU_OPTIONS 3
 
 class ModuleEditor : public Module
 {
@@ -15,7 +16,10 @@ public:
 	update_status Update();
 	update_status PostUpdate();
 	bool CleanUp();
-//
-//private:
-//	void* context;
+
+private:
+	const char* menu_items[MENU_OPTIONS] = { "File", "Edit", "View" };
+
+	void MenuBar(const char** items);
+	void MenuOption(const char* option);
 };
