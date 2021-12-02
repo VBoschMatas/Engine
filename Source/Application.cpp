@@ -26,11 +26,10 @@ Application::Application()
 	modules.push_back(input = new ModuleInput());
 	modules.push_back(textures = new ModuleTexture());
 	modules.push_back(editorcamera = new ModuleEditorCamera());
-	modules.push_back(renderer = new ModuleRender());
-	//modules.push_back(rendererex = new ModuleRenderExercise());
 	modules.push_back(program = new ModuleProgram());
-	modules.push_back(editor = new ModuleEditor());
+	modules.push_back(renderer = new ModuleRender());
 	modules.push_back(dd = new ModuleDebugDraw());
+	modules.push_back(editor = new ModuleEditor());
 }
 
 Application::~Application()

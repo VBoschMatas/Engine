@@ -123,9 +123,7 @@ void ModuleEditorCamera::Controller()
 	float effective_speed = move_speed;
 
 	if (App->input->GetKey(SDL_SCANCODE_W))
-	{
 		position += frustum.Front() * effective_speed;
-	}
 	if (App->input->GetKey(SDL_SCANCODE_S))
 		position -= frustum.Front() * effective_speed;
 	if (App->input->GetKey(SDL_SCANCODE_A))

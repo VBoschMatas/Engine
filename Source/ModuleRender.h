@@ -38,6 +38,5 @@ private:
 	void initTextures();
 	void RenderVBO(unsigned int vbo, unsigned int program);
 	void RenderVBOTexture(unsigned int vbo, unsigned int program);
-	void RenderVBOBase(unsigned int vbo, unsigned int program);
 	void DeleteVBO(unsigned int vbo);
 };

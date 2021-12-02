@@ -9,6 +9,7 @@
 #include "SDL.h"
 #include "MathGeoLib.h"
 #include "ModuleEditorCamera.h"
+#include "ModuleDebugDraw.h"
 
 ModuleRender::ModuleRender()
 {
@@ -121,9 +122,8 @@ bool ModuleRender::Init()
 
 update_status ModuleRender::PreUpdate()
 {
-	int w,  h;
-	SDL_GetWindowSize(App->window->window, &w, &h);
-	glViewport(0, 0, w, h);
+	SDL_Surface* screen_surface = App->window->screen_surface;
+	glViewport(0, 0, screen_surface->w, screen_surface->h);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	return UPDATE_CONTINUE;
@@ -132,8 +132,10 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update()
 {
+	SDL_Surface* screen_surface = App->window->screen_surface;
 	RenderVBOTexture(vbo, program);
-	RenderVBOBase(vbo, program);
+
+	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
 
 	//RenderVBO(vbo, program);
 
@@ -187,7 +189,6 @@ unsigned int ModuleRender::CreateVBO()
 	unsigned int vbo;
 
 	vao = CreateVAO();
-	DEBUG("VAO %d", vao);
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -264,17 +265,4 @@ void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program)
 	glBindVertexArray(vao);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
-
-void ModuleRender::RenderVBOBase(unsigned int vbo, unsigned int program)
-{
-	glUseProgram(program);
-
-	float4x4 model = float4x4::FromTRS(float3(0.0f, 0.0f, 0.0f), float4x4::RotateZ(pi / 1.0f), float3(1.0f, 1.0f, 0.0f));
-
-	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->editorcamera->getView()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->editorcamera->getProjection()[0][0]);
-
-	
 }
