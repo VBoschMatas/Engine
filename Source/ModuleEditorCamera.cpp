@@ -140,7 +140,7 @@ void ModuleEditorCamera::Controller()
 
 	float effective_speed = move_speed;
 
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT))
+	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == 3)
 	{
 		//Movement with WASD
 		if (App->input->GetKey(SDL_SCANCODE_W))
@@ -159,9 +159,10 @@ void ModuleEditorCamera::Controller()
 		// Mouse camera rotation
 		int mouse_x, mouse_y;
 		App->input->GetMouseMovement(mouse_x, mouse_y);
-		Rotate((float)mouse_y * -rotation_speed, (float)mouse_x * -rotation_speed);
+		if(mouse_x != 0 || mouse_x != 0)
+			Rotate((float)mouse_y * -rotation_speed, (float)mouse_x * -rotation_speed);
 
-		App->input->CenterMouse();
+		//App->input->CenterMouse();
 	}
 
 	//Movement & rotation with arrow keys

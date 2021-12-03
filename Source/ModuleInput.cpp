@@ -50,15 +50,22 @@ update_status ModuleInput::Update()
 				mouse_motion_y = sdlEvent.motion.yrel;
 				mouse_x = sdlEvent.motion.x;
 				mouse_y = sdlEvent.motion.y;
-				//DEBUG("MOUSE: %d, %d .... %d, %d", mouse_x, mouse_y, mouse_motion_x, mouse_motion_y);
+				
 				break;
         }
     }
-
     keyboard = SDL_GetKeyboardState(NULL);
 	mouse_buttons = SDL_GetMouseState(NULL, NULL);
 
     return UPDATE_CONTINUE;
+}
+
+update_status ModuleInput::PostUpdate()
+{
+	mouse_motion_x = 0;
+	mouse_motion_y = 0;
+
+	return UPDATE_CONTINUE;
 }
 
 // Called before quitting
