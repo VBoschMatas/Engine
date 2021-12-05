@@ -10,6 +10,7 @@ public:
 	void StartTime();
 	unsigned int ReadTime();
 	unsigned int StopTime();
+	float DeltaTime();
 
 private:
 	bool time_running;

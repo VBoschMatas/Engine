@@ -42,7 +42,7 @@ private:
 	float3 position;
 
 public:
-	void lockView() { lock_view != lock_view; };
+	//void lockView() { lock_view != lock_view; };
 	float4x4 getProjection() { return frustum.ProjectionMatrix(); };
 	float4x4 getView() { return float4x4(frustum.ViewMatrix()); };
 };

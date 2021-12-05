@@ -6,6 +6,9 @@
 #include "ModuleInput.h"
 
 #define DEGTORAD pi / 180.0f
+#define RADTODEG 180.0f / pi
+
+#define SHIFT_ACCELERATION 2
 
 ModuleEditorCamera::ModuleEditorCamera()
 {
@@ -53,7 +56,7 @@ void ModuleEditorCamera::InitPerspectiveMatrix()
 	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
 	auto screen_surface = App->window->screen_surface;
 	SetAspectRatio(screen_surface->w, screen_surface->h);
-	SetFOV(90.0f);
+	SetFOV(70.0f);
 	SetPlaneDistances(0.1f, 100.0f);
 	SetPosition(float3(0.0f, 1.0f, 10.0f));
 	float3x3 identity = float3x3::identity;
@@ -113,7 +116,13 @@ void ModuleEditorCamera::SetFOV(float deg)
 
 void ModuleEditorCamera::Zoom(float deg_diff)
 {
-	//TODO Zoom
+	float temp_fov = (horizontal_fov * RADTODEG) + deg_diff;
+	if (0.0f < temp_fov && temp_fov < 180.0f)
+	{
+		horizontal_fov = temp_fov * DEGTORAD;
+		frustum.SetHorizontalFovAndAspectRatio(horizontal_fov, aspect_ratio);
+		DEBUG("FOV: %f", horizontal_fov * RADTODEG)
+	}
 }
 
 void ModuleEditorCamera::SetPlaneDistances(const float new_near_distance, const float new_far_distance)
@@ -137,32 +146,59 @@ void ModuleEditorCamera::Controller()
 {
 	static const float move_speed = 0.05f;
 	static const float rotation_speed = 0.005f;
-
 	float effective_speed = move_speed;
 
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == 3)
+	// Actions when Left Alt is pressed
+	if (App->input->GetKey(SDL_SCANCODE_LALT))
 	{
-		//Movement with WASD
-		if (App->input->GetKey(SDL_SCANCODE_W))
-			position += frustum.Front() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_S))
-			position -= frustum.Front() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_A))
-			position -= frustum.WorldRight() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_D))
-			position += frustum.WorldRight() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_Q))
-			position += frustum.Up() * effective_speed;
-		if (App->input->GetKey(SDL_SCANCODE_E))
-			position -= frustum.Up() * effective_speed;
+		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) || App->input->GetMouseButton(SDL_BUTTON_X1))
+		{
+			int mouse_x, mouse_y;
+			App->input->GetMouseMovement(mouse_x, mouse_y);
+			if (mouse_y != 0)
+				Zoom((float)mouse_y * effective_speed);
+		}
+	}
+	else { // Use only mouse controlls if no special keys where used
+		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) || App->input->GetMouseButton(SDL_BUTTON_X1))
+		{
+			float total_speed = effective_speed;
+			if (App->input->GetKey(SDL_SCANCODE_LSHIFT))
+				total_speed *= SHIFT_ACCELERATION;
+			//Movement with WASD
+			if (App->input->GetKey(SDL_SCANCODE_W))
+				position += frustum.Front() * total_speed;
+			if (App->input->GetKey(SDL_SCANCODE_S))
+				position -= frustum.Front() * total_speed;
+			if (App->input->GetKey(SDL_SCANCODE_A))
+				position -= frustum.WorldRight() * total_speed;
+			if (App->input->GetKey(SDL_SCANCODE_D))
+				position += frustum.WorldRight() * total_speed;
+			if (App->input->GetKey(SDL_SCANCODE_Q))
+				position += frustum.Up() * total_speed;
+			if (App->input->GetKey(SDL_SCANCODE_E))
+				position -= frustum.Up() * total_speed;
 
-		// Mouse camera rotation
-		int mouse_x, mouse_y;
-		App->input->GetMouseMovement(mouse_x, mouse_y);
-		if(mouse_x != 0 || mouse_x != 0)
-			Rotate((float)mouse_y * -rotation_speed, (float)mouse_x * -rotation_speed);
-
-		//App->input->CenterMouse();
+			// Mouse camera rotation
+			int mouse_x, mouse_y;
+			App->input->GetMouseMovement(mouse_x, mouse_y);
+			if (mouse_x != 0 || mouse_y != 0)
+				Rotate((float)mouse_y * -rotation_speed, (float)mouse_x * -rotation_speed);
+		}
+		else if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE))
+		{
+			int mouse_x, mouse_y;
+			App->input->GetMouseMovement(mouse_x, mouse_y);
+			//Movement with mouse if using middle button
+			if (mouse_x > 0)
+				position -= Abs((float)mouse_x) * frustum.WorldRight() * effective_speed;
+			if (mouse_x < 0)
+				position += Abs((float)mouse_x) * frustum.WorldRight() * effective_speed;
+			if (mouse_y > 0)
+				position += Abs((float)mouse_y) * frustum.Up() * effective_speed;
+			if (mouse_y < 0)
+				position -= Abs((float)mouse_y) * frustum.Up() * effective_speed;
+		}
 	}
 
 	//Movement & rotation with arrow keys
@@ -174,6 +210,9 @@ void ModuleEditorCamera::Controller()
 		Rotate(0, rotation_speed);
 	if (App->input->GetKey(SDL_SCANCODE_RIGHT))
 		Rotate(0, -rotation_speed);
+
+	if (App->input->GetMouseWheel() != 0)
+		position += frustum.Front() * effective_speed * (float)App->input->GetMouseWheel();
 
 	frustum.SetPos(position);
 }

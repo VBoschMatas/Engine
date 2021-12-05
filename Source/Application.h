@@ -5,7 +5,6 @@
 #include "Module.h"
 
 class ModuleProgram;
-class ModuleRenderExercise;
 class ModuleRender;
 class ModuleWindow;
 class ModuleTextures;
@@ -14,8 +13,6 @@ class ModuleEditor;
 class ModuleEditorCamera;
 class ModuleTexture;
 class ModuleDebugDraw;
-class MicroTimer;
-class Timer;
 
 class Application
 {
@@ -30,7 +27,6 @@ public:
 
 public:
 	ModuleProgram* program = nullptr;
-	ModuleRenderExercise* rendererex = nullptr;
 	ModuleRender* renderer = nullptr;
 	ModuleWindow* window = nullptr;
 	ModuleInput* input = nullptr;
@@ -40,8 +36,6 @@ public:
 	ModuleDebugDraw* dd = nullptr;
 
 private:
-	Timer* timer = nullptr;
-	MicroTimer* micro_timer = nullptr;
 	std::list<Module*> modules;
 
 };

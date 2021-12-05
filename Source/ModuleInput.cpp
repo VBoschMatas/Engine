@@ -30,7 +30,7 @@ bool ModuleInput::Init()
 }
 
 // Called every draw update
-update_status ModuleInput::Update()
+update_status ModuleInput::PreUpdate()
 {
     SDL_Event sdlEvent;
 
@@ -52,6 +52,8 @@ update_status ModuleInput::Update()
 				mouse_y = sdlEvent.motion.y;
 				
 				break;
+			case SDL_MOUSEWHEEL:
+				mouse_wheel = sdlEvent.wheel.y;
         }
     }
     keyboard = SDL_GetKeyboardState(NULL);
@@ -64,7 +66,8 @@ update_status ModuleInput::PostUpdate()
 {
 	mouse_motion_x = 0;
 	mouse_motion_y = 0;
-
+	mouse_wheel = 0;
+	//SDL_ShowCursor(SDL_ENABLE);
 	return UPDATE_CONTINUE;
 }
 
@@ -74,9 +77,4 @@ bool ModuleInput::CleanUp()
 	DEBUG("Quitting SDL input event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 	return true;
-}
-
-void CenterMouse()
-{
-	SDL_WarpMouseInWindow(App->window->window, App->window->screen_surface->w / 2, App->window->screen_surface->h / 2);
 }

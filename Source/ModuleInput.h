@@ -23,11 +23,9 @@ public:
 	~ModuleInput();
 
 	bool Init();
-	update_status Update();
+	update_status PreUpdate();
 	update_status PostUpdate();
 	bool CleanUp();
-
-	void CenterMouse();
 
 	// Check key states (includes mouse and joy buttons)
 	const unsigned GetKey(int id) const
@@ -35,9 +33,9 @@ public:
 		return keyboard[id];
 	}
 
-	const unsigned GetMouseButton(int id) const
+	const bool GetMouseButton(int id) const
 	{
-		return mouse_buttons;
+		return mouse_buttons == id;
 	}
 
 	const void GetMouseMovement(int &_x, int &_y) const
@@ -46,9 +44,16 @@ public:
 		_y = mouse_motion_y;
 	}
 
+	int GetMouseWheel() const
+	{
+		return mouse_wheel;
+	}
+
 private:
+
 	const Uint8 *keyboard = NULL;
 	Uint32 mouse_buttons;
+	int mouse_wheel;
 	int mouse_motion_x, mouse_motion_y;
 	int mouse_x, mouse_y;
 };
