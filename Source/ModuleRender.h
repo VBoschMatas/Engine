@@ -34,9 +34,6 @@ private:
 	unsigned int CreateVBO();
 	unsigned int CreateVAO();
 	unsigned int CreateEBO();
-	void initFrustum();
-	void initTextures();
-	void RenderVBO(unsigned int vbo, unsigned int program);
 	void RenderVBOTexture(unsigned int vbo, unsigned int program);
 	void DeleteVBO(unsigned int vbo);
 };

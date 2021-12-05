@@ -163,16 +163,8 @@ bool ModuleRender::CleanUp()
 
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
-}
-
-void ModuleRender::initFrustum()
-{
-
-}
-
-void ModuleRender::initTextures()
-{
-
+	SDL_UpdateWindowSurface(App->window->window);
+	App->window->screen_surface = SDL_GetWindowSurface(App->window->window);
 }
 
 unsigned int ModuleRender::CreateVBO()
@@ -235,19 +227,9 @@ void ModuleRender::DeleteVBO(unsigned int vbo)
 	glDeleteBuffers(1, &vbo);
 }
 
-void ModuleRender::RenderVBO(unsigned int vbo, unsigned int program)
-{
-	glUseProgram(program);
-
-	glBindVertexArray(vao);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
-
 void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program)
 {
-	glUseProgram(program);
+	glUseProgram(App->program->program);
 
 	float4x4 model = float4x4::FromTRS(float3(2.0f, -2.0f, 0.0f), float4x4::RotateZ(pi / 20.0f), float3(10.0f, 10.0f, 0.0f));
 

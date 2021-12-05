@@ -26,7 +26,6 @@ private:
 	void SetFOV(float deg);
 	void Zoom(float deg_diff);
 	void SetPlaneDistances(const float near_distance, const float far_distance);
-	void WindowResized(unsigned int screen_width, unsigned int screen_height);
 
 	void Controller();
 
@@ -43,6 +42,8 @@ private:
 
 public:
 	//void lockView() { lock_view != lock_view; };
+	void WindowResized(unsigned int screen_width, unsigned int screen_height);
+
 	float4x4 getProjection() { return frustum.ProjectionMatrix(); };
 	float4x4 getView() { return float4x4(frustum.ViewMatrix()); };
 };

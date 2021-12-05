@@ -121,7 +121,6 @@ void ModuleEditorCamera::Zoom(float deg_diff)
 	{
 		horizontal_fov = temp_fov * DEGTORAD;
 		frustum.SetHorizontalFovAndAspectRatio(horizontal_fov, aspect_ratio);
-		DEBUG("FOV: %f", horizontal_fov * RADTODEG)
 	}
 }
 
