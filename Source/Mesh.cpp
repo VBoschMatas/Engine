@@ -1,57 +1,40 @@
 #include "Mesh.h"
 #include "Application.h"
-#include "Globals.h"
 #include "ModuleProgram.h"
 #include "ModuleEditorCamera.h"
 #include "GL/glew.h"
 #include "Math/float2.h"
 #include "Math/float4x4.h"
 
-void Mesh::LoadVBO(const aiMesh* mesh)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<unsigned int> textures)
+{
+	this->vertices = vertices;
+	this->indices = indices;
+	this->textures = textures;
+
+	LoadVBO();
+	LoadEBO();
+	CreateVAO();
+}
+
+void Mesh::LoadVBO()
 {
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	unsigned int vertex_size = (sizeof(float) * 3 + sizeof(float) * 2);
-	unsigned int buffer_size = vertex_size * mesh->mNumVertices;
-	glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
-	unsigned position_size = sizeof(float) * 3 * mesh->mNumVertices;
-	glBufferSubData(GL_ARRAY_BUFFER, 0, position_size, mesh->mVertices);
-
-	unsigned int uv_offset = position_size;
-	unsigned int uv_size = sizeof(float) * 2 * mesh->mNumVertices;
-	float2* uvs = (float2*)(glMapBufferRange(GL_ARRAY_BUFFER, uv_offset, uv_size, GL_MAP_WRITE_BIT));
-
-	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
-	{
-		uvs[i] = float2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
-	}
-
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-	num_vertices = mesh->mNumVertices;
+	num_vertices = vertices.size();
 }
 
-void Mesh::LoadEBO(const aiMesh* mesh)
+void Mesh::LoadEBO()
 {
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-	unsigned int index_size = sizeof(unsigned) * mesh->mNumFaces*3;
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, nullptr, GL_STATIC_DRAW);
-	unsigned int* indices = (unsigned int*)(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_MAP_WRITE_BIT));
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
-	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
-	{
-		assert(mesh->mFaces[i].mNumIndices == 3);
-
-		*(indices++) = mesh->mFaces[i].mIndices[0];
-		*(indices++) = mesh->mFaces[i].mIndices[1];
-		*(indices++) = mesh->mFaces[i].mIndices[2];
-	}
-
-	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-	num_indices = mesh->mNumFaces * 3;
+	num_indices = indices.size();
 }
 
 void Mesh::CreateVAO()
@@ -62,15 +45,14 @@ void Mesh::CreateVAO()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	// Might change when adding normals
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * num_vertices));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 }
 
-void Mesh::Draw(const std::vector<unsigned int>& model_textures)
+void Mesh::Draw(unsigned int program)
 {
-	unsigned int program = App->program->program;
 	const float4x4& view = App->editorcamera->getView();
 	const float4x4 proj = App->editorcamera->getProjection();
 	float4x4 model = float4x4::identity;
@@ -80,11 +62,16 @@ void Mesh::Draw(const std::vector<unsigned int>& model_textures)
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, (const float*)&model);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, (const float*)&view);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, (const float*)&proj);
-	
+	for (unsigned int i = 0; i < textures.size(); ++i)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
+		glBindTexture(GL_TEXTURE_2D, textures[i]);
+	}
+
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, model_textures[0]); //material index
-	glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
 
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 }

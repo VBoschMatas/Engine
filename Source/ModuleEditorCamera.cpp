@@ -145,7 +145,8 @@ void ModuleEditorCamera::Controller()
 {
 	static const float move_speed = 0.05f;
 	static const float rotation_speed = 0.005f;
-	float effective_speed = move_speed;
+	float effective_speed = move_speed * Time->DeltaTime();
+	DEBUG("DELTA TIME: %f", Time->DeltaTime());
 
 	// Actions when Left Alt is pressed
 	if (App->input->GetKey(SDL_SCANCODE_LALT))

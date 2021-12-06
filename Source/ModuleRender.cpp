@@ -10,6 +10,7 @@
 #include "MathGeoLib.h"
 #include "ModuleEditorCamera.h"
 #include "ModuleDebugDraw.h"
+#include "Model.h"
 
 ModuleRender::ModuleRender()
 {
@@ -94,27 +95,21 @@ bool ModuleRender::Init()
 
 	program = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
 
-	vbo = CreateVBO();
+	//vbo = CreateVBO();
 
 	// Generate
-	glGenTextures(1, &texture_id);
-	glBindTexture(GL_TEXTURE_2D, texture_id);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	//unsigned int img_id = App->textures->LoadTexture("textures/Lenna.png");
 
-	unsigned int img_id = App->textures->LoadTexture("textures/Lenna.png");
+	
 
-	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
-		ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
-		ilGetData());
-	glGenerateMipmap(GL_TEXTURE_2D);
+	//glUseProgram(program);
+	//glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
 
-	glUseProgram(program);
-	glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
+	//ilDeleteImages(1, &img_id);
 
-	ilDeleteImages(1, &img_id);
-
+	model = new Model();
+	model->Load("BakerHouse.fbx");
 
 	return true;
 }
@@ -132,9 +127,11 @@ update_status ModuleRender::PreUpdate()
 update_status ModuleRender::Update()
 {
 	SDL_Surface* screen_surface = App->window->screen_surface;
-	RenderVBOTexture(vbo, program);
+	//RenderVBOTexture(vbo, program);
 
 	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
+
+	model->Draw(program);
 
 	//RenderVBO(vbo, program);
 
@@ -231,7 +228,7 @@ void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program)
 {
 	glUseProgram(App->program->program);
 
-	float4x4 model = float4x4::FromTRS(float3(2.0f, -2.0f, 0.0f), float4x4::RotateZ(pi / 20.0f), float3(10.0f, 10.0f, 0.0f));
+	float4x4 model = float4x4::identity;
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->editorcamera->getView()[0][0]);

@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include "Model.h"
 #include "Math/float4x4.h"
 #include "MathGeoLib/Geometry/Frustum.h"
 
@@ -30,6 +31,8 @@ private:
 	unsigned int texture_id;
 
 	unsigned int program;
+
+	Model* model;
 
 	unsigned int CreateVBO();
 	unsigned int CreateVAO();

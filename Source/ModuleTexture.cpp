@@ -54,7 +54,20 @@ unsigned int ModuleTexture::LoadTexture(const char *path)
 	ilBindImage(texid);
 	ilLoadImage(path);
 	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-	iluRotate(180.0f);
+
+	unsigned int texture_id;
+
+	glGenTextures(1, &texture_id);
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
+		ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
+		ilGetData());
+	glGenerateMipmap(GL_TEXTURE_2D);
+
 	return texid;
 }
 
