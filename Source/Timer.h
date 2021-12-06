@@ -1,6 +1,7 @@
 #pragma once
 #include "Globals.h"
 #include <math.h>
+#include <algorithm>
 
 #define MSTOSEC (1.0f/1000.0f)
 #define FPS_60 16.66666666666667f
@@ -24,14 +25,6 @@ private:
 
 class TimeManager
 {
-private:
-	size_t current_index;
-	unsigned int current_frame;
-	float frame_times_ms[TIMERBUFFER];
-	float delta_time;
-	float fps;
-	Timer timer;
-
 public:
 	TimeManager() : current_index(-1), current_frame(0), delta_time(0.0f), fps(0.0f), timer()
 	{
@@ -40,32 +33,9 @@ public:
 
 	~TimeManager() {};
 
-	void Start()
-	{
-		timer.StartTime();
-	};
+	void Start();
 
-	void End(bool cap_60 = true)
-	{
-		delta_time = timer.ReadTime();
-
-		if (cap_60)
-		{
-			float delay_amount = std::max(0.0f, (FPS_60 - delta_time));
-
-			delta_time += delay_amount;
-
-			SDL_Delay(delay_amount);
-		}
-
-		current_index = (current_index + 1) % TIMERBUFFER;
-
-		frame_times_ms[current_index] = delta_time;
-
-		++current_frame;
-
-		fps = CalculateFPS();
-	};
+	void End(bool cap_60 = true);
 
 	float FPS() const
 	{
@@ -83,21 +53,15 @@ public:
 	};
 
 private:
-	float CalculateFPS()
-	{
-		float sum = 0.0f;
-		for (size_t i = 0; i < TIMERBUFFER; ++i)
-		{
-			sum += frame_times_ms[i];
-		}
+private:
+	size_t current_index;
+	unsigned int current_frame;
+	float frame_times_ms[TIMERBUFFER];
+	float delta_time;
+	float fps;
+	Timer timer;
 
-		if (current_frame < TIMERBUFFER)
-		{
-			return 1.0f / (sum * MSTOSEC / (float)current_frame);
-		}
-
-		return 1.0f / (sum * MSTOSEC * (1/ TIMERBUFFER));
-	}
+	float CalculateFPS();
 };
 
 extern TimeManager* Time;

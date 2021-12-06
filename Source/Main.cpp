@@ -18,11 +18,14 @@ enum main_states
 };
 
 Application* App = NULL;
+TimeManager* Time = NULL;
 
 int main(int argc, char ** argv)
 {
 	int main_return = EXIT_FAILURE;
 	main_states state = MAIN_CREATION;
+
+	Time = new TimeManager();
 
 	while (state != MAIN_EXIT)
 	{
@@ -53,7 +56,12 @@ int main(int argc, char ** argv)
 
 		case MAIN_UPDATE:
 		{
+			Time->Start();
+
 			int update_return = App->Update();
+
+
+			Time->End();
 
 			if (update_return == UPDATE_ERROR)
 			{
@@ -85,6 +93,7 @@ int main(int argc, char ** argv)
 	}
 
 	delete App;
+	delete Time;
 	DEBUG("Bye :)\n");
 	return main_return;
 }
