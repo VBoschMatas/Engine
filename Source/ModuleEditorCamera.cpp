@@ -39,7 +39,11 @@ update_status ModuleEditorCamera::Update()
 {
 	//LookAt(float3(0.0f, 0.0f, 0.0f));
 	Controller();
-	if (lock_view) LookAt(float3(0.0f, 0.0f, 0.0f));
+	if (lock_view)
+	{
+		DEBUG("LOOKING AT")
+		LookAt(float3(0.0f, 0.0f, 0.0f));
+	}
 	return UPDATE_CONTINUE;
 }
 
@@ -150,13 +154,21 @@ void ModuleEditorCamera::Controller()
 
 	// Actions when Left Alt is pressed
 	if (App->input->GetKey(SDL_SCANCODE_LALT))
-	{
+	{	// For some reason my laptop's mouse instead of giving "BUTTON_RIGHT" gives "BUTTON_X1" on right click
+		// will be changed once I can use another mouse
 		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) || App->input->GetMouseButton(SDL_BUTTON_X1))
 		{
 			int mouse_x, mouse_y;
 			App->input->GetMouseMovement(mouse_x, mouse_y);
 			if (mouse_y != 0)
 				Zoom((float)mouse_y * move_speed);
+		}
+		if (App->input->GetMouseButton(SDL_BUTTON_LEFT))
+		{
+			int mouse_x, mouse_y;
+			App->input->GetMouseMovement(mouse_x, mouse_y);
+			/*if (mouse_y != 0)
+				Zoom((float)mouse_y * move_speed);*/
 		}
 	}
 	else { // Use only mouse controlls if no special keys where used
@@ -213,6 +225,11 @@ void ModuleEditorCamera::Controller()
 
 	if (App->input->GetMouseWheel() != 0)
 		position += frustum.Front() * move_speed * (float)App->input->GetMouseWheel() * 2;
+
+	if (App->input->GetPressedKey(SDL_SCANCODE_F))
+	{
+		lock_view = !lock_view;
+	}
 
 	frustum.SetPos(position);
 }

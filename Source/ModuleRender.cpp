@@ -95,19 +95,6 @@ bool ModuleRender::Init()
 
 	program = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
 
-	//vbo = CreateVBO();
-
-	// Generate
-
-	//unsigned int img_id = App->textures->LoadTexture("textures/Lenna.png");
-
-	
-
-	//glUseProgram(program);
-	//glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
-
-	//ilDeleteImages(1, &img_id);
-
 	model = new Model();
 	model->Load("BakerHouse.fbx");
 
@@ -127,13 +114,10 @@ update_status ModuleRender::PreUpdate()
 update_status ModuleRender::Update()
 {
 	SDL_Surface* screen_surface = App->window->screen_surface;
-	//RenderVBOTexture(vbo, program);
 
 	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
 
 	model->Draw(program);
-
-	//RenderVBO(vbo, program);
 
 	return UPDATE_CONTINUE;
 }
@@ -162,82 +146,4 @@ void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
 	SDL_UpdateWindowSurface(App->window->window);
 	App->window->screen_surface = SDL_GetWindowSurface(App->window->window);
-}
-
-unsigned int ModuleRender::CreateVBO()
-{
-	float vertices[] = {
-		//Quad					//Texture
-		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,
-		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,
-		0.5f, 0.5f, 0.0f,		1.0f, 1.0f,
-		-0.5f, 0.5f, 0.0f,		0.0f, 1.0f 
-	};
-
-	unsigned int vbo;
-
-	vao = CreateVAO();
-
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	ebo = CreateEBO();
-
-	return vbo;
-}
-
-unsigned int ModuleRender::CreateVAO()
-{
-	unsigned int vao;
-
-	glGenVertexArrays(1, &vao);
-
-	glBindVertexArray(vao);
-
-	return vao;
-}
-
-unsigned int ModuleRender::CreateEBO()
-{
-	unsigned int indices[] = {
-		0, 1, 2,
-		2, 3, 0
-	};
-
-	unsigned int ebo;
-
-	glGenBuffers(1, &ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	return ebo;
-}
-
-void ModuleRender::DeleteVBO(unsigned int vbo)
-{
-	glDeleteBuffers(1, &vbo);
-}
-
-void ModuleRender::RenderVBOTexture(unsigned int vbo, unsigned int program)
-{
-	glUseProgram(App->program->program);
-
-	float4x4 model = float4x4::identity;
-
-	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->editorcamera->getView()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->editorcamera->getProjection()[0][0]);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture_id);
-
-	glBindVertexArray(vao);
-
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

@@ -54,10 +54,12 @@ update_status ModuleInput::PreUpdate()
 				mouse_motion_y = sdlEvent.motion.yrel;
 				mouse_x = sdlEvent.motion.x;
 				mouse_y = sdlEvent.motion.y;
-				
 				break;
 			case SDL_MOUSEWHEEL:
 				mouse_wheel = sdlEvent.wheel.y;
+				break;
+			case SDL_KEYUP:
+				kybrd_button = sdlEvent.key.keysym.scancode;
         }
     }
     keyboard = SDL_GetKeyboardState(NULL);
@@ -71,7 +73,7 @@ update_status ModuleInput::PostUpdate()
 	mouse_motion_x = 0;
 	mouse_motion_y = 0;
 	mouse_wheel = 0;
-	//SDL_ShowCursor(SDL_ENABLE);
+	kybrd_button = NULL;
 	return UPDATE_CONTINUE;
 }
 

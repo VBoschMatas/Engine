@@ -33,6 +33,11 @@ public:
 		return keyboard[id];
 	}
 
+	const bool GetPressedKey(unsigned int id) const
+	{
+		return kybrd_button == id;
+	}
+
 	const bool GetMouseButton(int id) const
 	{
 		return mouse_buttons == id;
@@ -53,6 +58,7 @@ private:
 
 	const Uint8 *keyboard = NULL;
 	Uint32 mouse_buttons;
+	Uint8 kybrd_button;
 	int mouse_wheel;
 	int mouse_motion_x, mouse_motion_y;
 	int mouse_x, mouse_y;
