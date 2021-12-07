@@ -8,8 +8,8 @@
 #define DEGTORAD pi / 180.0f
 #define RADTODEG 180.0f / pi
 
-#define MOVE_SPEED 5.0f
-#define ROTATION_SPEED 1.0f
+#define MOVE_SPEED 4.0f
+#define ROTATION_SPEED 0.5f
 #define SHIFT_ACCELERATION 2
 
 ModuleEditorCamera::ModuleEditorCamera()
@@ -39,9 +39,10 @@ update_status ModuleEditorCamera::Update()
 {
 	//LookAt(float3(0.0f, 0.0f, 0.0f));
 	Controller();
-	if (lock_view)
+	if (lock_view) //For now all objects will be at 0, 0, 0. Once object selection is incorporated this will change
 	{
-		DEBUG("LOOKING AT")
+		lock_distance = frustum.Pos().Distance(float3(0, 0, 0));
+		DEBUG("DISTANCE TO CENTER: %f", lock_distance);
 		LookAt(float3(0.0f, 0.0f, 0.0f));
 	}
 	return UPDATE_CONTINUE;
@@ -95,8 +96,12 @@ void ModuleEditorCamera::Rotate(float pitch, float yaw)
 	if (pitch != 0.0f)
 	{
 		rotation = Quat::RotateAxisAngle(frustum.WorldRight(), pitch);
-		frustum.SetUp(rotation.Mul(frustum.Up()).Normalized());
-		frustum.SetFront(rotation.Mul(frustum.Front()).Normalized());
+		float3 temp_up = rotation.Mul(frustum.Up()).Normalized();
+		if (RADTODEG * temp_up.AngleBetween(float3(0, 1, 0)) <= 90)
+		{
+			frustum.SetUp(rotation.Mul(frustum.Up()).Normalized());
+			frustum.SetFront(rotation.Mul(frustum.Front()).Normalized());
+		}
 	}
 
 	//Yaw
@@ -167,6 +172,7 @@ void ModuleEditorCamera::Controller()
 		{
 			int mouse_x, mouse_y;
 			App->input->GetMouseMovement(mouse_x, mouse_y);
+			//TODO orbit
 			/*if (mouse_y != 0)
 				Zoom((float)mouse_y * move_speed);*/
 		}
@@ -224,7 +230,12 @@ void ModuleEditorCamera::Controller()
 		Rotate(0, -rotation_speed);
 
 	if (App->input->GetMouseWheel() != 0)
-		position += frustum.Front() * move_speed * (float)App->input->GetMouseWheel() * 2;
+	{
+		float wheel_speed = move_speed;
+		if (lock_view)
+			wheel_speed *= (lock_distance/3);
+		position += frustum.Front() * wheel_speed * (float)App->input->GetMouseWheel() * 2;
+	}
 
 	if (App->input->GetPressedKey(SDL_SCANCODE_F))
 	{

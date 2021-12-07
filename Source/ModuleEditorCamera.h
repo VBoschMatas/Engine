@@ -38,10 +38,10 @@ private:
 	float far_distance;
 	float3 look_position;
 	bool lock_view;
+	float lock_distance;
 	float3 position;
 
 public:
-	//void lockView() { lock_view != lock_view; };
 	void WindowResized(unsigned int screen_width, unsigned int screen_height);
 
 	float4x4 getProjection() { return frustum.ProjectionMatrix(); };
