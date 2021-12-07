@@ -22,11 +22,16 @@ void Model::Load(std::string file_name)
 
 	directory = file_name.substr(0, file_name.find_last_of('/'));
 
+	std::vector<float3> all_vertices;
+
 	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
-		meshes.push_back(LoadMeshes(mesh, scene));
+		meshes.push_back(LoadMeshes(mesh, scene, all_vertices));
 	}
+
+	bounding_box = OBB::OptimalEnclosingOBB(&all_vertices[0], all_vertices.size());
+
 	/*const aiScene* scene = aiImportFile(file_name, aiProcessPreset_TargetRealtime_MaxQuality);
 	if (scene)
 	{
@@ -78,7 +83,7 @@ void Model::Load(std::string file_name)
 //	}
 //}
 
-Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene)
+Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
@@ -93,6 +98,7 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene)
 		p_vector.y = mesh->mVertices[i].y;
 		p_vector.z = mesh->mVertices[i].z;
 		vertex.position = p_vector;
+		comb_vertices.push_back(p_vector);
 
 		if (mesh->mTextureCoords[0])
 		{
@@ -137,8 +143,6 @@ std::vector<unsigned int> Model::LoadTextures(aiMaterial* material, aiTextureTyp
 		unsigned int texture = App->textures->LoadTexture(path.C_Str());
 		textures.push_back(texture);
 		App->textures->UnloadTexture(1, &texture);
-
-		DEBUG("Texture %d: %d", i, textures[i]);
 	}
 	
 	return textures;

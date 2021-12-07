@@ -4,6 +4,8 @@
 #include "GL/glew.h"
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
+#include "ModuleRender.h"
+#include "Geometry/OBB.h"
 
 #define DEGTORAD pi / 180.0f
 #define RADTODEG 180.0f / pi
@@ -42,9 +44,11 @@ update_status ModuleEditorCamera::Update()
 	if (lock_view) //For now all objects will be at 0, 0, 0. Once object selection is incorporated this will change
 	{
 		lock_distance = frustum.Pos().Distance(float3(0, 0, 0));
-		DEBUG("DISTANCE TO CENTER: %f", lock_distance);
 		LookAt(float3(0.0f, 0.0f, 0.0f));
 	}
+
+	DEBUG("DISTANCE: %f", App->renderer->model->bounding_box.Distance(frustum.Pos()));
+
 	return UPDATE_CONTINUE;
 }
 
@@ -232,8 +236,9 @@ void ModuleEditorCamera::Controller()
 	if (App->input->GetMouseWheel() != 0)
 	{
 		float wheel_speed = move_speed;
+		//When the view is locked the camera will be slower the closest it is from the object
 		if (lock_view)
-			wheel_speed *= (lock_distance/3);
+			wheel_speed *= ((App->renderer->model->bounding_box.Distance(frustum.Pos()) + 0.5f)/3.0f);
 		position += frustum.Front() * wheel_speed * (float)App->input->GetMouseWheel() * 2;
 	}
 

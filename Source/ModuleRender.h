@@ -23,6 +23,8 @@ public:
 	void WindowResized(unsigned width, unsigned height);
 	void* context;
 
+	Model* model;
+
 private:
 	unsigned int vao;
 	unsigned int vbo;
@@ -31,8 +33,6 @@ private:
 	unsigned int texture_id;
 
 	unsigned int program;
-
-	Model* model;
 
 	unsigned int CreateVBO();
 	unsigned int CreateVAO();
