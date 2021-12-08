@@ -83,11 +83,6 @@ void ModuleEditor::MainMenuBar()
 				console_window = true;
 			}
 
-			if (ImGui::MenuItem("Render Exercise"))
-			{
-				mesh_window = true;
-			}
-
 			if (ImGui::MenuItem("Performance", (const char*) 0, performance_window))
 			{
 				performance_window = !performance_window;
@@ -124,19 +119,6 @@ void ModuleEditor::MainMenuBar()
 		ImGui::EndMainMenuBar();
 	}
 }
-
-void ModuleEditor::MenuBar(const char** items)
-{
-	ImGui::BeginMainMenuBar();
-	for (int i = 0; i < MENU_OPTIONS; ++i)
-		//MenuOption(items[i]);
-	ImGui::EndMainMenuBar();
-}
-
-//void ModuleEditor::MenuOption(const char* option)
-//{
-//	ImGui::Text(option);
-//}
 
 void ModuleEditor::AboutWindow()
 {
