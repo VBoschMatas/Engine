@@ -28,8 +28,6 @@ ModuleEditor::~ModuleEditor()
 
 bool ModuleEditor::Init()
 {
-	char* license_path = util::ConcatCStrings(App->GetWorkingDirectory(), "\\..\\LICENSE");
-	util::ReadFile(license_file_path, &license_text);
 
 	char buffer[MAX_PATH];
 	_getcwd(buffer, MAX_PATH);
