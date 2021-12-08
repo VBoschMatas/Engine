@@ -1,7 +1,6 @@
 #include "Model.h"
 #include <direct.h>
 #include <shlwapi.h>
-#include <filesystem>
 #include "Application.h"
 #include "ModuleProgram.h"
 #include "ModuleTexture.h"
@@ -112,6 +111,10 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 std::vector<unsigned int> Model::LoadTextures(aiMaterial* material, aiTextureType type)
 {
 	std::vector<unsigned int> textures;
+
+	unsigned int n_textures = material->GetTextureCount(type);
+	if (n_textures == 0)
+		console->AddLog("This model has no textures!");
 
 	for (unsigned int i = 0; i < material->GetTextureCount(type); ++i)
 	{

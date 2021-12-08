@@ -36,7 +36,7 @@ public:
 	inline void ImGui()
 	{
 		int counter = 0;
-		int current_pos = start;
+		int current_pos = start - 1;
 
 		while (counter < CONSOLE_MAX_LINES - 1)
 		{

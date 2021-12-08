@@ -254,3 +254,17 @@ void ModuleEditorCamera::Controller()
 
 	frustum.SetPos(position);
 }
+
+void ModuleEditorCamera::FitNewModel()
+{
+	float3 extreme_point = App->renderer->model->bounding_box.ExtremePoint(float3(1.0f, 1.0f, 1.0f));
+	float extreme_dist = 1.5f;
+	SetPosition(extreme_point * extreme_dist);
+	LookAt(float3(0.0f, 0.0f, 0.0f));
+	while (!frustum.Contains(App->renderer->model->bounding_box) && extreme_dist < 15.0f)
+	{
+		SetPosition(extreme_point * extreme_dist);
+		LookAt(float3(0.0f, 0.0f, 0.0f));
+		extreme_dist += 0.1f;
+	}
+}

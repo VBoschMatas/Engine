@@ -157,6 +157,7 @@ void ModuleRender::DroppedModel(char* path)
 
 	model = new Model();
 	model->Load(path_name);
+	App->editorcamera->FitNewModel();
 }
 
 
