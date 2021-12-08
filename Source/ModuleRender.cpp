@@ -96,7 +96,7 @@ bool ModuleRender::Init()
 	program = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
 
 	model = new Model();
-	model->Load("BakerHouse.fbx");
+	model->Load("models/BakerHouse.fbx");
 
 	return true;
 }

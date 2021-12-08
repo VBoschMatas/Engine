@@ -303,8 +303,10 @@
     <ClInclude Include="ModuleProgram.h" />
     <ClInclude Include="ModuleRender.h" />
     <ClInclude Include="ModuleTexture.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="ModuleWindow.h" />
+    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\Geometry\QuadTree.inl" />
@@ -313,6 +315,9 @@
     <None Include="MathGeoLib\Geometry\TriangleMesh_IntersectRay_SSE.inl" />
     <None Include="MathGeoLib\Math\float2.inl" />
     <None Include="MathGeoLib\Math\Matrix.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Engine.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

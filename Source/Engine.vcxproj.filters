@@ -428,6 +428,8 @@
     <ClInclude Include="ModuleDebugDraw.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imGui">
@@ -456,5 +458,8 @@
     <None Include="MathGeoLib\Math\Matrix.inl">
       <Filter>MathGeoLib</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Engine.rc" />
   </ItemGroup>
 </Project>

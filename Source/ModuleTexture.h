@@ -19,7 +19,7 @@ private:
 	bool success;
 
 public:
-	unsigned int LoadTexture(const char *path);
+	unsigned int LoadTexture(const char *path, bool &texture_found);
 	void UnloadTexture(int i, const unsigned int* texture);
 	unsigned int getTexId() { return texid; };
 };

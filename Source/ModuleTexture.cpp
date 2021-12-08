@@ -48,11 +48,12 @@ bool ModuleTexture::CleanUp()
 	return true;
 }
 
-unsigned int ModuleTexture::LoadTexture(const char *path)
+unsigned int ModuleTexture::LoadTexture(const char *path, bool &texture_found)
 {
+
 	ilGenImages(1, &texid);
 	ilBindImage(texid);
-	ilLoadImage(path);
+	texture_found = ilLoadImage(path);
 	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 
 	unsigned int texture_id;
