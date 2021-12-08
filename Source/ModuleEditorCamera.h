@@ -25,6 +25,7 @@ private:
 	void SetAspectRatio(unsigned int screen_width, unsigned int screen_height);
 	void SetFOV(float deg);
 	void Zoom(float deg_diff);
+	void Orbit(float pitch, float yaw, float3 object_position);
 	void SetPlaneDistances(const float near_distance, const float far_distance);
 
 	void Controller();

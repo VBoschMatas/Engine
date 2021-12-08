@@ -43,11 +43,9 @@ update_status ModuleEditorCamera::Update()
 	Controller();
 	if (lock_view) //For now all objects will be at 0, 0, 0. Once object selection is incorporated this will change
 	{
-		lock_distance = frustum.Pos().Distance(float3(0, 0, 0));
+		lock_distance = frustum.Pos().Distance(float3(0.0f, 0.0f, 0.0f));
 		LookAt(float3(0.0f, 0.0f, 0.0f));
 	}
-
-	DEBUG("DISTANCE: %f", App->renderer->model->bounding_box.Distance(frustum.Pos()));
 
 	return UPDATE_CONTINUE;
 }
@@ -107,7 +105,6 @@ void ModuleEditorCamera::Rotate(float pitch, float yaw)
 			frustum.SetFront(rotation.Mul(frustum.Front()).Normalized());
 		}
 	}
-
 	//Yaw
 	if (yaw != 0.0f)
 	{
@@ -137,6 +134,14 @@ void ModuleEditorCamera::Zoom(float deg_diff)
 		horizontal_fov = temp_fov * DEGTORAD;
 		frustum.SetHorizontalFovAndAspectRatio(horizontal_fov, aspect_ratio);
 	}
+}
+
+void ModuleEditorCamera::Orbit(float pitch, float yaw, float3 object_position)
+{
+	float3 cam_position = frustum.Pos();
+	SetPosition(object_position);
+	Rotate(pitch, yaw);
+	SetPosition(frustum.Front() * -lock_distance);
 }
 
 void ModuleEditorCamera::SetPlaneDistances(const float new_near_distance, const float new_far_distance)
@@ -172,13 +177,13 @@ void ModuleEditorCamera::Controller()
 			if (mouse_y != 0)
 				Zoom((float)mouse_y * move_speed);
 		}
-		if (App->input->GetMouseButton(SDL_BUTTON_LEFT))
+		// Only orbit if the model is focused
+		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) && lock_view)
 		{
 			int mouse_x, mouse_y;
 			App->input->GetMouseMovement(mouse_x, mouse_y);
-			//TODO orbit
-			/*if (mouse_y != 0)
-				Zoom((float)mouse_y * move_speed);*/
+			if (mouse_x != 0 || mouse_y != 0) //Orbit now will orbit (0, 0, 0), once objects are selectable this will change
+				Orbit((float)mouse_y * -rotation_speed, (float)mouse_x * -rotation_speed, float3(0.0f, 0.0f, 0.0f));
 		}
 	}
 	else { // Use only mouse controlls if no special keys where used
