@@ -18,7 +18,6 @@ public:
 private:
 	//Windows
 	bool console_window = false;
-	bool performance_window = false;
 	bool about_window = false;
 	bool properties_window = false;
 	bool configuration_window = false;
@@ -31,8 +30,10 @@ private:
 
 	void MainMenuBar();
 	void AboutWindow();
-	void PerformanceWindow();
 	void ConsoleWindow();
 	void PropertiesWindow();
 	void ConfigurationWindow();
+
+	void VirtualMemory(float& total, float& consumed);
+	void PhysicalMemory(float& total, float& consumed);
 };

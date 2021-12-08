@@ -160,9 +160,17 @@ void ModuleRender::DroppedModel(char* path)
 	App->editorcamera->FitNewModel();
 }
 
-
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
 	SDL_UpdateWindowSurface(App->window->window);
 	App->window->screen_surface = SDL_GetWindowSurface(App->window->window);
+}
+
+void ModuleRender::GetHardware(char*& vendor, char*& renderer, char*& opengl, char*& glsl, char*& glew)
+{
+	vendor = (char*) glGetString(GL_VENDOR);
+	renderer = (char*) glGetString(GL_RENDERER);
+	opengl = (char*) glGetString(GL_VERSION);
+	glsl = (char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
+	glew = (char*) glewGetString(GLEW_VERSION);
 }

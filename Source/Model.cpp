@@ -24,6 +24,8 @@ void Model::Load(const std::string file_name)
 	else
 		console->AddLog("Reading object: %s", file_name.c_str());
 
+	DEBUG("ORIGEN: %s", file_name.c_str());
+
 	const aiScene* scene = import.ReadFile(file_name, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)

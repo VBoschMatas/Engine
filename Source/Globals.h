@@ -26,7 +26,6 @@ struct Vertex
 };
 
 // Constants ----------
-#define GLSL_VERSION "#version 330"
 #define LIBRARIES "SDL 2.0.16\nGLEW 2.1.0\nDear ImGui 1.86\nDevIL 1.8.0"
 #define REPOSITORY_LINK "https://github.com/VBoschMatas/Engine"
 #define TEXTURE_DATA_FORMAT "{start_%lu}\Path: %s\nFormat: %s\nWidth: %i\nHeight: %i\nDepth: %i\n{end_%lu}\n"
@@ -35,6 +34,7 @@ struct Vertex
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 #define FULLSCREEN false
+#define MAXIMIZED true
 #define RESIZABLE true
 #define VSYNC true
 #define TITLE "Super Ultra Mega Awesome Engine"
