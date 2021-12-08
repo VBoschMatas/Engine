@@ -26,7 +26,7 @@ private:
 class TimeManager
 {
 public:
-	TimeManager() : current_index(-1), current_frame(0), delta_time(0.0f), fps(0.0f), timer()
+	TimeManager() : current_index(-1), current_frame(0), delta_time(0.0f), fps(0.0f), acc_time(0.0f), timer()
 	{
 		std::fill_n(frame_times_ms, TIMERBUFFER, 0.0f);
 	};
@@ -58,10 +58,9 @@ private:
 	unsigned int current_frame;
 	float frame_times_ms[TIMERBUFFER];
 	float delta_time;
+	float acc_time;
 	float fps;
 	Timer timer;
-
-	float CalculateFPS();
 };
 
 extern TimeManager* Time;

@@ -17,6 +17,13 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	CreateVAO();
 }
 
+Mesh::~Mesh()
+{
+	//glDeleteBuffers(1, &ebo);
+	//glDeleteBuffers(1, &vbo);
+	//glDeleteVertexArrays(1, &vao);
+}
+
 void Mesh::LoadVBO()
 {
 	glGenBuffers(1, &vbo);

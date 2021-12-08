@@ -60,6 +60,12 @@ update_status ModuleInput::PreUpdate()
 				break;
 			case SDL_KEYUP:
 				kybrd_button = sdlEvent.key.keysym.scancode;
+				break;
+			case SDL_DROPFILE:   // In case if dropped file
+				dropped_filedir = sdlEvent.drop.file;
+				App->renderer->DroppedModel(dropped_filedir);
+				SDL_free(dropped_filedir);    // Free dropped_filedir memory
+				break;
         }
     }
     keyboard = SDL_GetKeyboardState(NULL);

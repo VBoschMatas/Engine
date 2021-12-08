@@ -96,7 +96,7 @@ bool ModuleRender::Init()
 	program = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
 
 	model = new Model();
-	model->Load("models/BakerHouse.fbx");
+	model->Load("BakerHouse.fbx");
 
 	return true;
 }
@@ -116,8 +116,8 @@ update_status ModuleRender::Update()
 	SDL_Surface* screen_surface = App->window->screen_surface;
 
 	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
-
-	model->Draw(program);
+	if(model != nullptr)
+		model->Draw(program);
 
 	return UPDATE_CONTINUE;
 }
@@ -131,16 +131,34 @@ update_status ModuleRender::PostUpdate()
 // Called before quitting
 bool ModuleRender::CleanUp()
 {
-
-	glDeleteBuffers(1, &ebo);
-	glDeleteBuffers(1, &vbo);
-
 	DEBUG("Destroying renderer");
 	SDL_GL_DeleteContext(context);
-	//Destroy window
+
+	delete(model);
 
 	return true;
 }
+
+void ModuleRender::DroppedModel(char* path)
+{
+	std::string path_name(path);
+	if (path_name.substr(path_name.find_last_of('.')) != ".fbx" && path_name.substr(path_name.find_last_of('.')) != ".FBX")
+	{
+		SDL_ShowSimpleMessageBox(
+			SDL_MESSAGEBOX_INFORMATION,
+			"File dropped has an incorrect format",
+			"The dropped file has to be a \".fbx\"",
+			App->window->window
+		);
+		return;
+	}
+	if (model != nullptr)
+		delete(model);
+
+	model = new Model();
+	model->Load(path_name);
+}
+
 
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {

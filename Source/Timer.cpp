@@ -60,23 +60,13 @@ void TimeManager::End(bool cap_60)
 
 	frame_times_ms[current_index] = delta_time;
 
+	acc_time += delta_time;
+
 	++current_frame;
-
-	fps = CalculateFPS();
-}
-
-float TimeManager::CalculateFPS()
-{
-	float sum = 0.0f;
-	for (size_t i = 0; i < TIMERBUFFER; ++i)
+	if (acc_time > 1000.0f)
 	{
-		sum += frame_times_ms[i];
-	}
-
-	if (current_frame < TIMERBUFFER)
-	{
-		return 1.0f / (sum * MSTOSEC / (float)current_frame);
-	}
-
-	return 1.0f / (sum * MSTOSEC * (1 / TIMERBUFFER));
+		fps = current_frame;
+		current_frame = 0;
+		acc_time = 0.0f;
+	};
 }

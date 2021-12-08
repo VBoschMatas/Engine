@@ -16,12 +16,23 @@ public:
 	bool CleanUp();
 
 private:
-	bool console_window = false, performance_window = false, about_window = false;
+	//Windows
+	bool console_window = false;
+	bool performance_window = false;
+	bool about_window = false;
+	bool properties_window = false;
+	bool configuration_window = false;
+
 	std::vector<float> ms;
 	std::vector<float> fps;
 	bool quit_engine = false;
+
+	Timer print_freq;
+
 	void MainMenuBar();
 	void AboutWindow();
 	void PerformanceWindow();
 	void ConsoleWindow();
+	void PropertiesWindow();
+	void ConfigurationWindow();
 };

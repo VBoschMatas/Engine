@@ -600,7 +600,7 @@ bool ModuleDebugDraw::CleanUp()
 {
     dd::shutdown();
 
-    delete implementation;
+    delete(implementation);
     implementation = 0;
 
     return true;

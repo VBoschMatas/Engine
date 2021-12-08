@@ -55,7 +55,7 @@ public:
 	}
 
 private:
-
+	char* dropped_filedir;
 	const Uint8 *keyboard = NULL;
 	Uint32 mouse_buttons;
 	Uint8 kybrd_button;

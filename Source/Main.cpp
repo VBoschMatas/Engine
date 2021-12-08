@@ -62,7 +62,6 @@ int main(int argc, char ** argv)
 
 			int update_return = App->Update();
 
-
 			Time->End();
 
 			if (update_return == UPDATE_ERROR)

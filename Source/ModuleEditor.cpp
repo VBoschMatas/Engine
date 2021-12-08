@@ -2,11 +2,14 @@
 #include "ModuleEditor.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
+#include "Timer.h"
 #include "GL/glew.h"
 #include "SDL.h"
 #include "imGui/imgui.h"
 #include "imGui/imgui_impl_sdl.h"
 #include "imGui/imgui_impl_opengl3.h"
+
+#define PRINTFREQ 200
 
 ModuleEditor::ModuleEditor()
 {
@@ -23,6 +26,7 @@ bool ModuleEditor::Init()
 	ImGui::CreateContext();
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer->context);
 	ImGui_ImplOpenGL3_Init();
+	print_freq.StartTime();
 	return true;
 }
 
@@ -42,6 +46,10 @@ update_status ModuleEditor::PreUpdate()
 		AboutWindow();
 	if (console_window)
 		ConsoleWindow();
+	if (properties_window)
+		PropertiesWindow();
+	if (configuration_window)
+		ConfigurationWindow();
 
 	return UPDATE_CONTINUE;
 }
@@ -70,17 +78,14 @@ bool ModuleEditor::CleanUp() {
 
 void ModuleEditor::MainMenuBar()
 {
-	// Begin Drawing Main Menu Bar:
 	if (ImGui::BeginMainMenuBar())
 	{
-		// Begin Drawing Tools Menu:
 		if (ImGui::BeginMenu("Tools"))
 		{
 
-			if (ImGui::MenuItem("Console"))
+			if (ImGui::MenuItem("Console", (const char*)0, console_window))
 			{
-				// If user clicks on Console, trigger console window:
-				console_window = true;
+				console_window = !console_window;
 			}
 
 			if (ImGui::MenuItem("Performance", (const char*) 0, performance_window))
@@ -88,11 +93,19 @@ void ModuleEditor::MainMenuBar()
 				performance_window = !performance_window;
 			}
 
-			// End Drawing Tools Menu:
+			if (ImGui::MenuItem("Properties", (const char*)0, properties_window))
+			{
+				properties_window = !properties_window;
+			}
+
+			if (ImGui::MenuItem("Configuration", (const char*)0, configuration_window))
+			{
+				configuration_window = !configuration_window;
+			}
+
 			ImGui::EndMenu();
 		}
 
-		// Begin Drawing Help Menu:
 		if (ImGui::BeginMenu("Help"))
 		{
 
@@ -111,11 +124,9 @@ void ModuleEditor::MainMenuBar()
 				quit_engine = true;
 			}
 
-			// End Drawing Help Menu:
 			ImGui::EndMenu();
 		}
 
-		// End Drawing Main Menu Bar:
 		ImGui::EndMainMenuBar();
 	}
 }
@@ -128,7 +139,7 @@ void ModuleEditor::AboutWindow()
 	ImGui::AlignTextToFramePadding();
 	ImGui::TextWrapped("Super Ultra Mega Awesome Engine");
 	ImGui::Separator();
-	ImGui::TextWrapped("This engine is being developed at the master degree \"Advanced programminfor AAA Videogames\".\n");
+	ImGui::TextWrapped("This engine is being developed at the master degree \"Advanced programming for AAA Videogames\".\n");
 
 	ImGui::TextWrapped("\n");
 	ImGui::TextWrapped("Repository");
@@ -189,13 +200,18 @@ void ModuleEditor::PerformanceWindow()
 	{
 		fps.erase(fps.begin());
 	}
-	fps.push_back(Time->FPS());
-
 	if (ms.size() == TIMERBUFFER)
 	{
 		ms.erase(ms.begin());
 	}
-	ms.push_back(Time->DeltaTimeMs());
+
+	if (print_freq.ReadTime() >= PRINTFREQ)
+	{
+		print_freq.StartTime();
+
+		fps.push_back(Time->FPS());
+		ms.push_back(Time->DeltaTimeMs());
+	}
 
 	ImGui::Begin("Performance", &performance_window);
 
@@ -215,6 +231,24 @@ void ModuleEditor::ConsoleWindow()
 	ImGui::Begin("Console", &console_window);
 
 	console->ImGui();
+
+	ImGui::End();
+}
+
+void ModuleEditor::PropertiesWindow()
+{
+	ImGui::Begin("Properties", &properties_window);
+
+
+
+	ImGui::End();
+}
+
+void ModuleEditor::ConfigurationWindow()
+{
+	ImGui::Begin("Configuration", &configuration_window);
+
+
 
 	ImGui::End();
 }

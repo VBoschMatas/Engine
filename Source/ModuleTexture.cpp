@@ -69,10 +69,12 @@ unsigned int ModuleTexture::LoadTexture(const char *path, bool &texture_found)
 		ilGetData());
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	return texid;
+	ilDeleteImages(1, &texid);
+
+	return texture_id;
 }
 
 void ModuleTexture::UnloadTexture(int i, const unsigned int* texture)
 {
-	ilDeleteImages(i, texture);
+	glDeleteTextures(i, texture);
 }

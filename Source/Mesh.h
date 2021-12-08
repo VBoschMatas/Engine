@@ -7,7 +7,7 @@ class Mesh
 {
 public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<unsigned int> textures);
-	~Mesh() = default;
+	~Mesh();
 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;

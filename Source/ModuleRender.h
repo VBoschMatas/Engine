@@ -20,23 +20,15 @@ public:
 	update_status Update();
 	update_status PostUpdate();
 	bool CleanUp();
-	void WindowResized(unsigned width, unsigned height);
-	void* context;
 
+	void WindowResized(unsigned width, unsigned height);
+	void DroppedModel(char* path);
+
+	void* context;
 	Model* model;
 
 private:
-	unsigned int vao;
-	unsigned int vbo;
-	unsigned int ebo;
-
 	unsigned int texture_id;
 
 	unsigned int program;
-
-	unsigned int CreateVBO();
-	unsigned int CreateVAO();
-	unsigned int CreateEBO();
-	void RenderVBOTexture(unsigned int vbo, unsigned int program);
-	void DeleteVBO(unsigned int vbo);
 };
