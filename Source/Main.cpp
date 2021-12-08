@@ -19,6 +19,7 @@ enum main_states
 
 Application* App = NULL;
 TimeManager* Time = NULL;
+Console* console = NULL;
 
 int main(int argc, char ** argv)
 {
@@ -26,6 +27,7 @@ int main(int argc, char ** argv)
 	main_states state = MAIN_CREATION;
 
 	Time = new TimeManager();
+	console = new Console();
 
 	while (state != MAIN_EXIT)
 	{
@@ -94,6 +96,7 @@ int main(int argc, char ** argv)
 
 	delete App;
 	delete Time;
+	delete console;
 	DEBUG("Bye :)\n");
 	return main_return;
 }

@@ -19,7 +19,13 @@ public:
 
 private:
 	const char* menu_items[MENU_OPTIONS] = { "File", "Edit", "View" };
-
+	bool console_window = false, performance_window = false, about_window = false;
+	std::vector<float> ms;
+	std::vector<float> fps;
+	bool quit_engine = false;
+	void MainMenuBar();
 	void MenuBar(const char** items);
-	void MenuOption(const char* option);
+	void AboutWindow();
+	void PerformanceWindow();
+	void ConsoleWindow();
 };

@@ -429,7 +429,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Util.h" />
+    <ClInclude Include="Console.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imGui">

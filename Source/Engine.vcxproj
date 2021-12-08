@@ -208,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Console.h" />
     <ClInclude Include="Dummy.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="imGui\imconfig.h" />
@@ -306,7 +307,6 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="ModuleWindow.h" />
-    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\Geometry\QuadTree.inl" />

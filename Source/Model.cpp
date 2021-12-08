@@ -14,11 +14,12 @@
 void Model::Load(std::string file_name)
 {
 	Assimp::Importer import;
+	console->AddLog("Reading object: %s", file_name.substr(file_name.find_last_of('/')));
 	const aiScene* scene = import.ReadFile(file_name, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
 	{
-		DEBUG("Error loading %s: %s", file_name, import.GetErrorString());
+		console->AddLog("Error loading %s: %s", file_name, import.GetErrorString());
 		return;
 	}
 
@@ -28,11 +29,9 @@ void Model::Load(std::string file_name)
 	directory = buffer + directory;
 	directory.append("/");
 
-	DEBUG("FILE NAME: %s", file_name.c_str());
-	DEBUG("DIRECTORY: %s", directory.c_str());
-
 	std::vector<float3> all_vertices;
 
+	console->AddLog("Detected %d meshes", scene->mNumMeshes);
 	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
@@ -44,10 +43,11 @@ void Model::Load(std::string file_name)
 
 Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices)
 {
+	console->AddLog("Loading mesh...");
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<unsigned int> textures;
-
+	console->AddLog("	Loading VBO");
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
 	{
 		Vertex vertex;
@@ -58,7 +58,6 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 		p_vector.z = mesh->mVertices[i].z;
 		vertex.position = p_vector;
 		comb_vertices.push_back(p_vector);
-
 		if (mesh->mTextureCoords[0])
 		{
 			float2 t_vector;
@@ -71,7 +70,7 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 
 		vertices.push_back(vertex);
 	}
-
+	console->AddLog("	Loading EBO");
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
 	{
 		aiFace face = mesh->mFaces[i];
@@ -80,7 +79,7 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 			indices.push_back(face.mIndices[j]);
 		}
 	}
-
+	console->AddLog("	Loading Materials");
 	if (mesh->mMaterialIndex >= 0)
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
@@ -101,12 +100,14 @@ std::vector<unsigned int> Model::LoadTextures(aiMaterial* material, aiTextureTyp
 		material->GetTexture(type, i, &path);
 		bool texture_found;
 
+		console->AddLog("		Checking for textures in described path");
 		std::string mat_dir(directory);
 		mat_dir.append(path.C_Str());
 
 		unsigned int texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
 		if (!texture_found)
 		{
+			console->AddLog("		Checking for textures in same directory as object");
 			std::string tex_name(path.C_Str());
 			tex_name = tex_name.substr(0, tex_name.find_last_of('/'));
 			App->textures->UnloadTexture(1, &texture);
@@ -117,13 +118,16 @@ std::vector<unsigned int> Model::LoadTextures(aiMaterial* material, aiTextureTyp
 
 			if (!texture_found)
 			{
+				console->AddLog("		Checking for textures in textures directory");
 				App->textures->UnloadTexture(1, &texture);
 				std::string tex_dir;
 				tex_dir = "textures/";
 				tex_dir.append(tex_name);
 				texture = App->textures->LoadTexture(tex_dir.c_str(), texture_found);
 				if (!texture_found)
-					DEBUG("ERR: TEXTURE NOT FOUND!");
+				{
+					console->AddLog("		Textures not found!");
+				}
 			}
 		}
 		textures.push_back(texture);
