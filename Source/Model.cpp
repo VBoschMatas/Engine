@@ -24,8 +24,6 @@ void Model::Load(const std::string file_name)
 	else
 		console->AddLog("Reading object: %s", file_name.c_str());
 
-	DEBUG("ORIGEN: %s", file_name.c_str());
-
 	const aiScene* scene = import.ReadFile(file_name, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
@@ -57,7 +55,7 @@ void Model::Load(const std::string file_name)
 		aiMesh* mesh = scene->mMeshes[i];
 		meshes.push_back(LoadMeshes(mesh, scene, all_vertices));
 	}
-
+	console->AddLog("Creating OBB for the object");
 	bounding_box = OBB::OptimalEnclosingOBB(&all_vertices[0], all_vertices.size());
 }
 
@@ -67,7 +65,7 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<unsigned int> textures;
-	console->AddLog("	Loading VBO");
+	console->AddLog("	Getting vertices");
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
 	{
 		Vertex vertex;
@@ -90,7 +88,7 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 
 		vertices.push_back(vertex);
 	}
-	console->AddLog("	Loading EBO");
+	console->AddLog("	Getting indices");
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
 	{
 		aiFace face = mesh->mFaces[i];
@@ -99,7 +97,7 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 			indices.push_back(face.mIndices[j]);
 		}
 	}
-	console->AddLog("	Loading Materials");
+	console->AddLog("	Getting Materials");
 	if (mesh->mMaterialIndex >= 0)
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
@@ -153,7 +151,6 @@ std::vector<unsigned int> Model::LoadTextures(aiMaterial* material, aiTextureTyp
 				}
 			}
 		}
-		console->AddLog("TEXTURE: %d", texture);
 		textures.push_back(texture);
 	}
 	

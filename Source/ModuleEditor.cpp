@@ -2,6 +2,8 @@
 #include "ModuleEditor.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
+#include <iostream>
+#include <fstream>
 #include <direct.h>
 #include "Timer.h"
 #include "GL/glew.h"
@@ -32,31 +34,28 @@ bool ModuleEditor::Init()
 	char buffer[MAX_PATH];
 	_getcwd(buffer, MAX_PATH);
 
-	FILE* file = nullptr;
-
-	// In unix like systems and linux, r and rb are the same since they have single
-	// character for endline, \n, but in windows there are multiple characters for
-	// endline and additional b mode maps all those into \n.
-	// r stands for read mode.
-	fopen_s(&file, file_name, "rb");
-
-	if (file)
+	std::string license_path(buffer);
+	license_path = license_path.substr(0, license_path.find_last_of("\\"));
+	license_path.append("\\LICENSE");
+	std::string line;
+	std::ifstream myfile(license_path);
+	//myfile.open("example.txt");
+	license_text = "";
+	if (myfile.is_open())
 	{
-		static long file_offset = 0;
-		size_t element_size_bytes = 1;
-		fseek(file, file_offset, SEEK_END);
-		int size = ftell(file);
-		*data = (char*)malloc(size + 1);
-		fseek(file, 0, SEEK_SET);
-		fread(*data, element_size_bytes, size, file);
-		(*data)[size] = 0;
-		fclose(file);
+		while (getline(myfile, line))
+		{
+			license_text.append(line);
+			license_text.append("\n");
+		}
+		myfile.close();
 	}
 
 	ImGui::CreateContext();
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer->context);
 	ImGui_ImplOpenGL3_Init();
 	print_freq.StartTime();
+
 	return true;
 }
 
@@ -66,8 +65,6 @@ update_status ModuleEditor::PreUpdate()
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::ShowDemoWindow();
-
 	MainMenuBar();
 
 	ConfigurationWindow();
@@ -76,8 +73,6 @@ update_status ModuleEditor::PreUpdate()
 		AboutWindow();
 	if (console_window)
 		ConsoleWindow();
-	if (properties_window)
-		PropertiesWindow();
 
 	return UPDATE_CONTINUE;
 }
@@ -114,11 +109,6 @@ void ModuleEditor::MainMenuBar()
 			if (ImGui::MenuItem("Console", (const char*)0, console_window))
 			{
 				console_window = !console_window;
-			}
-
-			if (ImGui::MenuItem("Properties", (const char*)0, properties_window))
-			{
-				properties_window = !properties_window;
 			}
 
 			if (ImGui::MenuItem("Configuration", (const char*)0, configuration_window))
@@ -162,16 +152,20 @@ void ModuleEditor::AboutWindow()
 	ImGui::AlignTextToFramePadding();
 	ImGui::TextWrapped("Super Ultra Mega Awesome Engine");
 	ImGui::Separator();
-	ImGui::TextWrapped("This engine is being developed at the master degree \"Advanced programming for AAA Videogames\".\n");
-
-	ImGui::TextWrapped("\n");
-	ImGui::TextWrapped("Repository");
-	ImGui::Separator();
-	ImGui::TextWrapped("Check my repository");
-	if (ImGui::Button("Open Repository", ImVec2(ImGui::GetContentRegionAvailWidth(), 0)))
-	{
-		ShellExecute(NULL, "open", REPOSITORY_LINK, NULL, NULL, SW_SHOWNORMAL);
-	}
+	ImGui::TextWrapped("This engine is being developed at the master degree \"Advanced programming for AAA Videogames\".");
+	ImGui::TextWrapped("\n\nControlls:");
+	ImGui::TextWrapped("UP/DOWN ARROW KEYS: move forward/backwards");
+	ImGui::TextWrapped("LEFT/RIGHT ARROW KEYS: yaw rotation");
+	ImGui::TextWrapped("MOUSE WHEEL: move forward/backwards");
+	ImGui::TextWrapped("MOUSE WHEEL CLICK + MOUSE MOVEMENT: move camera up/down/left/right");
+	ImGui::TextWrapped("F KEY: lock/unlock view on object");
+	ImGui::TextWrapped("\nMOUSE RIGHT CLICK + MOUSE MOVEMENT: rotate camera");
+	ImGui::TextWrapped("MOUSE RIGHT CLICK + Q/E: move camera up/down");
+	ImGui::TextWrapped("MOUSE RIGHT CLICK + W/S: move camera forward/backwards");
+	ImGui::TextWrapped("MOUSE RIGHT CLICK + A/D: move camera left/right");
+	ImGui::TextWrapped("MOUSE RIGHT CLICK + SHIFT: double movement speed");
+	ImGui::TextWrapped("\nALT BUTTON + MOUSE RIGHT CLICK: Change FOV");
+	ImGui::TextWrapped("ALT BUTTON + MOUSE LEFT CLICK: Orbit object if view locked");
 
 	ImGui::TextWrapped("\n");
 	ImGui::TextWrapped("Author(s)");
@@ -187,15 +181,15 @@ void ModuleEditor::AboutWindow()
 	ImGui::TextWrapped("License");
 	ImGui::Separator();
 
-	if (license_buffer == nullptr)
+	if (license_text == "")
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-		ImGui::TextWrapped("An error occured while fetching license.");
+		ImGui::TextWrapped("Can't load the license");
 		ImGui::PopStyleColor();
 	}
 	else
 	{
-		ImGui::TextWrapped(license_buffer);
+		ImGui::TextWrapped(license_text.c_str());
 	}
 
 	ImGui::End();
@@ -206,15 +200,6 @@ void ModuleEditor::ConsoleWindow()
 	ImGui::Begin("Console", &console_window);
 
 	console->ImGui();
-
-	ImGui::End();
-}
-
-void ModuleEditor::PropertiesWindow()
-{
-	ImGui::Begin("Properties", &properties_window);
-
-
 
 	ImGui::End();
 }

@@ -17,21 +17,20 @@ public:
 
 private:
 	//Windows
-	bool console_window = false;
+	bool console_window = true;
 	bool about_window = false;
-	bool properties_window = false;
 	bool configuration_window = false;
 
 	std::vector<float> ms;
 	std::vector<float> fps;
 	bool quit_engine = false;
+	std::string license_text;
 
 	Timer print_freq;
 
 	void MainMenuBar();
 	void AboutWindow();
 	void ConsoleWindow();
-	void PropertiesWindow();
 	void ConfigurationWindow();
 
 	void VirtualMemory(float& total, float& consumed);

@@ -30,7 +30,7 @@ void Mesh::LoadVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
+	console->AddLog("	VBO loaded");
 	num_vertices = vertices.size();
 }
 
@@ -40,7 +40,7 @@ void Mesh::LoadEBO()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
+	console->AddLog("	EBO loaded");
 	num_indices = indices.size();
 }
 
@@ -56,6 +56,7 @@ void Mesh::CreateVAO()
 	// Might change when adding normals
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+	console->AddLog("	VAO created with VBO and EBO");
 }
 
 void Mesh::Draw(unsigned int program)
