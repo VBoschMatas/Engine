@@ -24,7 +24,7 @@ void Model::Load(const std::string file_name)
 	else
 		console->AddLog("Reading object: %s", file_name.c_str());
 
-	const aiScene* scene = import.ReadFile(file_name, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = import.ReadFile(file_name, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
 	{
@@ -76,6 +76,12 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 		p_vector.z = mesh->mVertices[i].z;
 		vertex.position = p_vector;
 		comb_vertices.push_back(p_vector);
+
+		p_vector.x = mesh->mNormals[i].x;
+		p_vector.y = mesh->mNormals[i].y;
+		p_vector.z = mesh->mNormals[i].z;
+		vertex.normal = p_vector;
+
 		if (mesh->mTextureCoords[0])
 		{
 			float2 t_vector;

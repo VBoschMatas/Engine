@@ -21,7 +21,7 @@ enum update_status
 struct Vertex
 {
 	float3 position;
-	// add normals in the future
+	float3 normal;
 	float2 uv;
 };
 

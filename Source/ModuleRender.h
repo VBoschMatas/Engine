@@ -25,6 +25,8 @@ public:
 	void DroppedModel(char* path);
 	void GetHardware(char*& vendor, char*& renderer, char*& opengl, char*& glsl, char*& glew);
 
+	void TempLight();
+
 	void* context;
 	Model* model;
 

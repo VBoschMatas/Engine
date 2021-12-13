@@ -52,6 +52,7 @@ void __stdcall OurOpenGLErrorFunction(GLenum source, GLenum type, GLuint id, GLe
 	default: return;
 	};
 	DEBUG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
+	console->AddLog("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
 }
 
 // Called before render is available
@@ -93,7 +94,7 @@ bool ModuleRender::Init()
 	SDL_Surface* screen_surface = App->window->screen_surface;
 	glViewport(0, 0, screen_surface->w, screen_surface->h);
 
-	program = App->program->CreateProgram("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
+	program = App->program->CreateProgram("shaders/light_vertex.glsl", "shaders/light_fragment.glsl");
 
 	model = new Model();
 	model->Load("BakerHouse.fbx");
@@ -115,6 +116,7 @@ update_status ModuleRender::Update()
 {
 	SDL_Surface* screen_surface = App->window->screen_surface;
 
+	//TempLight();
 	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
 	if(model != nullptr)
 		model->Draw(program);
@@ -173,4 +175,10 @@ void ModuleRender::GetHardware(char*& vendor, char*& renderer, char*& opengl, ch
 	opengl = (char*) glGetString(GL_VERSION);
 	glsl = (char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
 	glew = (char*) glewGetString(GLEW_VERSION);
+}
+
+void ModuleRender::TempLight()
+{
+	glUniform3f(glGetUniformLocation(program, "lightDir"), 0.2f, 0.9f, 0.7f);
+	glUniform3f(glGetUniformLocation(program, "ambientColor"), 1.0f, 1.0f, 1.0f);
 }
