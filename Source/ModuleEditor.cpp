@@ -2,6 +2,8 @@
 #include "ModuleEditor.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
+#include "Model.h"
+#include "Mesh.h"
 #include <iostream>
 #include <fstream>
 #include <direct.h>
@@ -71,6 +73,8 @@ update_status ModuleEditor::PreUpdate()
 		AboutWindow();
 	if (console_window)
 		ConsoleWindow();
+	if (model_window)
+		ModelInfoWindow();
 
 	return UPDATE_CONTINUE;
 }
@@ -112,6 +116,11 @@ void ModuleEditor::MainMenuBar()
 			if (ImGui::MenuItem("Configuration", (const char*)0, configuration_window))
 			{
 				configuration_window = !configuration_window;
+			}
+
+			if (ImGui::MenuItem("GameObject Information", (const char*)0, model_window))
+			{
+				model_window = !model_window;
 			}
 
 			ImGui::EndMenu();
@@ -280,6 +289,26 @@ void ModuleEditor::ConfigurationWindow()
 		ImGui::TextWrapped("DevIL: %d", IL_VERSION);
 	}
 
+	ImGui::End();
+}
+
+void ModuleEditor::ModelInfoWindow()
+{
+	ImGui::Begin("Game Object");
+
+	std::vector<Mesh> meshes = App->renderer->model->GetMeshes();
+
+	for()
+
+	if (ImGui::CollapsingHeader("Mesh"))
+	{
+		ImGui::TextWrapped("Vertices: %d", vertices);
+	}
+
+	if (ImGui::CollapsingHeader("Texture"))
+	{
+
+	}
 	ImGui::End();
 }
 

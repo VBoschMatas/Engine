@@ -14,6 +14,8 @@ public:
 	std::vector<unsigned int> textures;
 
 	void Draw(unsigned int program);
+
+	unsigned int GetVertices() { return num_vertices; };
 private:
 	unsigned int vbo;
 	unsigned int ebo;

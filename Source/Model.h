@@ -14,6 +14,8 @@ public:
 	void Load(const std::string file_name);
 	void Draw(unsigned int program);
 
+	std::vector<Mesh> GetMeshes() { return meshes; };
+
 	math::OBB bounding_box;
 private:
 	std::vector<Mesh> meshes;

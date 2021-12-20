@@ -1,7 +1,14 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
-#include "SDL.h"
+
+enum class Window_Type : unsigned int
+{
+	Console,
+	About,
+	Config,
+	MAX
+};
 
 class ModuleEditor : public Module
 {
@@ -20,6 +27,8 @@ private:
 	bool console_window = true;
 	bool about_window = false;
 	bool configuration_window = false;
+	bool model_window = false;
+	//bool editor_windows[Window_Type::MAX] = {};
 
 	std::vector<float> ms;
 	std::vector<float> fps;
@@ -32,6 +41,7 @@ private:
 	void AboutWindow();
 	void ConsoleWindow();
 	void ConfigurationWindow();
+	void ModelInfoWindow();
 
 	void VirtualMemory(float& total, float& consumed);
 	void PhysicalMemory(float& total, float& consumed);
