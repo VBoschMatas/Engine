@@ -257,7 +257,7 @@ void ModuleEditorCamera::Controller()
 
 void ModuleEditorCamera::FitNewModel()
 {
-	float3 extreme_point = App->renderer->model->bounding_box.ExtremePoint(float3(1.0f, 1.0f, 1.0f));
+	/*float3 extreme_point = App->renderer->model->bounding_box.ExtremePoint(float3(1.0f, 1.0f, 1.0f));
 	float extreme_dist = extreme_point.Distance(float3(0.0f, 0.0f, 0.0f)) / 10.0f;
 	float new_distance = 1.5f;
 	SetPosition(extreme_point * extreme_dist);
@@ -267,5 +267,5 @@ void ModuleEditorCamera::FitNewModel()
 		SetPosition(extreme_point * new_distance);
 		LookAt(float3(0.0f, 0.0f, 0.0f));
 		new_distance += extreme_dist;
-	}
+	}*/
 }
