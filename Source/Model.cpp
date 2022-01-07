@@ -1,9 +1,9 @@
 #include "Model.h"
 #include <direct.h>
 #include <shlwapi.h>
+#include <algorithm>
 #include "Application.h"
 #include "ModuleProgram.h"
-#include "ModuleTexture.h"
 #include "assimp/cimport.h"
 #include "assimp/postprocess.h"
 #include "assimp/material.h"
@@ -19,10 +19,13 @@ void Model::Load(const std::string file_name)
 	dir_length = file_name.find_last_of('/');
 	if (dir_length == std::string::npos || dir_length == -1)
 		dir_length = file_name.find_last_of('\\');
+
 	if (dir_length != std::string::npos && dir_length != -1)
-		console->AddLog("Reading object: %s", file_name.substr(dir_length).c_str());
+		model_name = file_name.substr(dir_length);
 	else
-		console->AddLog("Reading object: %s", file_name.c_str());
+		model_name = file_name;
+
+	console->AddLog("Reading object: %s", model_name.c_str());
 
 	const aiScene* scene = import.ReadFile(file_name, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 
@@ -64,7 +67,7 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 	console->AddLog("Loading mesh...");
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	std::vector<unsigned int> textures;
+	std::vector<Texture> textures;
 	console->AddLog("	Getting vertices");
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
 	{
@@ -104,62 +107,111 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 		}
 	}
 	console->AddLog("	Getting Materials");
-	if (mesh->mMaterialIndex >= 0)
+
+	bool existing_material = false;
+	for (auto const& m : model_materials)
 	{
-		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		std::vector<unsigned int> tex = LoadTextures(material, aiTextureType_DIFFUSE);
-		textures.insert(textures.end(), tex.begin(), tex.end());
+		if (m.id == mesh->mMaterialIndex)
+		{
+			for (auto const& t : m.texture_id)
+			{
+				textures.push_back(model_textures.find(t)->second);
+			}
+			existing_material = true;
+			console->AddLog("	Material already loaded");
+			break;
+		}
 	}
 
+	if (mesh->mMaterialIndex >= 0 && !existing_material)
+	{
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+		std::vector<Texture> tex = LoadTextures(material, mesh->mMaterialIndex, aiTextureType_DIFFUSE);
+		textures.insert(textures.end(), tex.begin(), tex.end());
+	}
 	return Mesh(vertices, indices, textures);
 }
 
-std::vector<unsigned int> Model::LoadTextures(aiMaterial* material, aiTextureType type)
+std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int material_index, aiTextureType type)
 {
-	std::vector<unsigned int> textures;
+	std::vector<Texture> textures;
+
+	std::vector<unsigned int> tex_hash_vect;
+	unsigned int tex_hash;
 
 	unsigned int n_textures = material->GetTextureCount(type);
 	if (n_textures == 0)
 		console->AddLog("This model has no textures!");
 
-	for (unsigned int i = 0; i < material->GetTextureCount(type); ++i)
+	for (unsigned int i = 0; i < n_textures; ++i)
 	{
 		aiString path;
 		material->GetTexture(type, i, &path);
-		bool texture_found;
-
+		bool texture_found = false;
+		bool already_exists = false;
 		console->AddLog("		Checking for textures in described path");
 		std::string mat_dir(directory);
 		mat_dir.append(path.C_Str());
+		Texture texture;
 
-		unsigned int texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
-		if (!texture_found)
+		tex_hash = std::hash<std::string>{}(mat_dir);
+		if (model_textures.find(tex_hash) != model_textures.end())
+		{
+			texture = model_textures.find(tex_hash)->second;
+			already_exists = true;
+		}
+
+		texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
+		if (!texture_found && !already_exists)
 		{
 			std::string tex_name(path.C_Str());
 			tex_name = tex_name.substr(0, tex_name.find_last_of('\\'));
-			App->textures->UnloadTexture(1, &texture);
+			App->textures->UnloadTexture(1, &texture.id);
 			std::string same_dir(directory);
 			same_dir.append(tex_name);
 			console->AddLog("		Checking for textures in same directory as object: %s", same_dir.c_str());
+
+			tex_hash = std::hash<std::string>{}(same_dir);
+			if (model_textures.find(tex_hash) != model_textures.end())
+			{
+				texture = model_textures.find(tex_hash)->second;
+				already_exists = true;
+			}
+
 			texture = App->textures->LoadTexture(same_dir.c_str(), texture_found);
 
-			if (!texture_found)
+			if (!texture_found && !already_exists)
 			{
 				console->AddLog("		Checking for textures in textures directory");
-				App->textures->UnloadTexture(1, &texture);
+				App->textures->UnloadTexture(1, &texture.id);
 				std::string tex_dir;
 				tex_dir = "textures\\";
 				tex_dir.append(tex_name);
+
+				tex_hash = std::hash<std::string>{}(tex_dir);
+				if (model_textures.find(tex_hash) != model_textures.end())
+				{
+					texture = model_textures.find(tex_hash)->second;
+					already_exists = true;
+				}
+
 				texture = App->textures->LoadTexture(tex_dir.c_str(), texture_found);
-				if (!texture_found)
+				if (!texture_found && !already_exists)
 				{
 					console->AddLog("		Textures not found!");
 				}
 			}
 		}
+		if (!already_exists)
+		{
+			model_textures.insert(std::pair<unsigned int, Texture>(tex_hash, texture));
+		}
+		else
+			console->AddLog("	This texture was used previously");
+		tex_hash_vect.push_back(tex_hash);
 		textures.push_back(texture);
 	}
-	
+	model_materials.push_back(Material{ material_index, tex_hash_vect });
 	return textures;
 }
 
@@ -169,4 +221,40 @@ void Model::Draw(unsigned int program)
 	{
 		meshes[i].Draw(program);
 	}
+}
+
+/*
+	ImGui print for model info
+*/
+void Model::PrintModelInfo()
+{
+	const ImVec4 title_colour(255, 255, 0, 255);
+
+	ImGui::TextColored(title_colour, "Model");
+	ImGui::Separator();
+	ImGui::TextWrapped("Name: %s", model_name.substr(0, std::string::size_type(model_name.find_last_of('.'))).c_str());
+	ImGui::TextWrapped("Type: %s", model_name.substr(std::string::size_type(model_name.find_last_of('.'))).c_str());
+
+	ImGui::TextWrapped("\n");
+	ImGui::TextColored(title_colour, "Textures");
+	ImGui::Separator();
+	for (auto const& t : model_textures)
+	{
+		ImGui::TextWrapped("Path: %s", t.second.path.c_str());
+		ImGui::Image((void*)(intptr_t)t.second.id, ImVec2(200, 200));
+		ImGui::TextWrapped("%dx%d", t.second.width, t.second.height);
+		ImGui::TextWrapped("\n");
+	}
+	ImGui::TextColored(title_colour, "Meshes");
+	ImGui::Separator();
+	ImGui::TextWrapped("Num of meshes: %d", meshes.size());
+	unsigned int total_t = 0, total_v = 0, total_i = 0;
+	for (int i = 0; i < meshes.size(); ++i)
+	{
+		ImGui::TextWrapped("[%d]T: %d  V: %d  I: %d", i, meshes[i].GetIndices()/3, meshes[i].GetVertices(), meshes[i].GetIndices());
+		total_t += meshes[i].GetIndices() / 3;
+		total_v += meshes[i].GetVertices();
+		total_i += meshes[i].GetIndices();
+	}
+	ImGui::TextWrapped("Total: T: %d  V: %d  I: %d", total_t, total_v, total_i);
 }

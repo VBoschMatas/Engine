@@ -73,14 +73,17 @@ update_status ModuleEditor::PreUpdate()
 		AboutWindow();
 	if (console_window)
 		ConsoleWindow();
-	if (model_window)
-		ModelInfoWindow();
+	if (inspector_window)
+		InspectorWindow();
+
 
 	return UPDATE_CONTINUE;
 }
 
 update_status ModuleEditor::Update()
 {
+	//ImGui::ShowDemoWindow();
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -118,9 +121,9 @@ void ModuleEditor::MainMenuBar()
 				configuration_window = !configuration_window;
 			}
 
-			if (ImGui::MenuItem("GameObject Information", (const char*)0, model_window))
+			if (ImGui::MenuItem("Inspector", (const char*)0, inspector_window))
 			{
-				model_window = !model_window;
+				inspector_window = !inspector_window;
 			}
 
 			ImGui::EndMenu();
@@ -292,26 +295,6 @@ void ModuleEditor::ConfigurationWindow()
 	ImGui::End();
 }
 
-void ModuleEditor::ModelInfoWindow()
-{
-	ImGui::Begin("Game Object");
-
-	std::vector<Mesh> meshes = App->renderer->model->GetMeshes();
-
-	for()
-
-	if (ImGui::CollapsingHeader("Mesh"))
-	{
-		ImGui::TextWrapped("Vertices: %d", vertices);
-	}
-
-	if (ImGui::CollapsingHeader("Texture"))
-	{
-
-	}
-	ImGui::End();
-}
-
 void ModuleEditor::VirtualMemory(float& total, float& consumed)
 {
 	MEMORYSTATUSEX memInfo;
@@ -328,4 +311,16 @@ void ModuleEditor::PhysicalMemory(float& total, float& consumed)
 	GlobalMemoryStatusEx(&memInfo);
 	total = memInfo.ullTotalPhys;
 	consumed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+}
+
+void ModuleEditor::InspectorWindow()
+{
+	ImGui::Begin("Inspector", &inspector_window);
+
+	if (ImGui::CollapsingHeader("Object"))
+	{
+		App->renderer->model->PrintModelInfo();
+	}
+
+	ImGui::End();
 }

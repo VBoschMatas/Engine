@@ -26,9 +26,8 @@ private:
 	//Windows
 	bool console_window = true;
 	bool about_window = false;
-	bool configuration_window = false;
-	bool model_window = false;
-	//bool editor_windows[Window_Type::MAX] = {};
+	bool configuration_window = false; 
+	bool inspector_window = true;
 
 	std::vector<float> ms;
 	std::vector<float> fps;
@@ -41,8 +40,7 @@ private:
 	void AboutWindow();
 	void ConsoleWindow();
 	void ConfigurationWindow();
-	void ModelInfoWindow();
-
+	void InspectorWindow();
 	void VirtualMemory(float& total, float& consumed);
 	void PhysicalMemory(float& total, float& consumed);
 };

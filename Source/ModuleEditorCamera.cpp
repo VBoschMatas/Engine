@@ -259,12 +259,12 @@ void ModuleEditorCamera::FitNewModel()
 {
 	float3 extreme_point = App->renderer->model->bounding_box.ExtremePoint(float3(1.0f, 1.0f, 1.0f));
 	float extreme_dist = extreme_point.Distance(float3(0.0f, 0.0f, 0.0f)) / 10.0f;
-	float new_distance = 1.5f;
-	SetPosition(extreme_point * extreme_dist);
+	float new_distance = extreme_point.Distance(float3(0.0f, 0.0f, 0.0f));
+	SetPosition(float3(1.0f, 1.0f, 1.0f) * extreme_dist);
 	LookAt(float3(0.0f, 0.0f, 0.0f));
-	while (!frustum.Contains(App->renderer->model->bounding_box) && new_distance < 15.0f)
+	while (!frustum.Contains(App->renderer->model->bounding_box) && new_distance < frustum.FarPlaneDistance())
 	{
-		SetPosition(extreme_point * new_distance);
+		SetPosition(float3(1.0f, 1.0f, 1.0f) * new_distance);
 		LookAt(float3(0.0f, 0.0f, 0.0f));
 		new_distance += extreme_dist;
 	}

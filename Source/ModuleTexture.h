@@ -2,6 +2,14 @@
 #include "Module.h"
 #include "Globals.h"
 
+struct Texture
+{
+	std::string path;
+	unsigned int width;
+	unsigned int height;
+	unsigned int id;
+};
+
 class ModuleTexture: public Module
 {
 public:
@@ -15,12 +23,10 @@ public:
 	bool CleanUp();
 
 private:
-	unsigned int texid;
 	bool success;
 
 public:
-	unsigned int LoadTexture(const char *path, bool &texture_found);
+	Texture LoadTexture(const char *path, bool &texture_found);
 	void UnloadTexture(int i, const unsigned int* texture);
-	unsigned int getTexId() { return texid; };
 };
 

@@ -6,7 +6,7 @@
 #include "Math/float2.h"
 #include "Math/float4x4.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<unsigned int> textures)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
 {
 	this->vertices = vertices;
 	this->indices = indices;
@@ -77,7 +77,7 @@ void Mesh::Draw(unsigned int program)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
-		glBindTexture(GL_TEXTURE_2D, textures[i]);
+		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 
 	glActiveTexture(GL_TEXTURE0);
