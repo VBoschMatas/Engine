@@ -24,14 +24,21 @@ public:
 	void WindowResized(unsigned width, unsigned height);
 	void DroppedModel(char* path);
 	void GetHardware(char*& vendor, char*& renderer, char*& opengl, char*& glsl, char*& glew);
+	void LoadFrameBuffer();
+	void ClearFrameBuffer();
 
 	void TempLight();
 
 	void* context;
 	Model* model;
 
+	unsigned int GetFBTexture() { return textureColorbuffer; };
+
 private:
 	unsigned int texture_id;
+
+	unsigned int fbo;
+	unsigned int textureColorbuffer;
 
 	unsigned int program;
 };

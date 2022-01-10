@@ -76,6 +76,7 @@ update_status ModuleEditor::PreUpdate()
 	if (inspector_window)
 		InspectorWindow();
 
+	SceneWindow();
 
 	return UPDATE_CONTINUE;
 }
@@ -83,7 +84,6 @@ update_status ModuleEditor::PreUpdate()
 update_status ModuleEditor::Update()
 {
 	//ImGui::ShowDemoWindow();
-
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -322,5 +322,27 @@ void ModuleEditor::InspectorWindow()
 		App->renderer->model->PrintModelInfo();
 	}
 
+	ImGui::End();
+}
+
+void ModuleEditor::SceneWindow()
+{
+	ImGui::Begin("Scene");
+	//get the mouse position
+	ImVec2 pos = ImGui::GetCursorScreenPos();
+
+	//pass the texture of the FBO
+	//window.getRenderTexture() is the texture of the FBO
+	//the next parameter is the upper left corner for the uvs to be applied at
+	//the third parameter is the lower right corner
+	//the last two parameters are the UVs
+	//they have to be flipped (normally they would be (0,0);(1,1) 
+	ImGui::GetWindowDrawList()->AddImage(
+		(void*)App->renderer->GetFBTexture(),
+		ImVec2(ImGui::GetCursorScreenPos()),
+		ImVec2(ImGui::GetCursorScreenPos().x + App->window->screen_surface->w,
+			ImGui::GetCursorScreenPos().y + App->window->screen_surface->h), ImVec2(0, 1), ImVec2(1, 0));
+
+	//we are done working with this window
 	ImGui::End();
 }

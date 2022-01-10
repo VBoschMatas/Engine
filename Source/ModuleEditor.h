@@ -37,6 +37,7 @@ private:
 	Timer print_freq;
 
 	void MainMenuBar();
+	void SceneWindow();
 	void AboutWindow();
 	void ConsoleWindow();
 	void ConfigurationWindow();

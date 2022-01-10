@@ -94,6 +94,8 @@ bool ModuleRender::Init()
 	SDL_Surface* screen_surface = App->window->screen_surface;
 	glViewport(0, 0, screen_surface->w, screen_surface->h);
 
+	LoadFrameBuffer();
+
 	program = App->program->CreateProgram("shaders/light_vertex.glsl", "shaders/light_fragment.glsl");
 
 	model = new Model();
@@ -108,6 +110,7 @@ update_status ModuleRender::PreUpdate()
 	glViewport(0, 0, screen_surface->w, screen_surface->h);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ClearFrameBuffer();
 	return UPDATE_CONTINUE;
 }
 
@@ -117,9 +120,15 @@ update_status ModuleRender::Update()
 	SDL_Surface* screen_surface = App->window->screen_surface;
 
 	//TempLight();
+
+	//Draw inside the framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
 	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
 	if(model != nullptr)
 		model->Draw(program);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return UPDATE_CONTINUE;
 }
@@ -135,7 +144,7 @@ bool ModuleRender::CleanUp()
 {
 	DEBUG("Destroying renderer");
 	SDL_GL_DeleteContext(context);
-
+	glDeleteFramebuffers(1, &fbo);
 	delete(model);
 
 	return true;
@@ -181,4 +190,37 @@ void ModuleRender::TempLight()
 {
 	glUniform3f(glGetUniformLocation(program, "lightDir"), 0.2f, 0.9f, 0.7f);
 	glUniform3f(glGetUniformLocation(program, "ambientColor"), 1.0f, 1.0f, 1.0f);
+}
+
+void ModuleRender::LoadFrameBuffer()
+{
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	// We create the frameobject texture
+	glGenTextures(1, &textureColorbuffer);
+	glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, App->window->screen_surface->w, App->window->screen_surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// attach it to currently bound framebuffer object
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+
+	// We create a Renderbuffer to save the data in a quick access buffer
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, App->window->screen_surface->w, App->window->screen_surface->h);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+}
+
+void ModuleRender::ClearFrameBuffer()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glViewport(0, 0, App->window->screen_surface->w, App->window->screen_surface->h);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
