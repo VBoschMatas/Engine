@@ -59,14 +59,17 @@ void Mesh::CreateVAO()
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+
+	glBindVertexArray(0);
 	console->AddLog("	VAO created with VBO and EBO");
 }
 
-void Mesh::Draw(unsigned int program)
+void Mesh::Draw(unsigned int program, float3 position, float3 rotation)
 {
 	const float4x4& view = App->editorcamera->getView();
 	const float4x4 proj = App->editorcamera->getProjection();
-	float4x4 model = float4x4::identity;
+	//float4x4 model = float4x4::identity;
+	float4x4 model = float4x4::FromEulerXYZ(position.x, position.y, position.z);
 
 	glUseProgram(program);
 

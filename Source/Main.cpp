@@ -3,6 +3,7 @@
 #include "ModuleRender.h"
 #include "Globals.h"
 #include "Timer.h"
+#include "optick.h"
 
 #include "SDL/include/SDL.h"
 #pragma comment( lib, "SDL/lib/x64/SDL2.lib" )
@@ -31,6 +32,8 @@ int main(int argc, char ** argv)
 
 	while (state != MAIN_EXIT)
 	{
+		OPTICK_FRAME("MainThread");
+
 		switch (state)
 		{
 		case MAIN_CREATION:

@@ -13,6 +13,7 @@ class ModuleEditor;
 class ModuleEditorCamera;
 class ModuleTexture;
 class ModuleDebugDraw;
+class ModuleScene;
 
 class Application
 {
@@ -34,6 +35,7 @@ public:
 	ModuleEditorCamera* editorcamera = nullptr;
 	ModuleTexture* textures = nullptr;
 	ModuleDebugDraw* dd = nullptr;
+	ModuleScene* scene = nullptr;
 
 private:
 	std::list<Module*> modules;

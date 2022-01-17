@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include "Globals.h"
+#include "GameObject.h"
 #include "ModuleTexture.h"
 #include "Mesh.h"
 #include "Geometry/OBB.h"
@@ -13,7 +14,7 @@ struct Material
 	std::vector<unsigned int> texture_id;
 };
 
-class Model
+class Model : public GameObject
 {
 public:
 	Model() = default;
@@ -24,10 +25,26 @@ public:
 
 	void PrintModelInfo();
 
+	void SetPosition(float x, float y, float z)
+	{
+		position = { x, y, z };
+	};
+
+	void SetRotation(float x, float y, float z)
+	{
+		rotation = { x, y, z };
+	};
+
+	float3 GetPosition() { return position; };
+	float3 GetRotation() { return rotation; };
+
 	std::vector<Mesh> GetMeshes() { return meshes; };
 
 	math::OBB bounding_box;
 private:
+	float3 position = {0.0f, 0.0f, 0.0f};
+	float3 rotation = {0.0f, 0.0f, 0.0f};
+
 	std::vector<Mesh> meshes;
 	std::string directory;
 

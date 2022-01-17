@@ -10,7 +10,7 @@ public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	~Mesh();
 
-	void Draw(unsigned int program);
+	void Draw(unsigned int program, float3 position, float3 rotation);
 
 	unsigned int GetVertices() { return num_vertices; };
 	unsigned int GetIndices() { return num_indices; };

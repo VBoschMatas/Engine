@@ -141,7 +141,11 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int mate
 
 	unsigned int n_textures = material->GetTextureCount(type);
 	if (n_textures == 0)
+	{
+		bool temp;
 		console->AddLog("This model has no textures!");
+		textures.push_back(App->textures->LoadTexture("textures/default.jfif", temp));
+	}
 
 	for (unsigned int i = 0; i < n_textures; ++i)
 	{
@@ -199,6 +203,8 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int mate
 				if (!texture_found && !already_exists)
 				{
 					console->AddLog("		Textures not found!");
+					App->textures->UnloadTexture(1, &texture.id);
+					texture = App->textures->LoadTexture("textures/default.jfif", texture_found);
 				}
 			}
 		}
@@ -219,7 +225,7 @@ void Model::Draw(unsigned int program)
 {
 	for (unsigned int i = 0; i < meshes.size(); ++i)
 	{
-		meshes[i].Draw(program);
+		meshes[i].Draw(program, position, rotation);
 	}
 }
 

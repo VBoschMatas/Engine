@@ -2,6 +2,7 @@
 #include "ModuleEditor.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
+#include "ModuleScene.h"
 #include "Model.h"
 #include "Mesh.h"
 #include <iostream>

@@ -10,7 +10,10 @@
 #include "MathGeoLib.h"
 #include "ModuleEditorCamera.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleScene.h"
+#include "GameObject.h"
 #include "Model.h"
+#include "optick.h"
 
 ModuleRender::ModuleRender()
 {
@@ -98,9 +101,11 @@ bool ModuleRender::Init()
 
 	program = App->program->CreateProgram("shaders/light_vertex.glsl", "shaders/light_fragment.glsl");
 
-	model = new Model();
-	model->Load("BakerHouse.fbx");
+	//model = new Model();
+	//model->Load("BakerHouse.fbx");
 
+	App->scene->AddGameObject(GoType::Model, "models/WoodenCrate01.fbx");
+	App->scene->AddGameObject(GoType::Model, "BakerHouse.fbx");
 	return true;
 }
 
@@ -125,8 +130,10 @@ update_status ModuleRender::Update()
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
-	if(model != nullptr)
-		model->Draw(program);
+
+	App->scene->Draw(program);
+	//if(model != nullptr)
+	//	model->Draw(program);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -135,6 +142,7 @@ update_status ModuleRender::Update()
 
 update_status ModuleRender::PostUpdate()
 {
+	OPTICK_EVENT();
 	SDL_GL_SwapWindow(App -> window->window);
 	return UPDATE_CONTINUE;
 }
@@ -145,7 +153,6 @@ bool ModuleRender::CleanUp()
 	DEBUG("Destroying renderer");
 	SDL_GL_DeleteContext(context);
 	glDeleteFramebuffers(1, &fbo);
-	delete(model);
 
 	return true;
 }
