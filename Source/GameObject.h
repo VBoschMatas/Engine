@@ -64,6 +64,6 @@ private:
 	GameObject* parent;
 	std::vector<GameObject*> children;
 
-	std::vector<Component*> components;
+	std::vector<Component> components;
 };
 

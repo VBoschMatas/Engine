@@ -11,10 +11,9 @@
 #include "GL/glew.h"
 #include "IL/il.h"
 
-//std::vector<Component*> Model::Load(const std::string file_name)
-void Model::Load(const std::string file_name)
+std::vector<Component> Model::Load(const std::string file_name)
 {
-	std::vector<Component*> comp_list = {};
+	std::vector<Component> comp_list = {};
 
 	Assimp::Importer import;
 

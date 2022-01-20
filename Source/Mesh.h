@@ -5,7 +5,7 @@
 #include "Globals.h"
 #include "Component.h"
 
-class Mesh
+class Mesh : Component
 {
 public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);

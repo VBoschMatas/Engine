@@ -20,8 +20,7 @@ public:
 	Model() = default;
 	~Model() = default;
 
-	//std::vector<Component*> Load(const std::string file_name);
-	void Load(const std::string file_name);
+	std::vector<Component> Load(const std::string file_name);
 	void Draw(unsigned int program);
 
 	void PrintModelInfo();
