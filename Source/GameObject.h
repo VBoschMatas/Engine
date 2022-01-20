@@ -1,11 +1,13 @@
 #pragma once
-
+#include "Globals.h"
 #include <vector>
 
 enum class GoType
 {
+	Empty,
 	Model,
-	Camera
+	Camera,
+	Text
 };
 
 class Component;
@@ -13,17 +15,12 @@ class Component;
 class GameObject
 {
 public:
-	GameObject() = default;
-	virtual ~GameObject() = default;
+	GameObject(unsigned int _id);
+	~GameObject() = default;
 
-	virtual void Load(unsigned int _id, const std::string file_name = "")
-	{
-		id = _id;
-		name = "EmptyObject";
-		parent = nullptr;
-	};
+	void Load(const std::string file_name = "", GoType _type = GoType::Empty);
 
-	virtual void Update(unsigned int program) {};
+	void Update(unsigned int program);
 
 	// Setters
 	void setPosition(const float _x, const float _y, const float _z) { position = { _x, _y, _z }; };

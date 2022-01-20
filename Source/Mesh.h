@@ -3,6 +3,7 @@
 #include <vector>
 #include "ModuleTexture.h"
 #include "Globals.h"
+#include "Component.h"
 
 class Mesh
 {

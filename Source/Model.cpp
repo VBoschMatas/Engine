@@ -11,8 +11,11 @@
 #include "GL/glew.h"
 #include "IL/il.h"
 
+//std::vector<Component*> Model::Load(const std::string file_name)
 void Model::Load(const std::string file_name)
 {
+	std::vector<Component*> comp_list = {};
+
 	Assimp::Importer import;
 
 	size_t dir_length = std::string::npos;
@@ -57,6 +60,7 @@ void Model::Load(const std::string file_name)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
 		meshes.push_back(LoadMeshes(mesh, scene, all_vertices));
+		//comp_list.push_back(LoadMeshes(mesh, scene, all_vertices));
 	}
 	console->AddLog("Creating OBB for the object");
 	bounding_box = OBB::OptimalEnclosingOBB(&all_vertices[0], all_vertices.size());
@@ -153,6 +157,7 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int mate
 		material->GetTexture(type, i, &path);
 		bool texture_found = false;
 		bool already_exists = false;
+		// Searching in described path
 		console->AddLog("		Checking for textures in described path");
 		std::string mat_dir(directory);
 		mat_dir.append(path.C_Str());
@@ -165,10 +170,14 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int mate
 			already_exists = true;
 		}
 
-		texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
+		if (!already_exists)
+			texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
+
+
+		std::string tex_name(path.C_Str());
+		// Searching in the same dir as the model
 		if (!texture_found && !already_exists)
 		{
-			std::string tex_name(path.C_Str());
 			tex_name = tex_name.substr(0, tex_name.find_last_of('\\'));
 			App->textures->UnloadTexture(1, &texture.id);
 			std::string same_dir(directory);
@@ -182,38 +191,45 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int mate
 				already_exists = true;
 			}
 
-			texture = App->textures->LoadTexture(same_dir.c_str(), texture_found);
-
-			if (!texture_found && !already_exists)
-			{
-				console->AddLog("		Checking for textures in textures directory");
-				App->textures->UnloadTexture(1, &texture.id);
-				std::string tex_dir;
-				tex_dir = "textures\\";
-				tex_dir.append(tex_name);
-
-				tex_hash = std::hash<std::string>{}(tex_dir);
-				if (model_textures.find(tex_hash) != model_textures.end())
-				{
-					texture = model_textures.find(tex_hash)->second;
-					already_exists = true;
-				}
-
-				texture = App->textures->LoadTexture(tex_dir.c_str(), texture_found);
-				if (!texture_found && !already_exists)
-				{
-					console->AddLog("		Textures not found!");
-					App->textures->UnloadTexture(1, &texture.id);
-					texture = App->textures->LoadTexture("textures/default.jfif", texture_found);
-				}
-			}
+			if (!already_exists)
+				texture = App->textures->LoadTexture(same_dir.c_str(), texture_found);
 		}
+
+		// Searching in the Game --> Textures dir
+		if (!texture_found && !already_exists)
+		{
+			console->AddLog("		Checking for textures in textures directory");
+			App->textures->UnloadTexture(1, &texture.id);
+			std::string tex_dir;
+			tex_dir = "textures\\";
+			tex_dir.append(tex_name);
+
+			tex_hash = std::hash<std::string>{}(tex_dir);
+			if (model_textures.find(tex_hash) != model_textures.end())
+			{
+				texture = model_textures.find(tex_hash)->second;
+				already_exists = true;
+			}
+			if (!already_exists)
+				texture = App->textures->LoadTexture(tex_dir.c_str(), texture_found);
+		}
+
+		// Texture not found
+		if (!texture_found && !already_exists)
+		{
+			console->AddLog("		Textures not found!");
+			App->textures->UnloadTexture(1, &texture.id);
+			texture = App->textures->LoadTexture("textures/default.jfif", texture_found);
+		}
+
+		// We save the texture if it is new
 		if (!already_exists)
 		{
 			model_textures.insert(std::pair<unsigned int, Texture>(tex_hash, texture));
 		}
 		else
 			console->AddLog("	This texture was used previously");
+
 		tex_hash_vect.push_back(tex_hash);
 		textures.push_back(texture);
 	}
@@ -257,7 +273,7 @@ void Model::PrintModelInfo()
 	unsigned int total_t = 0, total_v = 0, total_i = 0;
 	for (int i = 0; i < meshes.size(); ++i)
 	{
-		ImGui::TextWrapped("[%d]T: %d  V: %d  I: %d", i, meshes[i].GetIndices()/3, meshes[i].GetVertices(), meshes[i].GetIndices());
+		ImGui::TextWrapped("[%d]T: %d  V: %d  I: %d", i, meshes[i].GetIndices() / 3, meshes[i].GetVertices(), meshes[i].GetIndices());
 		total_t += meshes[i].GetIndices() / 3;
 		total_v += meshes[i].GetVertices();
 		total_i += meshes[i].GetIndices();

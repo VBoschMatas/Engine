@@ -101,11 +101,11 @@ bool ModuleRender::Init()
 
 	program = App->program->CreateProgram("shaders/light_vertex.glsl", "shaders/light_fragment.glsl");
 
-	//model = new Model();
-	//model->Load("BakerHouse.fbx");
+	model = new Model();
+	model->Load("BakerHouse.fbx");
 
-	App->scene->AddGameObject(GoType::Model, "models/WoodenCrate01.fbx");
-	App->scene->AddGameObject(GoType::Model, "BakerHouse.fbx");
+	//App->scene->AddGameObject(GoType::Model, "models/WoodenCrate01.fbx");
+	//App->scene->AddGameObject(GoType::Model, "BakerHouse.fbx");
 	return true;
 }
 
@@ -131,9 +131,9 @@ update_status ModuleRender::Update()
 
 	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
 
-	App->scene->Draw(program);
-	//if(model != nullptr)
-	//	model->Draw(program);
+	//App->scene->Draw(program);
+	if(model != nullptr)
+		model->Draw(program);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

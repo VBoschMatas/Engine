@@ -1,9 +1,9 @@
 #pragma once
 #include "Module.h"
-#include "GameObject.h"
 #include "Globals.h"
 #include <vector>
 #include "Model.h"
+#include "GameObject.h"
 
 class ModuleScene : public Module
 {
@@ -20,7 +20,7 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
-	void AddGameObject(GoType type, const std::string file_name);
+	void AddGameObject(const std::string file_name, GoType type);
 	void RemoveGameObject(unsigned int id);
 
 	void Draw(unsigned int program);

@@ -3,10 +3,10 @@
 #include <vector>
 #include <map>
 #include "Globals.h"
-#include "GameObject.h"
 #include "ModuleTexture.h"
 #include "Mesh.h"
 #include "Geometry/OBB.h"
+#include "Component.h"
 
 struct Material
 {
@@ -14,12 +14,13 @@ struct Material
 	std::vector<unsigned int> texture_id;
 };
 
-class Model : public GameObject
+class Model
 {
 public:
 	Model() = default;
 	~Model() = default;
 
+	//std::vector<Component*> Load(const std::string file_name);
 	void Load(const std::string file_name);
 	void Draw(unsigned int program);
 

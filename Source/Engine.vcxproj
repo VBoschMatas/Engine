@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="imGui\imgui.cpp" />
     <ClCompile Include="imGui\imgui_demo.cpp" />
     <ClCompile Include="imGui\imgui_draw.cpp" />

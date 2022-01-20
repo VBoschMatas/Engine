@@ -46,7 +46,7 @@ bool ModuleScene::CleanUp()
 	return true;
 }
 
-void ModuleScene::AddGameObject(GoType type, const std::string file_name)
+void ModuleScene::AddGameObject(const std::string file_name, GoType type)
 {
 	Model* model = new Model();
 	model->Load(file_name);

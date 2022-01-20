@@ -164,6 +164,7 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ModuleScene.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="GameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
