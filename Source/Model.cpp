@@ -11,9 +11,9 @@
 #include "GL/glew.h"
 #include "IL/il.h"
 
-std::vector<Component> Model::Load(const std::string file_name)
+std::vector<Component*> Model::Load(const std::string &file_name)
 {
-	std::vector<Component> comp_list = {};
+	std::vector<Component*> comp_list;
 
 	Assimp::Importer import;
 
@@ -34,7 +34,7 @@ std::vector<Component> Model::Load(const std::string file_name)
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
 	{
 		console->AddLog("Error loading %s: %s", file_name, import.GetErrorString());
-		return;
+		return {};
 	}
 
 	// Linux absolutepath starts with '/' but for now we will focus on windows
@@ -58,14 +58,15 @@ std::vector<Component> Model::Load(const std::string file_name)
 	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
-		meshes.push_back(LoadMeshes(mesh, scene, all_vertices));
-		//comp_list.push_back(LoadMeshes(mesh, scene, all_vertices));
+		comp_list.push_back(LoadMeshes(mesh, scene, all_vertices));
 	}
 	console->AddLog("Creating OBB for the object");
 	bounding_box = OBB::OptimalEnclosingOBB(&all_vertices[0], all_vertices.size());
+
+	return comp_list;
 }
 
-Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices)
+Mesh* Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices)
 {
 	console->AddLog("Loading mesh...");
 	std::vector<Vertex> vertices;
@@ -110,7 +111,7 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 		}
 	}
 	console->AddLog("	Getting Materials");
-
+	// Through scene ID identify the material passed, then save it if necessary and set a pointer in the mesh and GameObject
 	bool existing_material = false;
 	for (auto const& m : model_materials)
 	{
@@ -132,12 +133,13 @@ Mesh Model::LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& 
 		std::vector<Texture> tex = LoadTextures(material, mesh->mMaterialIndex, aiTextureType_DIFFUSE);
 		textures.insert(textures.end(), tex.begin(), tex.end());
 	}
-	return Mesh(vertices, indices, textures);
+	return new Mesh(vertices, indices, textures);
 }
 
+// Move Load Textures to Mesh
 std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int material_index, aiTextureType type)
 {
-	std::vector<Texture> textures;
+	std::vector<Texture> textures = {};
 
 	std::vector<unsigned int> tex_hash_vect;
 	unsigned int tex_hash;
@@ -148,6 +150,8 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int mate
 		bool temp;
 		console->AddLog("This model has no textures!");
 		textures.push_back(App->textures->LoadTexture("textures/default.jfif", temp));
+
+		return textures;
 	}
 
 	for (unsigned int i = 0; i < n_textures; ++i)
@@ -232,16 +236,10 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int mate
 		tex_hash_vect.push_back(tex_hash);
 		textures.push_back(texture);
 	}
-	model_materials.push_back(Material{ material_index, tex_hash_vect });
-	return textures;
-}
 
-void Model::Draw(unsigned int program)
-{
-	for (unsigned int i = 0; i < meshes.size(); ++i)
-	{
-		meshes[i].Draw(program, position, rotation);
-	}
+	model_materials.push_back(Material{ material_index, tex_hash_vect });
+
+	return textures;
 }
 
 /*
@@ -272,10 +270,10 @@ void Model::PrintModelInfo()
 	unsigned int total_t = 0, total_v = 0, total_i = 0;
 	for (int i = 0; i < meshes.size(); ++i)
 	{
-		ImGui::TextWrapped("[%d]T: %d  V: %d  I: %d", i, meshes[i].GetIndices() / 3, meshes[i].GetVertices(), meshes[i].GetIndices());
-		total_t += meshes[i].GetIndices() / 3;
-		total_v += meshes[i].GetVertices();
-		total_i += meshes[i].GetIndices();
+		ImGui::TextWrapped("[%d]T: %d  V: %d  I: %d", i, meshes[i]->GetIndices() / 3, meshes[i]->GetVertices(), meshes[i]->GetIndices());
+		total_t += meshes[i]->GetIndices() / 3;
+		total_v += meshes[i]->GetVertices();
+		total_i += meshes[i]->GetIndices();
 	}
 	ImGui::TextWrapped("Total: T: %d  V: %d  I: %d", total_t, total_v, total_i);
 }

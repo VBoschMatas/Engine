@@ -5,24 +5,22 @@
 
 
 
+void Scene::Update(unsigned int program)
+{
+	for (GameObject* go : children)
+	{
+		go->Update(program);
+	}
+}
 
 
 void Scene::AddGameObject(const std::string file_name, GoType type)
 {
 	++last_go_id;
-	GameObject* model = new GameObject(last_go_id);
+	GameObject* go = new GameObject(last_go_id);
 
-	//model->Model::Load(file_name);
-	
-	switch (type)
-	{
-	case GoType::Model:
-		//Model* model = new Model(last_go_id);
-		break;
-	default:
-		//GameObject* go = new GameObject(last_go_id);
-		break;
-	}
+	go->Load(file_name, type);
 
-	children.push_back(model);
+	game_objects.push_back(go);
+	children.push_back(go);
 }

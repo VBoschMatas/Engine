@@ -318,6 +318,8 @@ void ModuleEditor::InspectorWindow()
 {
 	ImGui::Begin("Inspector", &inspector_window);
 
+	ImGui::TextWrapped("Currently not working");
+
 	if (ImGui::CollapsingHeader("Object"))
 	{
 		App->renderer->model->PrintModelInfo();

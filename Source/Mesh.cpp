@@ -6,7 +6,7 @@
 #include "Math/float2.h"
 #include "Math/float4x4.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
+Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, std::vector<Texture> &textures)
 {
 	this->vertices = vertices;
 	this->indices = indices;
@@ -64,11 +64,10 @@ void Mesh::CreateVAO()
 	console->AddLog("	VAO created with VBO and EBO");
 }
 
-void Mesh::Draw(unsigned int program, float3 position, float3 rotation)
+void Mesh::Update(unsigned int program, float3 &position, float3 &rotation, float3 &scale)
 {
 	const float4x4& view = App->editorcamera->getView();
 	const float4x4 proj = App->editorcamera->getProjection();
-	//float4x4 model = float4x4::identity;
 	float4x4 model = float4x4::FromEulerXYZ(position.x, position.y, position.z);
 
 	glUseProgram(program);
@@ -88,4 +87,9 @@ void Mesh::Draw(unsigned int program, float3 position, float3 rotation)
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+}
+
+void Mesh::PrintComponentInfo()
+{
+
 }

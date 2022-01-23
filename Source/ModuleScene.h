@@ -3,7 +3,7 @@
 #include "Globals.h"
 #include <vector>
 #include "Model.h"
-#include "GameObject.h"
+#include "Scene.h"
 
 class ModuleScene : public Module
 {
@@ -20,13 +20,16 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
-	void AddGameObject(const std::string file_name, GoType type);
-	void RemoveGameObject(unsigned int id);
+	void AddScene(const char* name);
+	void RemoveScene(unsigned int id);
+	Scene* getScene(unsigned int id);
+	void Update(unsigned int program);
 
-	void Draw(unsigned int program);
+	unsigned int current_scene;
 
 private:
-	std::vector<Model*> GameObjects;
+	unsigned int scenes_number;
+	std::vector<Scene*> Scenes;
 
 };
 

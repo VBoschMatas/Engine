@@ -5,16 +5,18 @@
 #include "Globals.h"
 #include "Component.h"
 
-class Mesh : Component
+class Mesh : public Component
 {
 public:
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+	Mesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, std::vector<Texture> &textures);
 	~Mesh();
 
-	void Draw(unsigned int program, float3 position, float3 rotation);
+	void Update(unsigned int program, float3 &position, float3 &rotation, float3 &sacale) override;
 
 	unsigned int GetVertices() { return num_vertices; };
 	unsigned int GetIndices() { return num_indices; };
+
+	void PrintComponentInfo() override;
 private:
 	unsigned int vbo;
 	unsigned int ebo;

@@ -7,12 +7,7 @@
 #include "Mesh.h"
 #include "Geometry/OBB.h"
 #include "Component.h"
-
-struct Material
-{
-	unsigned int id;
-	std::vector<unsigned int> texture_id;
-};
+#include "Scene.h"
 
 class Model
 {
@@ -20,8 +15,7 @@ public:
 	Model() = default;
 	~Model() = default;
 
-	std::vector<Component> Load(const std::string file_name);
-	void Draw(unsigned int program);
+	std::vector<Component*> Load(const std::string &file_name);
 
 	void PrintModelInfo();
 
@@ -38,14 +32,14 @@ public:
 	float3 GetPosition() { return position; };
 	float3 GetRotation() { return rotation; };
 
-	std::vector<Mesh> GetMeshes() { return meshes; };
+	std::vector<Mesh*> GetMeshes() { return meshes; };
 
 	math::OBB bounding_box;
 private:
 	float3 position = {0.0f, 0.0f, 0.0f};
 	float3 rotation = {0.0f, 0.0f, 0.0f};
 
-	std::vector<Mesh> meshes;
+	std::vector<Mesh*> meshes;
 	std::string directory;
 
 	std::string model_name;
@@ -55,6 +49,6 @@ private:
 	std::vector<Material> model_materials;
 
 	std::vector<Texture> LoadTextures(aiMaterial* material, unsigned int material_index, aiTextureType type);
-	Mesh LoadMeshes(aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices);
+	Mesh* LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices);
 };
 

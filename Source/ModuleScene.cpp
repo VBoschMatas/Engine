@@ -2,7 +2,7 @@
 
 ModuleScene::ModuleScene()
 {
-	GameObjects = {};
+	Scenes = {};
 }
 
 ModuleScene::~ModuleScene()
@@ -15,7 +15,8 @@ ModuleScene::~ModuleScene()
 
 bool ModuleScene::Init()
 {
-	GameObjects = {};
+	Scenes = {};
+	current_scene = 0;
 
 	return true;
 }
@@ -37,32 +38,37 @@ update_status ModuleScene::PostUpdate()
 
 bool ModuleScene::CleanUp()
 {
-	for (int i = 0; i < GameObjects.size(); ++i)
+	for (int i = 0; i < Scenes.size(); ++i)
 	{
-		delete(GameObjects[i]);
+		delete(Scenes[i]);
 	}
 
-	GameObjects.clear();
+	Scenes.clear();
 	return true;
 }
 
-void ModuleScene::AddGameObject(const std::string file_name, GoType type)
+void ModuleScene::AddScene(const char* name)
 {
-	Model* model = new Model();
-	model->Load(file_name);
+	Scene* scene = new Scene(name, scenes_number);
 
-	GameObjects.push_back(model);
+	Scenes.push_back(scene);
 }
 
-void ModuleScene::RemoveGameObject(unsigned int id) //for now it deletes all GameObjects
+void ModuleScene::RemoveScene(unsigned int id) //for now it deletes all GameObjects
 {
-	GameObjects.clear();
+	Scenes.clear();
 }
 
-void ModuleScene::Draw(unsigned int program)
+Scene* ModuleScene::getScene(unsigned int id)
 {
-	for (int i = 0; i < GameObjects.size(); ++i)
+	return Scenes[id];
+}
+
+void ModuleScene::Update(unsigned int program)
+{
+	Scenes[current_scene]->Update(program);
+	/*for (int i = 0; i < Scenes.size(); ++i)
 	{
-		GameObjects[i]->Draw(program);
-	}
+		Scenes[i]->Update(program);
+	}*/
 }

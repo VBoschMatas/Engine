@@ -11,6 +11,7 @@ enum class GoType
 };
 
 class Component;
+class Scene;
 
 class GameObject
 {
@@ -18,7 +19,7 @@ public:
 	GameObject(unsigned int _id);
 	~GameObject() = default;
 
-	void Load(const std::string file_name = "", GoType _type = GoType::Empty);
+	void Load(const std::string &file_name = "", GoType _type = GoType::Empty);
 
 	void Update(unsigned int program);
 
@@ -53,6 +54,7 @@ public:
 
 	bool active;
 
+	void PrintGameObjectInfo();
 private:
 	unsigned int id;
 	float3 position;
@@ -64,6 +66,6 @@ private:
 	GameObject* parent;
 	std::vector<GameObject*> children;
 
-	std::vector<Component> components;
+	std::vector<Component*> components;
 };
 
