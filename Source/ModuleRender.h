@@ -41,4 +41,6 @@ private:
 	unsigned int textureColorbuffer;
 
 	unsigned int program;
+
+	ImVec2 currentWindowSize;
 };

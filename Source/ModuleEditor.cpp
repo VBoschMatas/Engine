@@ -2,6 +2,7 @@
 #include "ModuleEditor.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
+#include "ModuleEditorCamera.h"
 #include "ModuleScene.h"
 #include "Model.h"
 #include "ComponentMesh.h"
@@ -330,6 +331,12 @@ void ModuleEditor::SceneWindow()
 	ImGui::Begin("Scene");
 	//get the mouse position
 	ImVec2 pos = ImGui::GetCursorScreenPos();
+	ImVec2 newWindowSize = ImGui::GetWindowSize();
+	if (newWindowSize.x != currentWindowSize.x || newWindowSize.y != currentWindowSize.y) {
+		currentWindowSize = newWindowSize;
+		App->renderer->WindowResized(newWindowSize.y, newWindowSize.x);
+		App->editorcamera->WindowResized(newWindowSize.y, newWindowSize.x);
+	}
 
 	//pass the texture of the FBO
 	//window.getRenderTexture() is the texture of the FBO

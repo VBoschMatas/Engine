@@ -34,6 +34,8 @@ private:
 	bool quit_engine = false;
 	std::string license_text;
 
+	ImVec2 currentWindowSize;
+
 	Timer print_freq;
 
 	void MainMenuBar();
