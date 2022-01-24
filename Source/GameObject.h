@@ -28,6 +28,7 @@ public:
 	// Setters
 	void setName(const char* _name) { name = _name; };
 	void addChild(GameObject* _gameobject) { children.push_back(_gameobject); };
+	void addChildren(std::vector<GameObject*> _gameobjects) { children.insert(children.end(), _gameobjects.begin(), _gameobjects.end()); };
 	void setParent(GameObject* _parent) { parent = _parent; };
 	void addComponent(Component* _component) { components.push_back(_component); }; // If just one component is added
 	void addComponent(std::vector<Component*> _components) {components.insert(components.end(),_components.begin(), _components.end()); }; // If a group of components are added

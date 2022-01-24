@@ -41,5 +41,6 @@ private:
 
 	std::vector<Texture> LoadTextures(aiMaterial* material, unsigned int material_index, aiTextureType type);
 	ComponentMesh* LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices);
+	std::vector<GameObject*> LoadChildren(aiNode* aiParent, GameObject* goParent,const aiScene* scene);
 };
 

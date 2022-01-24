@@ -63,29 +63,66 @@ std::vector<GameObject*> Model::Load(const std::string &file_name, GameObject* r
 	directory.append("\\");
 
 	std::vector<float3> all_vertices;
-	console->AddLog("Detected %d meshes", scene->mNumMeshes);
-	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
-	{
-		std::vector<Component*> comp_list = {};
-		// For every mesh we create a new empty GameObject
-		GameObject* new_child = App->scene->getScene(App->scene->current_scene)->AddGameObject(scene->mMeshes[i]->mName.C_Str(), root, GoType::Empty);
-		children.push_back(new_child);
+	console->AddLog("Detected %d children", scene->mRootNode->mNumChildren);
+	//for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
+	//{
+	//	std::vector<Component*> comp_list = {};
+	//	// For every mesh we create a new empty GameObject
+	//	GameObject* new_child = App->scene->getScene(App->scene->current_scene)->AddGameObject(scene->mMeshes[i]->mName.C_Str(), root, GoType::Empty);
+	//	children.push_back(new_child);
 
-		aiMesh* mesh = scene->mMeshes[i];
-		console->AddLog("Loading mesh %s", scene->mMeshes[i]->mName.C_Str());
-		ComponentMesh* aux_comp = LoadMeshes(mesh, scene, all_vertices);
-		comp_list.push_back(aux_comp);
-		//App->scene->getScene(App->scene->current_scene)->AddGameObject()
+	//	aiMesh* mesh = scene->mMeshes[i];
+	//	console->AddLog("Loading mesh %s", scene->mMeshes[i]->mName.C_Str());
+	//	ComponentMesh* aux_comp = LoadMeshes(mesh, scene, all_vertices);
+	//	comp_list.push_back(aux_comp);
+	//	//App->scene->getScene(App->scene->current_scene)->AddGameObject()
 
-		new_child->addComponent(comp_list);
-		std::vector<Component*> compo = children.back()->getComponents();
-	}
+	//	new_child->addComponent(comp_list);
+	//	std::vector<Component*> compo = children.back()->getComponents();
+	//}
+
+	children = LoadChildren(scene->mRootNode, root, scene);
 
 	console->AddLog("Creating OBB for the object");
-	bounding_box = OBB::OptimalEnclosingOBB(&all_vertices[0], all_vertices.size());
+	//bounding_box = OBB::OptimalEnclosingOBB(&all_vertices[0], all_vertices.size());
 
 	root->setName(model_name.substr(0, std::string::size_type(model_name.find_last_of('.'))).c_str());
+	//scene->mRootNode->mTransformation   TO DEVELOP
 
+	return children;
+}
+
+std::vector<GameObject*> Model::LoadChildren(aiNode* aiParent, GameObject* goParent, const aiScene* scene)
+{
+	std::vector<GameObject*> children = {};
+	for (unsigned int i = 0; i < aiParent->mNumChildren; ++i)
+	{
+		std::vector<Component*> comp_list = {};
+
+		aiNode* new_go = aiParent->mChildren[i];
+		GameObject* new_child = App->scene->getScene(App->scene->current_scene)->AddGameObject(new_go->mName.C_Str(), goParent, GoType::Empty);
+		children.push_back(new_child);
+
+		std::vector<GameObject*> grandchildren = {};
+		grandchildren = LoadChildren(new_go, new_child, scene);
+
+		console->AddLog("Detected %d meshes", new_go->mNumMeshes);
+		for (unsigned int i = 0; i < new_go->mNumMeshes; ++i)
+		{
+			unsigned int mesh_id = new_go->mMeshes[i];
+			aiMesh* mesh = scene->mMeshes[mesh_id];
+
+			console->AddLog("Loading mesh %s", scene->mMeshes[mesh_id]->mName.C_Str());
+			std::vector<float3> all_vertices;
+			ComponentMesh* aux_comp = LoadMeshes(mesh, scene, all_vertices);
+			comp_list.push_back(aux_comp);
+		}
+		//App->scene->getScene(App->scene->current_scene)->AddGameObject()
+		new_child->addComponent(comp_list);
+		new_child->addChildren(grandchildren);
+
+		//std::vector<Component*> compo = children.back()->getComponents();
+	}
 	return children;
 }
 

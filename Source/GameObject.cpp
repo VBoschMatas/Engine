@@ -5,6 +5,7 @@
 #include "Application.h"
 #include "ModuleScene.h"
 #include "Scene.h"
+#include "MathGeoLib.h"
 
 GameObject::GameObject(unsigned int _id, GameObject* _parent)
 {
@@ -36,7 +37,7 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 	{
 		Model* model = new Model();
 		std::vector<GameObject*> t_vect = model->Load(file_name, this);
-		children.insert(children.end(), t_vect.begin(), t_vect.end());
+		addChildren(t_vect);
 		delete(model);
 	}
 	break;
@@ -57,12 +58,13 @@ void GameObject::Update(unsigned int program)
 	if (!active)
 		return;
 
-	float3 position, rotation, scale;
+	float3 position, scale;
+	Quat rotation;
 
 	if (parent == nullptr)
 	{
 		position = { 0.0f, 0.0f, 0.0f };
-		rotation = { 0.0f, 0.0f, 0.0f };
+		rotation = Quat::FromEulerXYZ(0.0f, 0.0f, 0.0f);
 		scale = { 1.0f, 1.0f, 1.0f };
 	}
 	else 
@@ -104,9 +106,8 @@ ComponentTransform* GameObject::Transform()
 void GameObject::printGameObjectInfo()
 {
 	const ImVec4 title_colour(255, 255, 0, 255);
-
-	ImGui::Checkbox("", &active);
-	ImGui::TextColored(title_colour, getName().c_str());
+	ImGui::Checkbox("Active", &active); 
+	ImGui::InputText("Name", &name[0], 64);
 
 	ImGui::Separator();
 
@@ -146,10 +147,12 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 	else
 	{
 		node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-		ImGui::TreeNodeEx((void*)true, node_flags, "%s", name.c_str());
+		ImGui::TreeNodeEx((void*)this->id, node_flags, "%s", name.c_str());
 
 		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
 			App->scene->getScene(App->scene->current_scene)->selected_gameObject = this;
+
+
 	}
 	
 }

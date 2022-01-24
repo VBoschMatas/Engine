@@ -16,7 +16,7 @@ public:
 	ComponentMesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, std::vector<Texture> &textures);
 	~ComponentMesh();
 
-	void Update(unsigned int program, float3& position, float3& rotation, float3& scale) override;
+	void Update(unsigned int program, float3& position, Quat& rotation, float3& scale) override;
 
 	unsigned int GetVertices() { return num_vertices; };
 	unsigned int GetIndices() { return num_indices; };
