@@ -4,7 +4,7 @@
 #include "ModuleRender.h"
 #include "ModuleScene.h"
 #include "Model.h"
-#include "Mesh.h"
+#include "ComponentMesh.h"
 #include <iostream>
 #include <fstream>
 #include <direct.h>
@@ -78,6 +78,7 @@ update_status ModuleEditor::PreUpdate()
 		InspectorWindow();
 
 	SceneWindow();
+	HierarchyWindow();
 
 	return UPDATE_CONTINUE;
 }
@@ -317,13 +318,9 @@ void ModuleEditor::PhysicalMemory(float& total, float& consumed)
 void ModuleEditor::InspectorWindow()
 {
 	ImGui::Begin("Inspector", &inspector_window);
-
-	ImGui::TextWrapped("Currently not working");
-
-	if (ImGui::CollapsingHeader("Object"))
-	{
-		App->renderer->model->PrintModelInfo();
-	}
+	GameObject* inspected = App->scene->getScene(App->scene->current_scene)->selected_gameObject;
+	if (inspected != nullptr)
+		inspected->printGameObjectInfo();
 
 	ImGui::End();
 }
@@ -347,5 +344,14 @@ void ModuleEditor::SceneWindow()
 			ImGui::GetCursorScreenPos().y + App->window->screen_surface->h), ImVec2(0, 1), ImVec2(1, 0));
 
 	//we are done working with this window
+	ImGui::End();
+}
+
+void ModuleEditor::HierarchyWindow()
+{
+	ImGui::Begin("Hierarchy");
+
+	App->scene->printHierarchy();
+
 	ImGui::End();
 }

@@ -1,4 +1,4 @@
-#include "Mesh.h"
+#include "ComponentMesh.h"
 #include "Application.h"
 #include "ModuleProgram.h"
 #include "ModuleEditorCamera.h"
@@ -6,25 +6,27 @@
 #include "Math/float2.h"
 #include "Math/float4x4.h"
 
-Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, std::vector<Texture> &textures)
+ComponentMesh::ComponentMesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, std::vector<Texture> &textures)
 {
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
-
+	type = CompType::Mesh;
+	visible = true;
 	LoadVBO();
 	LoadEBO();
 	CreateVAO();
+	console->AddLog("Base mesh component of type: %d", getType());
 }
 
-Mesh::~Mesh()
+ComponentMesh::~ComponentMesh()
 {
 	//glDeleteBuffers(1, &ebo);
 	//glDeleteBuffers(1, &vbo);
 	//glDeleteVertexArrays(1, &vao);
 }
 
-void Mesh::LoadVBO()
+void ComponentMesh::LoadVBO()
 {
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -34,7 +36,7 @@ void Mesh::LoadVBO()
 	num_vertices = vertices.size();
 }
 
-void Mesh::LoadEBO()
+void ComponentMesh::LoadEBO()
 {
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -44,7 +46,7 @@ void Mesh::LoadEBO()
 	num_indices = indices.size();
 }
 
-void Mesh::CreateVAO()
+void ComponentMesh::CreateVAO()
 {
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -64,11 +66,14 @@ void Mesh::CreateVAO()
 	console->AddLog("	VAO created with VBO and EBO");
 }
 
-void Mesh::Update(unsigned int program, float3 &position, float3 &rotation, float3 &scale)
+void ComponentMesh::Update(unsigned int program, float3& position, float3& rotation, float3& scale)
 {
+	if (!visible)
+		return;
+
 	const float4x4& view = App->editorcamera->getView();
 	const float4x4 proj = App->editorcamera->getProjection();
-	float4x4 model = float4x4::FromEulerXYZ(position.x, position.y, position.z);
+	float4x4 model = float4x4::Translate(position.x, position.y, position.z);
 
 	glUseProgram(program);
 
@@ -89,7 +94,13 @@ void Mesh::Update(unsigned int program, float3 &position, float3 &rotation, floa
 	glBindVertexArray(0);
 }
 
-void Mesh::PrintComponentInfo()
+void ComponentMesh::printComponentInfo()
 {
+	const ImVec4 title_colour(255, 255, 0, 255);
 
+	ImGui::TextColored(title_colour, "Mesh");
+
+	ImGui::TextWrapped("Triangles: %d  (V: %d  I: %d)", GetIndices() / 3, GetVertices(), GetIndices());
+
+	ImGui::Checkbox("Visible", &visible);
 }

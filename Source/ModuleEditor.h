@@ -42,6 +42,7 @@ private:
 	void ConsoleWindow();
 	void ConfigurationWindow();
 	void InspectorWindow();
+	void HierarchyWindow();
 	void VirtualMemory(float& total, float& consumed);
 	void PhysicalMemory(float& total, float& consumed);
 };

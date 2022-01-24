@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "Application.h"
 #include "ModuleProgram.h"
+#include "ModuleScene.h"
 #include "assimp/cimport.h"
 #include "assimp/postprocess.h"
 #include "assimp/material.h"
@@ -11,9 +12,9 @@
 #include "GL/glew.h"
 #include "IL/il.h"
 
-std::vector<Component*> Model::Load(const std::string &file_name)
+std::vector<GameObject*> Model::Load(const std::string &file_name, GameObject* root)
 {
-	std::vector<Component*> comp_list;
+	std::vector<GameObject*> children = {};
 
 	Assimp::Importer import;
 
@@ -26,6 +27,14 @@ std::vector<Component*> Model::Load(const std::string &file_name)
 		model_name = file_name.substr(dir_length);
 	else
 		model_name = file_name;
+
+	// We clean up the name
+	std::string junk_chars = "/:*\?\"<>|\\";
+	model_name.erase(std::remove_if(model_name.begin(), model_name.end(),
+		[&junk_chars](const char& c) {
+			return junk_chars.find(c) != std::string::npos;
+		}),
+		model_name.end());
 
 	console->AddLog("Reading object: %s", model_name.c_str());
 
@@ -57,16 +66,30 @@ std::vector<Component*> Model::Load(const std::string &file_name)
 	console->AddLog("Detected %d meshes", scene->mNumMeshes);
 	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
 	{
+		std::vector<Component*> comp_list = {};
+		// For every mesh we create a new empty GameObject
+		GameObject* new_child = App->scene->getScene(App->scene->current_scene)->AddGameObject(scene->mMeshes[i]->mName.C_Str(), root, GoType::Empty);
+		children.push_back(new_child);
+
 		aiMesh* mesh = scene->mMeshes[i];
-		comp_list.push_back(LoadMeshes(mesh, scene, all_vertices));
+		console->AddLog("Loading mesh %s", scene->mMeshes[i]->mName.C_Str());
+		ComponentMesh* aux_comp = LoadMeshes(mesh, scene, all_vertices);
+		comp_list.push_back(aux_comp);
+		//App->scene->getScene(App->scene->current_scene)->AddGameObject()
+
+		new_child->addComponent(comp_list);
+		std::vector<Component*> compo = children.back()->getComponents();
 	}
+
 	console->AddLog("Creating OBB for the object");
 	bounding_box = OBB::OptimalEnclosingOBB(&all_vertices[0], all_vertices.size());
 
-	return comp_list;
+	root->setName(model_name.substr(0, std::string::size_type(model_name.find_last_of('.'))).c_str());
+
+	return children;
 }
 
-Mesh* Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices)
+ComponentMesh* Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices)
 {
 	console->AddLog("Loading mesh...");
 	std::vector<Vertex> vertices;
@@ -111,6 +134,7 @@ Mesh* Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<fl
 		}
 	}
 	console->AddLog("	Getting Materials");
+
 	// Through scene ID identify the material passed, then save it if necessary and set a pointer in the mesh and GameObject
 	bool existing_material = false;
 	for (auto const& m : model_materials)
@@ -133,7 +157,7 @@ Mesh* Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<fl
 		std::vector<Texture> tex = LoadTextures(material, mesh->mMaterialIndex, aiTextureType_DIFFUSE);
 		textures.insert(textures.end(), tex.begin(), tex.end());
 	}
-	return new Mesh(vertices, indices, textures);
+	return new ComponentMesh(vertices, indices, textures);
 }
 
 // Move Load Textures to Mesh

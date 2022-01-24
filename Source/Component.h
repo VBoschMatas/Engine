@@ -1,8 +1,9 @@
 #pragma once
+#include "Globals.h"
 
 enum class CompType
 {
-	Transform,
+	Transform = 0,
 	Mesh,
 	Material
 };
@@ -18,12 +19,9 @@ public:
 
 	virtual void Update(unsigned int program, float3 &position, float3 &rotation, float3 &scale) {};
 	
-	virtual void PrintComponentInfo()
-	{
-		ImGui::TextColored(ImVec4 (255, 255, 0, 255), "Empty Component");
-	};
+	virtual void printComponentInfo() {};
 
-private:
+protected:
 	unsigned int id;
 	CompType type;
 };

@@ -25,6 +25,8 @@ public:
 	Scene* getScene(unsigned int id);
 	void Update(unsigned int program);
 
+	void printHierarchy();
+
 	unsigned int current_scene;
 
 private:

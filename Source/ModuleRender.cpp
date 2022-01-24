@@ -107,7 +107,7 @@ bool ModuleRender::Init()
 	App->scene->AddScene("Scene 1");
 
 	App->scene->getScene(0)->AddGameObject("BakerHouse.fbx", GoType::Model);
-	App->scene->getScene(0)->AddGameObject("models/WoodenCrate01.fbx", GoType::Model);
+	//App->scene->getScene(0)->AddGameObject("models/WoodenCrate01.fbx", GoType::Model);
 
 	//App->scene->AddGameObject(GoType::Model, "models/WoodenCrate01.fbx");
 	//App->scene->AddGameObject(GoType::Model, "BakerHouse.fbx");
@@ -175,12 +175,9 @@ void ModuleRender::DroppedModel(char* path)
 		);
 		return;
 	}
-	if (model != nullptr)
-		delete(model);
 
-	model = new Model();
-	model->Load(path_name);
-	App->editorcamera->FitNewModel();
+	App->scene->getScene(App->scene->current_scene)->AddGameObject(path_name, GoType::Model);
+	//App->editorcamera->FitNewModel();
 }
 
 void ModuleRender::WindowResized(unsigned width, unsigned height)

@@ -7,30 +7,32 @@ enum class GoType
 	Empty,
 	Model,
 	Camera,
-	Text
+	Text,
+	Light
 };
 
 class Component;
 class Scene;
+class ComponentTransform;
 
 class GameObject
 {
 public:
-	GameObject(unsigned int _id);
-	~GameObject() = default;
+	GameObject(unsigned int _id, GameObject* _parent);
+	~GameObject();
 
 	void Load(const std::string &file_name = "", GoType _type = GoType::Empty);
 
 	void Update(unsigned int program);
 
 	// Setters
-	void setPosition(const float _x, const float _y, const float _z) { position = { _x, _y, _z }; };
-	void setRotation(const float _x, const float _y, const float _z) { rotation = { _x, _y, _z }; };
-	void setScale(const float _x, const float _y, const float _z) { scale = { _x, _y, _z }; };
 	void setName(const char* _name) { name = _name; };
 	void addChild(GameObject* _gameobject) { children.push_back(_gameobject); };
 	void setParent(GameObject* _parent) { parent = _parent; };
-	void addComponent(Component* _component) { components.push_back(_component); };
+	void addComponent(Component* _component) { components.push_back(_component); }; // If just one component is added
+	void addComponent(std::vector<Component*> _components) {components.insert(components.end(),_components.begin(), _components.end()); }; // If a group of components are added
+
+	ComponentTransform* Transform();
 
 	// We remove from the list 
 	void removeChild(const GameObject* _gameobject)
@@ -44,28 +46,24 @@ public:
 	}
 
 	// Getters
-	float3 getPosition() { return position; };
-	float3 getRotation() { return rotation; };
-	float3 getScale() { return scale; };
 	std::string getName() { return name; };
 	GoType getType() { return type; };
 	GameObject* getParent() { return parent; };
 	std::vector<GameObject*> getChildren() { return children; };
+	std::vector<Component*> getComponents() { return components; };
 
 	bool active;
+	bool selected;
 
-	void PrintGameObjectInfo();
+	void printGameObjectInfo();
+	void printHierarchy(ImGuiTreeNodeFlags flags);
 private:
 	unsigned int id;
-	float3 position;
-	float3 rotation;
-	float3 scale;
 	std::string name;
 	GoType type;
 
 	GameObject* parent;
 	std::vector<GameObject*> children;
-
 	std::vector<Component*> components;
 };
 

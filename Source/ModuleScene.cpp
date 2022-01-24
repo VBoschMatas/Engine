@@ -1,4 +1,5 @@
 #include "ModuleScene.h"
+#include "imgui.h"
 
 ModuleScene::ModuleScene()
 {
@@ -71,4 +72,9 @@ void ModuleScene::Update(unsigned int program)
 	{
 		Scenes[i]->Update(program);
 	}*/
+}
+
+void ModuleScene::printHierarchy()
+{
+	Scenes[current_scene]->printHierarchy();
 }

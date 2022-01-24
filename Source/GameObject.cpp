@@ -1,26 +1,42 @@
 #include "GameObject.h"
+#include "ComponentTransform.h"
 #include "Model.h"
 #include "imgui.h"
+#include "Application.h"
+#include "ModuleScene.h"
+#include "Scene.h"
 
-GameObject::GameObject(unsigned int _id)
+GameObject::GameObject(unsigned int _id, GameObject* _parent)
 {
 	id = _id;
 	name = "EmptyObject";
-	parent = nullptr;
+	parent = _parent;
+	selected = false;
+	active = true;
 };
+
+GameObject::~GameObject()
+{
+	for (Component* c : components)
+		delete(c);
+}
 
 void GameObject::Load(const std::string &file_name, GoType _type)
 {
 	name = file_name;
 	type = _type;
+	components.clear();
+	// All gameObjects have a transform
+	ComponentTransform* transform = new ComponentTransform();
+	components.push_back(transform);
 
 	switch (type)
 	{
 	case GoType::Model:
 	{
 		Model* model = new Model();
-		std::vector<Component*> t_vect = model->Load(file_name);
-		components.insert(components.end(), t_vect.begin(), t_vect.end());
+		std::vector<GameObject*> t_vect = model->Load(file_name, this);
+		children.insert(children.end(), t_vect.begin(), t_vect.end());
 		delete(model);
 	}
 	break;
@@ -31,13 +47,35 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 		name = "Text";
 		break;
 	default:
+		console->AddLog("Creating empty object...");
 		break;
 	}
 }
 
 void GameObject::Update(unsigned int program)
 {
-	float3 position{0.0f, 0.0f, 0.0f}, rotation{ 0.0f, 0.0f, 0.0f }, scale{ 0.0f, 0.0f, 0.0f };
+	if (!active)
+		return;
+
+	float3 position, rotation, scale;
+
+	if (parent == nullptr)
+	{
+		position = { 0.0f, 0.0f, 0.0f };
+		rotation = { 0.0f, 0.0f, 0.0f };
+		scale = { 1.0f, 1.0f, 1.0f };
+	}
+	else 
+	{
+		position = parent->Transform()->getPos();
+		rotation = parent->Transform()->getRot();
+		scale = parent->Transform()->getSca();
+	}
+
+	for (GameObject* ch : children)
+	{
+		ch->Update(program);
+	}
 
 	for (Component* c : components)
 	{
@@ -45,37 +83,73 @@ void GameObject::Update(unsigned int program)
 	}
 }
 
+ComponentTransform* GameObject::Transform()
+{
+	for (Component* c : components)
+	{
+		if (c->getType() == CompType::Transform)
+		{
+			ComponentTransform* aux_ptr = dynamic_cast<ComponentTransform*>(c);
+			if (aux_ptr)
+				return aux_ptr;
+		}
+	}
+	return nullptr;
+}
+
 
 /*
 	ImGui print for model info
 */
-void GameObject::PrintGameObjectInfo()
+void GameObject::printGameObjectInfo()
 {
 	const ImVec4 title_colour(255, 255, 0, 255);
 
-	ImGui::TextColored(title_colour, "Model");
+	ImGui::Checkbox("", &active);
+	ImGui::TextColored(title_colour, getName().c_str());
+
 	ImGui::Separator();
-	ImGui::TextWrapped("Name: %s", name.c_str());
-	ImGui::TextWrapped("Type: %s", type);
-	ImGui::Separator();
-	ImGui::TextColored(title_colour, "Textures");
-	for (auto const& t : model_textures)
+
+	for (Component* c : components)
 	{
-		ImGui::TextWrapped("Path: %s", t.second.path.c_str());
-		ImGui::Image((void*)(intptr_t)t.second.id, ImVec2(200, 200));
-		ImGui::TextWrapped("%dx%d", t.second.width, t.second.height);
-		ImGui::TextWrapped("\n");
+		c->printComponentInfo();
+
+		ImGui::Separator();
 	}
-	ImGui::TextColored(title_colour, "Meshes");
-	ImGui::Separator();
-	ImGui::TextWrapped("Num of meshes: %d", meshes.size());
-	unsigned int total_t = 0, total_v = 0, total_i = 0;
-	for (int i = 0; i < meshes.size(); ++i)
+}
+
+void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
+{
+	ImGuiTreeNodeFlags node_flags = flags;
+	if(selected)
+		node_flags = ImGuiTreeNodeFlags_Selected;
+
+	selected = false;
+
+	if (children.size() > 0)
 	{
-		ImGui::TextWrapped("[%d]T: %d  V: %d  I: %d", i, meshes[i]->GetIndices() / 3, meshes[i]->GetVertices(), meshes[i]->GetIndices());
-		total_t += meshes[i]->GetIndices() / 3;
-		total_v += meshes[i]->GetVertices();
-		total_i += meshes[i]->GetIndices();
+		bool is_open = ImGui::TreeNodeEx((void*)this->id, node_flags, name.c_str());
+
+		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+			App->scene->getScene(App->scene->current_scene)->selected_gameObject = this;
+
+		if (is_open)
+		{
+			for (GameObject* go : children)
+			{
+				go->printHierarchy(flags);
+			}
+
+			ImGui::TreePop();
+		}
 	}
-	ImGui::TextWrapped("Total: T: %d  V: %d  I: %d", total_t, total_v, total_i);
+	else
+	{
+		node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+		ImGui::TreeNodeEx((void*)true, node_flags, "%s", name.c_str());
+
+		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+			App->scene->getScene(App->scene->current_scene)->selected_gameObject = this;
+	}
+	
 }
