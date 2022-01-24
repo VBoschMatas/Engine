@@ -334,8 +334,8 @@ void ModuleEditor::SceneWindow()
 	ImVec2 newWindowSize = ImGui::GetWindowSize();
 	if (newWindowSize.x != currentWindowSize.x || newWindowSize.y != currentWindowSize.y) {
 		currentWindowSize = newWindowSize;
-		App->renderer->WindowResized(newWindowSize.y, newWindowSize.x);
-		App->editorcamera->WindowResized(newWindowSize.y, newWindowSize.x);
+		App->editorcamera->WindowResized(newWindowSize.x, newWindowSize.y);
+		App->renderer->WindowResized(newWindowSize.x, newWindowSize.y);
 	}
 
 	//pass the texture of the FBO
@@ -343,12 +343,16 @@ void ModuleEditor::SceneWindow()
 	//the next parameter is the upper left corner for the uvs to be applied at
 	//the third parameter is the lower right corner
 	//the last two parameters are the UVs
-	//they have to be flipped (normally they would be (0,0);(1,1) 
-	ImGui::GetWindowDrawList()->AddImage(
+	//they have to be flipped (normally they would be (0,0);(1,1)
+
+	/*ImGui::GetWindowDrawList()->AddImage(
 		(void*)App->renderer->GetFBTexture(),
 		ImVec2(ImGui::GetCursorScreenPos()),
 		ImVec2(ImGui::GetCursorScreenPos().x + App->window->screen_surface->w,
-			ImGui::GetCursorScreenPos().y + App->window->screen_surface->h), ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::GetCursorScreenPos().y + App->window->screen_surface->h), ImVec2(0, 1), ImVec2(1, 0));*/
+
+	ImVec2 windowSize = ImGui::GetWindowSize();
+	ImGui::Image((ImTextureID)App->renderer->GetFBTexture(), windowSize, ImVec2(0, 1), ImVec2(1, 0));
 
 	//we are done working with this window
 	ImGui::End();
