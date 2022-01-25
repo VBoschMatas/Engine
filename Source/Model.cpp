@@ -5,6 +5,7 @@
 #include "Application.h"
 #include "ModuleProgram.h"
 #include "ModuleScene.h"
+#include "ComponentMaterial.h"
 #include "assimp/cimport.h"
 #include "assimp/postprocess.h"
 #include "assimp/material.h"
@@ -62,26 +63,25 @@ std::vector<GameObject*> Model::Load(const std::string &file_name, GameObject* r
 	}
 	directory.append("\\");
 
+	// Load all of the scene materials
+	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+	{
+		Material* material = new Material(scene->mMaterials[i], directory.c_str(), i);
+		App->scene->getScene(App->scene->current_scene)->AddMaterial(material);
+	}
+
+
 	std::vector<float3> all_vertices;
+
+	// Create all its children and components
 	console->AddLog("Detected %d children", scene->mRootNode->mNumChildren);
-	//for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
-	//{
-	//	std::vector<Component*> comp_list = {};
-	//	// For every mesh we create a new empty GameObject
-	//	GameObject* new_child = App->scene->getScene(App->scene->current_scene)->AddGameObject(scene->mMeshes[i]->mName.C_Str(), root, GoType::Empty);
-	//	children.push_back(new_child);
-
-	//	aiMesh* mesh = scene->mMeshes[i];
-	//	console->AddLog("Loading mesh %s", scene->mMeshes[i]->mName.C_Str());
-	//	ComponentMesh* aux_comp = LoadMeshes(mesh, scene, all_vertices);
-	//	comp_list.push_back(aux_comp);
-	//	//App->scene->getScene(App->scene->current_scene)->AddGameObject()
-
-	//	new_child->addComponent(comp_list);
-	//	std::vector<Component*> compo = children.back()->getComponents();
-	//}
 
 	children = LoadChildren(scene->mRootNode, root, scene);
+
+	std::vector<Component*> comp_list = {};
+	comp_list = LoadComponents(scene->mRootNode, scene);
+
+	root->addComponent(comp_list);
 
 	console->AddLog("Creating OBB for the object");
 	//bounding_box = OBB::OptimalEnclosingOBB(&all_vertices[0], all_vertices.size());
@@ -106,17 +106,7 @@ std::vector<GameObject*> Model::LoadChildren(aiNode* aiParent, GameObject* goPar
 		std::vector<GameObject*> grandchildren = {};
 		grandchildren = LoadChildren(new_go, new_child, scene);
 
-		console->AddLog("Detected %d meshes", new_go->mNumMeshes);
-		for (unsigned int i = 0; i < new_go->mNumMeshes; ++i)
-		{
-			unsigned int mesh_id = new_go->mMeshes[i];
-			aiMesh* mesh = scene->mMeshes[mesh_id];
-
-			console->AddLog("Loading mesh %s", scene->mMeshes[mesh_id]->mName.C_Str());
-			std::vector<float3> all_vertices;
-			ComponentMesh* aux_comp = LoadMeshes(mesh, scene, all_vertices);
-			comp_list.push_back(aux_comp);
-		}
+		comp_list = LoadComponents(new_go, scene);
 		//App->scene->getScene(App->scene->current_scene)->AddGameObject()
 		new_child->addComponent(comp_list);
 		new_child->addChildren(grandchildren);
@@ -126,7 +116,26 @@ std::vector<GameObject*> Model::LoadChildren(aiNode* aiParent, GameObject* goPar
 	return children;
 }
 
-ComponentMesh* Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices)
+std::vector<Component*> Model::LoadComponents(aiNode* node, const aiScene* scene)
+{
+	std::vector<Component*> comp_list = {};
+	console->AddLog("Detected %d meshes", node->mNumMeshes);
+	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
+	{
+		unsigned int mesh_id = node->mMeshes[i];
+		aiMesh* mesh = scene->mMeshes[mesh_id];
+
+		console->AddLog("Loading mesh %s", scene->mMeshes[mesh_id]->mName.C_Str());
+		std::vector<float3> all_vertices;
+		std::pair<ComponentMesh*, ComponentMaterial*> aux_comp = LoadMeshes(mesh, scene, all_vertices);
+		comp_list.push_back(aux_comp.first);
+		comp_list.push_back(aux_comp.second);
+	}
+	return comp_list;
+}
+
+// We return the component mesh and the component material indexed to the mesh
+std::pair<ComponentMesh*, ComponentMaterial*> Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices)
 {
 	console->AddLog("Loading mesh...");
 	std::vector<Vertex> vertices;
@@ -170,10 +179,10 @@ ComponentMesh* Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::
 			indices.push_back(face.mIndices[j]);
 		}
 	}
-	console->AddLog("	Getting Materials");
 
-	// Through scene ID identify the material passed, then save it if necessary and set a pointer in the mesh and GameObject
-	bool existing_material = false;
+	// To Component material
+
+	/*bool existing_material = false;
 	for (auto const& m : model_materials)
 	{
 		if (m.id == mesh->mMaterialIndex)
@@ -193,112 +202,120 @@ ComponentMesh* Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 		std::vector<Texture> tex = LoadTextures(material, mesh->mMaterialIndex, aiTextureType_DIFFUSE);
 		textures.insert(textures.end(), tex.begin(), tex.end());
-	}
-	return new ComponentMesh(vertices, indices, textures);
+	}*/
+
+	ComponentMaterial* material = new ComponentMaterial(mesh);
+
+	return std::pair<ComponentMesh*, ComponentMaterial*>(new ComponentMesh(vertices, indices, textures), new ComponentMaterial(mesh));
 }
 
-// Move Load Textures to Mesh
+std::vector<ComponentMaterial*> Model::LoadMaterials(const aiScene* scene)
+{
+
+}
+
+// Move Load Textures to MATERIAL
 std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int material_index, aiTextureType type)
 {
 	std::vector<Texture> textures = {};
 
-	std::vector<unsigned int> tex_hash_vect;
-	unsigned int tex_hash;
+	//std::vector<unsigned int> tex_hash_vect;
+	//unsigned int tex_hash;
 
-	unsigned int n_textures = material->GetTextureCount(type);
-	if (n_textures == 0)
-	{
-		bool temp;
-		console->AddLog("This model has no textures!");
-		textures.push_back(App->textures->LoadTexture("textures/default.jfif", temp));
+	//unsigned int n_textures = material->GetTextureCount(type);
+	//if (n_textures == 0)
+	//{
+	//	bool temp;
+	//	console->AddLog("This model has no textures!");
+	//	textures.push_back(App->textures->LoadTexture("textures/default.jfif", temp));
 
-		return textures;
-	}
+	//	return textures;
+	//}
 
-	for (unsigned int i = 0; i < n_textures; ++i)
-	{
-		aiString path;
-		material->GetTexture(type, i, &path);
-		bool texture_found = false;
-		bool already_exists = false;
-		// Searching in described path
-		console->AddLog("		Checking for textures in described path");
-		std::string mat_dir(directory);
-		mat_dir.append(path.C_Str());
-		Texture texture;
+	//for (unsigned int i = 0; i < n_textures; ++i)
+	//{
+	//	aiString path;
+	//	material->GetTexture(type, i, &path);
+	//	bool texture_found = false;
+	//	bool already_exists = false;
+	//	// Searching in described path
+	//	console->AddLog("		Checking for textures in described path");
+	//	std::string mat_dir(directory);
+	//	mat_dir.append(path.C_Str());
+	//	Texture texture;
 
-		tex_hash = std::hash<std::string>{}(mat_dir);
-		if (model_textures.find(tex_hash) != model_textures.end())
-		{
-			texture = model_textures.find(tex_hash)->second;
-			already_exists = true;
-		}
+	//	tex_hash = std::hash<std::string>{}(mat_dir);
+	//	if (model_textures.find(tex_hash) != model_textures.end())
+	//	{
+	//		texture = model_textures.find(tex_hash)->second;
+	//		already_exists = true;
+	//	}
 
-		if (!already_exists)
-			texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
+	//	if (!already_exists)
+	//		texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
 
 
-		std::string tex_name(path.C_Str());
-		// Searching in the same dir as the model
-		if (!texture_found && !already_exists)
-		{
-			tex_name = tex_name.substr(0, tex_name.find_last_of('\\'));
-			App->textures->UnloadTexture(1, &texture.id);
-			std::string same_dir(directory);
-			same_dir.append(tex_name);
-			console->AddLog("		Checking for textures in same directory as object: %s", same_dir.c_str());
+	//	std::string tex_name(path.C_Str());
+	//	// Searching in the same dir as the model
+	//	if (!texture_found && !already_exists)
+	//	{
+	//		tex_name = tex_name.substr(0, tex_name.find_last_of('\\'));
+	//		App->textures->UnloadTexture(1, &texture.id);
+	//		std::string same_dir(directory);
+	//		same_dir.append(tex_name);
+	//		console->AddLog("		Checking for textures in same directory as object: %s", same_dir.c_str());
 
-			tex_hash = std::hash<std::string>{}(same_dir);
-			if (model_textures.find(tex_hash) != model_textures.end())
-			{
-				texture = model_textures.find(tex_hash)->second;
-				already_exists = true;
-			}
+	//		tex_hash = std::hash<std::string>{}(same_dir);
+	//		if (model_textures.find(tex_hash) != model_textures.end())
+	//		{
+	//			texture = model_textures.find(tex_hash)->second;
+	//			already_exists = true;
+	//		}
 
-			if (!already_exists)
-				texture = App->textures->LoadTexture(same_dir.c_str(), texture_found);
-		}
+	//		if (!already_exists)
+	//			texture = App->textures->LoadTexture(same_dir.c_str(), texture_found);
+	//	}
 
-		// Searching in the Game --> Textures dir
-		if (!texture_found && !already_exists)
-		{
-			console->AddLog("		Checking for textures in textures directory");
-			App->textures->UnloadTexture(1, &texture.id);
-			std::string tex_dir;
-			tex_dir = "textures\\";
-			tex_dir.append(tex_name);
+	//	// Searching in the Game --> Textures dir
+	//	if (!texture_found && !already_exists)
+	//	{
+	//		console->AddLog("		Checking for textures in textures directory");
+	//		App->textures->UnloadTexture(1, &texture.id);
+	//		std::string tex_dir;
+	//		tex_dir = "textures\\";
+	//		tex_dir.append(tex_name);
 
-			tex_hash = std::hash<std::string>{}(tex_dir);
-			if (model_textures.find(tex_hash) != model_textures.end())
-			{
-				texture = model_textures.find(tex_hash)->second;
-				already_exists = true;
-			}
-			if (!already_exists)
-				texture = App->textures->LoadTexture(tex_dir.c_str(), texture_found);
-		}
+	//		tex_hash = std::hash<std::string>{}(tex_dir);
+	//		if (model_textures.find(tex_hash) != model_textures.end())
+	//		{
+	//			texture = model_textures.find(tex_hash)->second;
+	//			already_exists = true;
+	//		}
+	//		if (!already_exists)
+	//			texture = App->textures->LoadTexture(tex_dir.c_str(), texture_found);
+	//	}
 
-		// Texture not found
-		if (!texture_found && !already_exists)
-		{
-			console->AddLog("		Textures not found!");
-			App->textures->UnloadTexture(1, &texture.id);
-			texture = App->textures->LoadTexture("textures/default.jfif", texture_found);
-		}
+	//	// Texture not found
+	//	if (!texture_found && !already_exists)
+	//	{
+	//		console->AddLog("		Textures not found!");
+	//		App->textures->UnloadTexture(1, &texture.id);
+	//		texture = App->textures->LoadTexture("textures/default.jfif", texture_found);
+	//	}
 
-		// We save the texture if it is new
-		if (!already_exists)
-		{
-			model_textures.insert(std::pair<unsigned int, Texture>(tex_hash, texture));
-		}
-		else
-			console->AddLog("	This texture was used previously");
+	//	// We save the texture if it is new
+	//	if (!already_exists)
+	//	{
+	//		model_textures.insert(std::pair<unsigned int, Texture>(tex_hash, texture));
+	//	}
+	//	else
+	//		console->AddLog("	This texture was used previously");
 
-		tex_hash_vect.push_back(tex_hash);
-		textures.push_back(texture);
-	}
+	//	tex_hash_vect.push_back(tex_hash);
+	//	textures.push_back(texture);
+	//}
 
-	model_materials.push_back(Material{ material_index, tex_hash_vect });
+	//model_materials.push_back(Material{ material_index, tex_hash_vect });
 
 	return textures;
 }

@@ -23,6 +23,7 @@ public:
 	void AddScene(const char* name);
 	void RemoveScene(unsigned int id);
 	Scene* getScene(unsigned int id);
+	Scene* getCurrentScene() { return getScene(current_scene); };
 	void Update(unsigned int program);
 
 	void printHierarchy();

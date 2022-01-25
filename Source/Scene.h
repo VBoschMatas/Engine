@@ -12,16 +12,8 @@ class GameObject;
 class Scene
 {
 public:
-	Scene(unsigned int _id)
-	{
-		id = _id;
-		last_go_id = 0;
-	};
-	Scene(const char* _name, unsigned int _id) {
-		name = _name;
-		id = _id;
-		last_go_id = 0;
-	};
+	Scene(unsigned int _id);
+	Scene(const char* _name, unsigned int _id);
 	~Scene() = default;
 
 	void setName(const char* _name) { name = _name; };
@@ -34,11 +26,17 @@ public:
 	GameObject* AddGameObject(const std::string file_name, GameObject* parent, GoType type = GoType::Empty);
 	void RemoveGameObject(unsigned int id);
 
-	GameObject* AddMesh(ComponentMesh* _mesh) { meshes.push_back(_mesh); };
+	void AddMesh(Mesh* _mesh) { meshes.push_back(_mesh); };
+	std::vector<Mesh*> GetMeshes() { return meshes; };
 	void RemoveMesh(unsigned int id);
 
-	GameObject* AddMaterial(Material _material) { scene_materials.push_back(_material); };
+	void AddMaterial(Material* _material) { scene_materials.push_back(_material); };
+	std::vector<Material*> GetMaterials() { return scene_materials; };
 	void RemoveMaterial(unsigned int id);
+
+	void AddTexture(unsigned int index, Texture* texture) { scene_textures.insert(std::pair<unsigned int, Texture*>(index, texture)); };
+	std::map<unsigned int, Texture*> GetTextures() { return scene_textures; };
+	void RemoveTexture(unsigned int id);
 
 	std::vector<GameObject*> getChildren() { return children; };
 
@@ -49,16 +47,23 @@ public:
 
 	GameObject* selected_gameObject = nullptr;
 
+	unsigned int getGoId() { unsigned int temp_id = last_go_id; ++last_go_id; return temp_id; };
+	unsigned int getMeshId() { unsigned int temp_id = last_mesh_id; ++last_mesh_id; return temp_id; };
+	unsigned int getMaterialId() { unsigned int temp_id = last_material_id; ++last_material_id; return temp_id; };
+
 private:
 	unsigned int id;
 	std::string name;
 	std::vector<GameObject*> children; // GameObjects that are directly attached to the root
-	unsigned int last_go_id;
 
 	// List of all GameObjects, Meshes, Textures and Materials used in the scene
 	std::vector<GameObject*> game_objects;
-	std::vector<ComponentMesh*> meshes;
-	std::map<unsigned int, Texture> scene_textures;
-	std::vector<Material> scene_materials;
+	std::vector<Mesh*> meshes;
+	std::map<unsigned int, Texture*> scene_textures;
+	std::vector<Material*> scene_materials;
+
+	unsigned int last_go_id;
+	unsigned int last_mesh_id;
+	unsigned int last_material_id;
 };
 

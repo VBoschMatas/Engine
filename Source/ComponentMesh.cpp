@@ -1,5 +1,6 @@
 #include "ComponentMesh.h"
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleProgram.h"
 #include "ModuleEditorCamera.h"
 #include "GL/glew.h"
@@ -8,45 +9,87 @@
 
 ComponentMesh::ComponentMesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, std::vector<Texture> &textures)
 {
-	this->vertices = vertices;
-	this->indices = indices;
-	this->textures = textures;
+	mesh = new Mesh(vertices, indices, textures, "HOLA CARACOLA");
+
 	type = CompType::Mesh;
 	visible = true;
-	LoadVBO();
-	LoadEBO();
-	CreateVAO();
-	console->AddLog("Base mesh component of type: %d", getType());
 }
 
 ComponentMesh::~ComponentMesh()
+{}
+
+void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotation, float3& scale)
 {
-	//glDeleteBuffers(1, &ebo);
-	//glDeleteBuffers(1, &vbo);
-	//glDeleteVertexArrays(1, &vao);
+	if (!visible)
+		return;
+
+	const float4x4& view = App->editorcamera->getView();
+	const float4x4 proj = App->editorcamera->getProjection();
+	float4x4 model = float4x4::FromTRS(position, rotation, scale);
+
+	glUseProgram(program);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, (const float*)&model);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, (const float*)&view);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, (const float*)&proj);
+
+	for (unsigned int i = 0; i < textures.size(); ++i)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
+		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+	}
+
+	glActiveTexture(GL_TEXTURE0);
+
+	glBindVertexArray(mesh->getVAO());
+	glDrawElements(GL_TRIANGLES, mesh->getIndicesNum(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 }
 
-void ComponentMesh::LoadVBO()
+void ComponentMesh::printComponentInfo()
+{
+	const ImVec4 title_colour(255, 255, 0, 255);
+
+	ImGui::TextColored(title_colour, "Mesh");
+
+	ImGui::TextWrapped("Triangles: %d  (V: %d  I: %d)", GetIndices() / 3, GetVertices(), GetIndices());
+
+	ImGui::Checkbox("Visible", &visible);
+}
+
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<Texture>& textures, std::string name)
+{
+	this->vertices = vertices;
+	this->indices = indices;
+	this->textures = textures;
+	this->name = name;
+	this->id = App->scene->getScene(App->scene->current_scene)->getMeshId();
+}
+
+void Mesh::LoadVBO()
 {
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 	console->AddLog("	VBO loaded");
+
 	num_vertices = vertices.size();
 }
 
-void ComponentMesh::LoadEBO()
+void Mesh::LoadEBO()
 {
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices, GL_STATIC_DRAW);
 	console->AddLog("	EBO loaded");
+
 	num_indices = indices.size();
 }
 
-void ComponentMesh::CreateVAO()
+void Mesh::CreateVAO()
 {
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -64,45 +107,4 @@ void ComponentMesh::CreateVAO()
 
 	glBindVertexArray(0);
 	console->AddLog("	VAO created with VBO and EBO");
-}
-
-void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotation, float3& scale)
-{
-	if (!visible)
-		return;
-
-	const float4x4& view = App->editorcamera->getView();
-	const float4x4 proj = App->editorcamera->getProjection();
-	//float4x4 model = float4x4::Translate(position.x, position.y, position.z);
-	float4x4 model = float4x4::FromTRS(position, rotation, scale);
-	
-
-	glUseProgram(program);
-
-	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, (const float*)&model);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, (const float*)&view);
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, (const float*)&proj);
-	for (unsigned int i = 0; i < textures.size(); ++i)
-	{
-		glActiveTexture(GL_TEXTURE0 + i);
-		glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
-	}
-
-	glActiveTexture(GL_TEXTURE0);
-
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-}
-
-void ComponentMesh::printComponentInfo()
-{
-	const ImVec4 title_colour(255, 255, 0, 255);
-
-	ImGui::TextColored(title_colour, "Mesh");
-
-	ImGui::TextWrapped("Triangles: %d  (V: %d  I: %d)", GetIndices() / 3, GetVertices(), GetIndices());
-
-	ImGui::Checkbox("Visible", &visible);
 }

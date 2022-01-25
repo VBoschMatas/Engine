@@ -40,7 +40,9 @@ private:
 	std::vector<Material> model_materials;
 
 	std::vector<Texture> LoadTextures(aiMaterial* material, unsigned int material_index, aiTextureType type);
-	ComponentMesh* LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices);
-	std::vector<GameObject*> LoadChildren(aiNode* aiParent, GameObject* goParent,const aiScene* scene);
+	std::pair<ComponentMesh*, ComponentMaterial*> LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices);
+	std::vector<ComponentMaterial*> LoadMaterials(const aiScene* scene);
+	std::vector<GameObject*> LoadChildren(aiNode* aiParent, GameObject* goParent, const aiScene* scene);
+	std::vector<Component*> LoadComponents(aiNode* node, const aiScene* scene);
 };
 

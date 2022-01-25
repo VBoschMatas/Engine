@@ -1,7 +1,20 @@
 #include "Scene.h"
 #include "Model.h"
 
+Scene::Scene(unsigned int _id)
+{
+	name = "New Scene";
+	id = _id;
+	last_go_id = 0;
+};
 
+Scene::Scene(const char* _name, unsigned int _id) {
+	name = _name;
+	id = _id;
+	last_go_id = 0;
+	last_material_id = 0;
+	last_mesh_id = 0;
+};
 
 
 
