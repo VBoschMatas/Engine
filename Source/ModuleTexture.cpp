@@ -48,10 +48,10 @@ bool ModuleTexture::CleanUp()
 	return true;
 }
 
-Texture* ModuleTexture::LoadTexture(const char *path, bool &texture_found)
+Texture ModuleTexture::LoadTexture(const char *path, bool &texture_found)
 {
-	Texture* tex = new Texture;
-	tex->path = path;
+	Texture tex;
+	tex.path = path;
 
 	unsigned int img_id;
 	ilGenImages(1, &img_id);
@@ -59,13 +59,13 @@ Texture* ModuleTexture::LoadTexture(const char *path, bool &texture_found)
 	texture_found = ilLoadImage(path);
 	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 
-	glGenTextures(1, &tex->id);
-	glBindTexture(GL_TEXTURE_2D, tex->id);
+	glGenTextures(1, &tex.id);
+	glBindTexture(GL_TEXTURE_2D, tex.id);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-	tex->width = ilGetInteger(IL_IMAGE_WIDTH); tex->height = ilGetInteger(IL_IMAGE_HEIGHT);
+	tex.width = ilGetInteger(IL_IMAGE_WIDTH); tex.height = ilGetInteger(IL_IMAGE_HEIGHT);
 	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
 		ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
 		ilGetData());

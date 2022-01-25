@@ -30,11 +30,8 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
-private:
-	bool success;
-
 public:
-	Texture* LoadTexture(const char *path, bool &texture_found);
+	Texture LoadTexture(const char *path, bool &texture_found);
 	void UnloadTexture(int i, const unsigned int* texture);
 };
 

@@ -140,7 +140,7 @@ std::pair<ComponentMesh*, ComponentMaterial*> Model::LoadMeshes(const aiMesh* me
 	console->AddLog("Loading mesh...");
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	std::vector<Texture> textures;
+
 	console->AddLog("	Getting vertices");
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
 	{
@@ -205,13 +205,9 @@ std::pair<ComponentMesh*, ComponentMaterial*> Model::LoadMeshes(const aiMesh* me
 	}*/
 
 	ComponentMaterial* material = new ComponentMaterial(mesh);
+	ComponentMesh* c_mesh = new ComponentMesh(vertices, indices, material->getMaterial(), mesh->mName.C_Str());
 
-	return std::pair<ComponentMesh*, ComponentMaterial*>(new ComponentMesh(vertices, indices, textures), new ComponentMaterial(mesh));
-}
-
-std::vector<ComponentMaterial*> Model::LoadMaterials(const aiScene* scene)
-{
-
+	return std::pair<ComponentMesh*, ComponentMaterial*>(c_mesh ,material);
 }
 
 // Move Load Textures to MATERIAL
@@ -325,7 +321,7 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* material, unsigned int mate
 */
 void Model::PrintModelInfo()
 {
-	const ImVec4 title_colour(255, 255, 0, 255);
+	/*const ImVec4 title_colour(255, 255, 0, 255);
 
 	ImGui::TextColored(title_colour, "Model");
 	ImGui::Separator();
@@ -353,5 +349,5 @@ void Model::PrintModelInfo()
 		total_v += meshes[i]->GetVertices();
 		total_i += meshes[i]->GetIndices();
 	}
-	ImGui::TextWrapped("Total: T: %d  V: %d  I: %d", total_t, total_v, total_i);
+	ImGui::TextWrapped("Total: T: %d  V: %d  I: %d", total_t, total_v, total_i);*/
 }

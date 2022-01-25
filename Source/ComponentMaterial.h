@@ -19,7 +19,7 @@ public:
 private:
 	unsigned int id;
 	std::vector<Texture*> textures;
-
+	Texture default_texture;
 	std::vector<Texture*> LoadTextures(aiMaterial* material, aiTextureType type, const char* path);
 };
 
@@ -29,9 +29,12 @@ public:
 	ComponentMaterial(const aiMesh* mesh);
 	virtual ~ComponentMaterial() = default;
 
-	void Update(unsigned int program, float3 & position, Quat & rotation, float3 & scale) override;
+	//void Update(unsigned int program, float3 & position, Quat & rotation, float3 & scale) override;
 
 	void printComponentInfo() override;
+
+	void setMaterial(Material* _material) { material = _material; };
+	Material* getMaterial() { return material; };
 
 private:
 	Material* material;

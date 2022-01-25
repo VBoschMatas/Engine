@@ -9,7 +9,7 @@
 class Mesh
 {
 public:
-	Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<Texture>& textures, std::string name);
+	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, Material* material, const char* name);
 	~Mesh() = default;
 
 	std::vector<Vertex> getVertices() { return vertices; };
@@ -44,7 +44,7 @@ private:
 class ComponentMesh : public Component
 {
 public:
-	ComponentMesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, std::vector<Texture> &textures);
+	ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name);
 	~ComponentMesh();
 
 	void Update(unsigned int program, float3& position, Quat& rotation, float3& scale) override;

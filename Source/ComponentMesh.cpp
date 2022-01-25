@@ -7,10 +7,10 @@
 #include "Math/float2.h"
 #include "Math/float4x4.h"
 
-ComponentMesh::ComponentMesh(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, std::vector<Texture> &textures)
+ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name)
 {
-	mesh = new Mesh(vertices, indices, textures, "HOLA CARACOLA");
-
+	mesh = new Mesh(vertices, indices, material, name);
+	console->AddLog("NUMBER OF Indices: %d", indices.size());
 	type = CompType::Mesh;
 	visible = true;
 }
@@ -33,11 +33,11 @@ void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotatio
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, (const float*)&view);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, (const float*)&proj);
 
-	for (unsigned int i = 0; i < textures.size(); ++i)
+	for (unsigned int i = 0; i < mesh->getMaterial()->getTextures().size(); ++i)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		glBindTexture(GL_TEXTURE_2D, mesh->getMaterial()->getTextures()[i]->id);
 	}
 
 	glActiveTexture(GL_TEXTURE0);
@@ -58,13 +58,17 @@ void ComponentMesh::printComponentInfo()
 	ImGui::Checkbox("Visible", &visible);
 }
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<Texture>& textures, std::string name)
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, Material* material, const char* name)
 {
 	this->vertices = vertices;
 	this->indices = indices;
-	this->textures = textures;
+	this->material_index = material;
 	this->name = name;
 	this->id = App->scene->getScene(App->scene->current_scene)->getMeshId();
+
+	LoadVBO();
+	LoadEBO();
+	CreateVAO();
 }
 
 void Mesh::LoadVBO()
@@ -83,7 +87,7 @@ void Mesh::LoadEBO()
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 	console->AddLog("	EBO loaded");
 
 	num_indices = indices.size();

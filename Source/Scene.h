@@ -14,7 +14,7 @@ class Scene
 public:
 	Scene(unsigned int _id);
 	Scene(const char* _name, unsigned int _id);
-	~Scene() = default;
+	~Scene() {};
 
 	void setName(const char* _name) { name = _name; };
 	void Update(unsigned int program);
@@ -34,8 +34,12 @@ public:
 	std::vector<Material*> GetMaterials() { return scene_materials; };
 	void RemoveMaterial(unsigned int id);
 
-	void AddTexture(unsigned int index, Texture* texture) { scene_textures.insert(std::pair<unsigned int, Texture*>(index, texture)); };
-	std::map<unsigned int, Texture*> GetTextures() { return scene_textures; };
+	Texture* AddTexture(unsigned int index, Texture texture)
+	{ 
+		scene_textures.insert(std::pair<unsigned int, Texture>(index, texture));
+		return &scene_textures.find(index)->second;
+	};
+	std::map<unsigned int, Texture>* GetTextures() { return &scene_textures; };
 	void RemoveTexture(unsigned int id);
 
 	std::vector<GameObject*> getChildren() { return children; };
@@ -59,7 +63,7 @@ private:
 	// List of all GameObjects, Meshes, Textures and Materials used in the scene
 	std::vector<GameObject*> game_objects;
 	std::vector<Mesh*> meshes;
-	std::map<unsigned int, Texture*> scene_textures;
+	std::map<unsigned int, Texture> scene_textures;
 	std::vector<Material*> scene_materials;
 
 	unsigned int last_go_id;
