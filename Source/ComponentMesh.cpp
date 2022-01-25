@@ -66,14 +66,16 @@ void ComponentMesh::CreateVAO()
 	console->AddLog("	VAO created with VBO and EBO");
 }
 
-void ComponentMesh::Update(unsigned int program, float3& position, float3& rotation, float3& scale)
+void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotation, float3& scale)
 {
 	if (!visible)
 		return;
 
 	const float4x4& view = App->editorcamera->getView();
 	const float4x4 proj = App->editorcamera->getProjection();
-	float4x4 model = float4x4::Translate(position.x, position.y, position.z);
+	//float4x4 model = float4x4::Translate(position.x, position.y, position.z);
+	float4x4 model = float4x4::FromTRS(position, rotation, scale);
+	
 
 	glUseProgram(program);
 

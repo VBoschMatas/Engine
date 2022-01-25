@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "MathGeoLib.h"
 
 class ComponentTransform : public Component
 {
@@ -7,11 +8,11 @@ public:
 	ComponentTransform();
 	~ComponentTransform() {};
 
-	void Update(unsigned int program, float3& position, float3& rotation, float3& scale) override;
+	void Update(unsigned int program, float3& position, Quat& rotation, float3& scale) override;
 	void printComponentInfo() override;
 
 	float3 getPos() { return float3(position[0], position[1], position[2]); };
-	float3 getRot() { return float3(rotation[0], rotation[1], rotation[2]); };
+	Quat getRot() { return Quat::FromEulerXYZ(rotation[0], rotation[1], rotation[2]); };
 	float3 getSca() { return float3(scale[0], scale[1], scale[2]); };
 
 	void setPos(float x, float y, float z) { position[0] = x; position[1] = y; position[2] = z; };

@@ -17,7 +17,7 @@ public:
 	unsigned int getId() { return id; };
 	CompType getType() { return type; };
 
-	virtual void Update(unsigned int program, float3 &position, float3 &rotation, float3 &scale) {};
+	virtual void Update(unsigned int program, float3 &position, Quat &rotation, float3 &scale) {};
 	
 	virtual void printComponentInfo() {};
 
