@@ -373,6 +373,14 @@ void ModuleEditor::SceneWindow()
 		if ((ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)) && ImGui::IsWindowHovered())
 			ImGui::SetWindowFocus();
 
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
+		{
+			float normalizedX = -1.0 + 2.0 * (ImGui::GetMousePos().x - ImGui::GetWindowPos().x) / ImGui::GetWindowWidth();
+			float normalizedY = 1.0 - 2.0 * (ImGui::GetMousePos().y - ImGui::GetWindowPos().y) / ImGui::GetWindowHeight();
+			console->AddLog("MOUSE X: %f   Y: %f", normalizedX, normalizedY);
+			App->editorcamera->ClickRaycast(normalizedX, normalizedY);
+		}
+
 		float width = ImGui::GetWindowContentRegionWidth();
 		float height = ImGui::GetContentRegionAvail().y;
 

@@ -6,6 +6,9 @@
 #include "ModuleInput.h"
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
+#include "ModuleScene.h"
+#include "Scene.h"
+#include "GameObject.h"
 #include "Geometry/OBB.h"
 
 #define DEGTORAD pi / 180.0f
@@ -271,5 +274,18 @@ void ModuleEditorCamera::FitNewModel()
 		SetPosition(float3(1.0f, 1.0f, 1.0f) * new_distance);
 		LookAt(float3(0.0f, 0.0f, 0.0f));
 		new_distance += extreme_dist;
+	}
+}
+
+void ModuleEditorCamera::ClickRaycast(float normalizedX, float normalizedY)
+{
+	LineSegment ray = frustum.UnProjectLineSegment(normalizedX, normalizedY);
+	console->AddLog("START! %f %f %f", ray.a.x, ray.a.y, ray.a.z);
+	console->AddLog("END! %f %f %f", ray.b.x, ray.b.y, ray.b.z);
+	for (GameObject* go : App->scene->getCurrentScene()->getGameObjects())
+	{
+		bool hit = ray.Intersects(go->getBoundingBox());
+		if (hit)
+			console->AddLog("HIT! %s", go->getName().c_str());
 	}
 }

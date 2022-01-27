@@ -44,6 +44,7 @@ private:
 
 public:
 	void WindowResized(unsigned int screen_width, unsigned int screen_height);
+	void ClickRaycast(float normalizedX, float normalizedY);
 	void FitNewModel();
 
 	float4x4 getProjection() { return frustum.ProjectionMatrix(); };

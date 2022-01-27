@@ -56,6 +56,8 @@ public:
 	std::vector<GameObject*> getChildren() { return children; };
 	std::vector<Component*> getComponents() { return components; };
 
+	math::OBB getBoundingBox() { return world_bbox; };
+
 	bool active;
 	bool selected;
 
