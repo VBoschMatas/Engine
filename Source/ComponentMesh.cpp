@@ -9,8 +9,9 @@
 #include "Math/float4x4.h"
 #include <array>
 
-ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name, const std::vector<float3>& obb_vertices)
+ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id)
 {
+	this->id = id;
 	mesh = new Mesh(vertices, indices, material, name, obb_vertices);
 	App->scene->getCurrentScene()->AddMesh(mesh);
 	console->AddLog("NUMBER OF Indices: %d", indices.size());
@@ -59,8 +60,8 @@ void ComponentMesh::printComponentInfo()
 {
 	const ImVec4 yellow_colour(255, 255, 0, 255);
 	static ImGuiTreeNodeFlags header_flags = ImGuiTreeNodeFlags_DefaultOpen;
-
-	if (ImGui::CollapsingHeader("Mesh", header_flags))
+	std::string itemid = "Mesh ##" + std::to_string(this->id);
+	if (ImGui::CollapsingHeader(itemid.c_str(), header_flags))
 	{
 		ImGui::TextColored(yellow_colour, "Triangles: "); ImGui::SameLine();
 		ImGui::Text("%d  (V: %d  I: %d)", GetIndices() / 3, GetVertices(), GetIndices());

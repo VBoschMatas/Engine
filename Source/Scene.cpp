@@ -1,3 +1,4 @@
+#include "Application.h"
 #include "Scene.h"
 #include "Model.h"
 
@@ -48,6 +49,22 @@ GameObject* Scene::AddGameObject(const std::string file_name, GameObject* parent
 		children.push_back(go);
 
 	return go;
+}
+
+void Scene::NewTexture(const char* path)
+{
+	unsigned int tex_hash = std::hash<std::string>{}(path);
+	std::map<unsigned int, Texture>::iterator it = GetTextures()->find(tex_hash);
+	std::map<unsigned int, Texture>::iterator end_it = GetTextures()->end();
+	if (it != end_it)
+	{
+		return;
+	}
+
+	Texture texture;
+	bool temp;
+	texture = App->textures->LoadTexture(path, temp);
+	AddTexture(tex_hash, texture);
 }
 
 void Scene::printHierarchy()

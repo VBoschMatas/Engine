@@ -161,24 +161,6 @@ bool ModuleRender::CleanUp()
 	return true;
 }
 
-void ModuleRender::DroppedModel(char* path)
-{
-	std::string path_name(path);
-	if (path_name.substr(path_name.find_last_of('.')) != ".fbx" && path_name.substr(path_name.find_last_of('.')) != ".FBX")
-	{
-		SDL_ShowSimpleMessageBox(
-			SDL_MESSAGEBOX_INFORMATION,
-			"File dropped has an incorrect format",
-			"The dropped file has to be a \".fbx\"",
-			App->window->window
-		);
-		return;
-	}
-
-	App->scene->getScene(App->scene->current_scene)->AddGameObject(path_name, GoType::Model);
-	//App->editorcamera->FitNewModel();
-}
-
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
 	SDL_UpdateWindowSurface(App->window->window);

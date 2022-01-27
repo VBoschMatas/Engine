@@ -116,7 +116,6 @@ void GameObject::printGameObjectInfo()
 	for (Component* c : components)
 	{
 		c->printComponentInfo();
-
 	}
 }
 

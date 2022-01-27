@@ -341,7 +341,6 @@ void ModuleEditor::SceneWindow()
 	{
 		scene_selected = ImGui::IsWindowFocused();
 
-
 		float width = ImGui::GetWindowContentRegionWidth();
 		float height = ImGui::GetContentRegionAvail().y;
 
@@ -406,8 +405,6 @@ void ModuleEditor::GuizmosMenu()
 		transform_op = ImGuizmo::ROTATE;
 	if (ImGui::IsKeyPressed(82)) // r Key
 		transform_op = ImGuizmo::SCALE;
-
-	// GIZMOS OPTIONS
 
 	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));

@@ -59,6 +59,8 @@ public:
 	bool active;
 	bool selected;
 
+	unsigned int getCompId() { unsigned int temp_id = last_comp_id; ++last_comp_id; return temp_id; };
+
 	void printGameObjectInfo();
 	void printHierarchy(ImGuiTreeNodeFlags flags);
 private:
@@ -73,5 +75,7 @@ private:
 	GameObject* parent;
 	std::vector<GameObject*> children;
 	std::vector<Component*> components;
+
+	unsigned int last_comp_id = 0;
 };
 

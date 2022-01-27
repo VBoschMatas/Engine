@@ -12,6 +12,7 @@ enum class TexType
 struct Texture
 {
 	std::string path;
+	std::string name;
 	unsigned int width;
 	unsigned int height;
 	unsigned int id;

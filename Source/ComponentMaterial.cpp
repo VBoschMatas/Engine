@@ -4,10 +4,11 @@
 #include "Scene.h"
 #include <map>
 
-ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset)
+ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset, unsigned int id)
 {
+	this->id = id;
 	if (mesh->mMaterialIndex >= 0)
-		material = App->scene->getCurrentScene()->GetMaterials()[mesh->mMaterialIndex + offset];
+		material = App->scene->getCurrentScene()->GetMaterials()[(size_t)(mesh->mMaterialIndex + offset)];
 	else
 		material = nullptr;
 }
@@ -162,13 +163,19 @@ void Material::RemoveTexture(unsigned int tex_id)
 	}
 }
 
+void Material::setTexture(Texture* tex, unsigned int tex_id)
+{
+	textures[tex_id] = tex;
+}
+
 void ComponentMaterial::printComponentInfo()
 {
 	const ImVec4 yellow_colour(255, 255, 0, 255);
 	static ImGuiTreeNodeFlags texture_flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen;
 	static ImGuiTreeNodeFlags header_flags = ImGuiTreeNodeFlags_DefaultOpen;
 
-	if (ImGui::CollapsingHeader("Material", header_flags))
+	std::string itemid = "Material ##" + std::to_string(this->id);
+	if (ImGui::CollapsingHeader(itemid.c_str(), header_flags))
 	{
 		ImGui::TextColored(yellow_colour, "Number of textures: %d", material->getTextures().size());
 		for (unsigned int i = 0; i < material->getTextures().size(); ++i)
@@ -178,12 +185,20 @@ void ComponentMaterial::printComponentInfo()
 				ImGui::Image((void*)(intptr_t)material->getTextures()[i]->id, ImVec2(80, 80));
 				ImGui::SameLine();
 				ImGui::BeginGroup();
+				ImGui::TextColored(yellow_colour, material->getTextures()[i]->name.c_str());
+				ImGui::SameLine();
+				ImGui::Text("%dx%d", material->getTextures()[i]->width, material->getTextures()[i]->height);
 				ImGui::TextWrapped("Path: %s", material->getTextures()[i]->path.c_str());
-				ImGui::TextWrapped("%dx%d", material->getTextures()[i]->width, material->getTextures()[i]->height);
-				if (ImGui::Button("New texture"))
+				if (ImGui::Button("Select texture"))
 				{
-					material->addTexture("textures/Lenna.png", i);
+					std::string sel_name = "SelectTex" + std::to_string(this->id);
+					if (!ImGui::IsPopupOpen(sel_name.c_str()))
+						ImGui::OpenPopup(sel_name.c_str());
+					//material->addTexture("textures/Lenna.png", i);
+					ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+					ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 				}
+				selectTexture(i);
 				if (ImGui::Button("Delete texture"))
 				{
 					material->RemoveTexture(i);
@@ -193,5 +208,39 @@ void ComponentMaterial::printComponentInfo()
 				ImGui::TreePop();
 			}
 		}
+	}
+}
+
+void ComponentMaterial::selectTexture(unsigned int tex_id)
+{
+	std::string sel_name = "SelectTex" + std::to_string(this->id);
+	if (ImGui::BeginPopupModal(sel_name.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Select one of the scene's textures.");
+		ImGui::Text("You can add new textures by dropping them.");
+		if (ImGui::BeginChildFrame(ImGui::GetID("frame"), ImVec2(-FLT_MIN, 250)))
+		{
+			std::map<unsigned int, Texture>* temp_textures = App->scene->getCurrentScene()->GetTextures();
+			for (auto & t : *temp_textures)
+			{
+				std::string itemid = "##texsel" + std::to_string(t.second.id);
+				if (ImGui::Selectable(itemid.c_str(), false, 0, ImVec2(0, 40))) {
+					material->setTexture(&t.second, tex_id);
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				ImGui::Image((void*)(intptr_t)t.second.id, ImVec2(40, 40));
+				ImGui::SameLine();
+				ImGui::Text(t.second.name.c_str());
+			}
+			ImGui::EndChildFrame();
+		}
+
+		ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
+		if (ImGui::Button("Cancel", button_size))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
 	}
 }

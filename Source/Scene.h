@@ -34,6 +34,7 @@ public:
 	std::vector<Material*> GetMaterials() { return scene_materials; };
 	void RemoveMaterial(unsigned int id);
 
+	void NewTexture(const char* path);
 	Texture* AddTexture(unsigned int index, Texture texture)
 	{ 
 		scene_textures.insert(std::pair<unsigned int, Texture>(index, texture));

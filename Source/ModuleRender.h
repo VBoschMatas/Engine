@@ -22,7 +22,6 @@ public:
 	bool CleanUp();
 
 	void WindowResized(unsigned width, unsigned height);
-	void DroppedModel(char* path);
 	void GetHardware(char*& vendor, char*& renderer, char*& opengl, char*& glsl, char*& glew);
 	void LoadFrameBuffer();
 	void ClearFrameBuffer();

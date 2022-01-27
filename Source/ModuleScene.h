@@ -28,6 +28,8 @@ public:
 
 	void printHierarchy();
 
+	void DroppedModel(char* path);
+
 	unsigned int current_scene;
 
 private:

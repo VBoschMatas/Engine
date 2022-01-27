@@ -53,6 +53,13 @@ Texture ModuleTexture::LoadTexture(const char *path, bool &texture_found)
 	Texture tex;
 	tex.path = path;
 
+	std::string n = path;
+	size_t offset = n.find_last_of("\\");
+	if (offset == std::string::npos)
+		offset = 0;
+	else ++offset;
+	tex.name = n.substr(offset);
+
 	unsigned int img_id;
 	ilGenImages(1, &img_id);
 	ilBindImage(img_id);

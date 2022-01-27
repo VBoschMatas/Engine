@@ -164,6 +164,9 @@ void ModuleEditorCamera::InitViewMatrix()
 
 void ModuleEditorCamera::Controller()
 {
+	if (!App->editor->isFocusScene())
+		return;
+
 	float move_speed = MOVE_SPEED * Time->DeltaTime();
 	float rotation_speed = ROTATION_SPEED * Time->DeltaTime();
 

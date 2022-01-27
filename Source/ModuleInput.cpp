@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleRender.h"
+#include "ModuleScene.h"
 #include "ModuleWindow.h"
 #include "ModuleEditorCamera.h"
 #include "SDL/include/SDL.h"
@@ -63,7 +64,7 @@ update_status ModuleInput::PreUpdate()
 				break;
 			case SDL_DROPFILE:   // In case if dropped file
 				dropped_filedir = sdlEvent.drop.file;
-				App->renderer->DroppedModel(dropped_filedir);
+				App->scene->DroppedModel(dropped_filedir);
 				SDL_free(dropped_filedir);    // Free dropped_filedir memory
 				break;
         }

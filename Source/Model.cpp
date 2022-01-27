@@ -83,7 +83,7 @@ std::vector<GameObject*> Model::Load(const std::string &file_name, GameObject* r
 	children = LoadChildren(scene->mRootNode, root, scene);
 
 	std::vector<Component*> comp_list = {};
-	comp_list = LoadComponents(scene->mRootNode, scene);
+	comp_list = LoadComponents(scene->mRootNode, scene, root);
 
 	root->addComponent(comp_list);
 
@@ -116,7 +116,7 @@ std::vector<GameObject*> Model::LoadChildren(aiNode* aiParent, GameObject* goPar
 		std::vector<GameObject*> grandchildren = {};
 		grandchildren = LoadChildren(new_go, new_child, scene);
 
-		comp_list = LoadComponents(new_go, scene);
+		comp_list = LoadComponents(new_go, scene, goParent);
 		//App->scene->getScene(App->scene->current_scene)->AddGameObject()
 		new_child->addComponent(comp_list);
 		new_child->addChildren(grandchildren);
@@ -126,7 +126,7 @@ std::vector<GameObject*> Model::LoadChildren(aiNode* aiParent, GameObject* goPar
 	return children;
 }
 
-std::vector<Component*> Model::LoadComponents(aiNode* node, const aiScene* scene)
+std::vector<Component*> Model::LoadComponents(aiNode* node, const aiScene* scene, GameObject* goParent)
 {
 	std::vector<Component*> comp_list = {};
 	console->AddLog("Detected %d meshes", node->mNumMeshes);
@@ -137,7 +137,7 @@ std::vector<Component*> Model::LoadComponents(aiNode* node, const aiScene* scene
 
 		console->AddLog("Loading mesh %s", scene->mMeshes[mesh_id]->mName.C_Str());
 		std::vector<float3> all_vertices;
-		std::pair<ComponentMesh*, ComponentMaterial*> aux_comp = LoadMeshes(mesh, scene, all_vertices);
+		std::pair<ComponentMesh*, ComponentMaterial*> aux_comp = LoadMeshes(mesh, scene, all_vertices, goParent);
 		comp_list.push_back(aux_comp.first);
 		comp_list.push_back(aux_comp.second);
 	}
@@ -145,7 +145,7 @@ std::vector<Component*> Model::LoadComponents(aiNode* node, const aiScene* scene
 }
 
 // We return the component mesh and the component material indexed to the mesh
-std::pair<ComponentMesh*, ComponentMaterial*> Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices)
+std::pair<ComponentMesh*, ComponentMaterial*> Model::LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices, GameObject* goParent)
 {
 	console->AddLog("Loading mesh...");
 	std::vector<Vertex> vertices;
@@ -214,8 +214,8 @@ std::pair<ComponentMesh*, ComponentMaterial*> Model::LoadMeshes(const aiMesh* me
 		textures.insert(textures.end(), tex.begin(), tex.end());
 	}*/
 
-	ComponentMaterial* material = new ComponentMaterial(mesh, material_offset);
-	ComponentMesh* c_mesh = new ComponentMesh(vertices, indices, material->getMaterial(), mesh->mName.C_Str(), comb_vertices);
+	ComponentMaterial* material = new ComponentMaterial(mesh, material_offset, goParent->getCompId());
+	ComponentMesh* c_mesh = new ComponentMesh(vertices, indices, material->getMaterial(), mesh->mName.C_Str(), comb_vertices, goParent->getCompId());
 
 	return std::pair<ComponentMesh*, ComponentMaterial*>(c_mesh ,material);
 }

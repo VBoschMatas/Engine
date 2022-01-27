@@ -27,8 +27,8 @@ private:
 
 	std::string model_name;
 
-	std::pair<ComponentMesh*, ComponentMaterial*> LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices);
+	std::pair<ComponentMesh*, ComponentMaterial*> LoadMeshes(const aiMesh* mesh, const aiScene* scene, std::vector<float3>& comb_vertices, GameObject* goParent);
 	std::vector<GameObject*> LoadChildren(aiNode* aiParent, GameObject* goParent, const aiScene* scene);
-	std::vector<Component*> LoadComponents(aiNode* node, const aiScene* scene);
+	std::vector<Component*> LoadComponents(aiNode* node, const aiScene* scene, GameObject* goParent);
 };
 

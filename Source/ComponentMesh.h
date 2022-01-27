@@ -48,7 +48,7 @@ private:
 class ComponentMesh : public Component
 {
 public:
-	ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name, const std::vector<float3>& obb_vertices);
+	ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id);
 	~ComponentMesh();
 
 	void Update(unsigned int program, float3& position, Quat& rotation, float3& scale) override;
