@@ -8,7 +8,7 @@ ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset, un
 {
 	this->id = id;
 	if (mesh->mMaterialIndex >= 0)
-		material = App->scene->getCurrentScene()->GetMaterials()[(size_t)(mesh->mMaterialIndex + offset)];
+		material = App->scene->getCurrentScene()->GetMaterials()[((size_t)mesh->mMaterialIndex + (size_t)offset)];
 	else
 		material = nullptr;
 }

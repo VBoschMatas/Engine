@@ -369,6 +369,8 @@ void ModuleEditor::SceneWindow()
 	if (ImGui::BeginChild("SceneCanvas", ImVec2(0, 0), true, ImGuiWindowFlags_NoMove))
 	{
 		scene_selected = ImGui::IsWindowFocused();
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+			ImGui::SetWindowFocus();
 
 		float width = ImGui::GetWindowContentRegionWidth();
 		float height = ImGui::GetContentRegionAvail().y;
