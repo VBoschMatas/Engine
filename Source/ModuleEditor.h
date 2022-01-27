@@ -28,6 +28,7 @@ private:
 	bool about_window = false;
 	bool configuration_window = false; 
 	bool inspector_window = true;
+	bool showAppDockspace = true;
 
 	std::vector<float> ms;
 	std::vector<float> fps;
@@ -38,7 +39,8 @@ private:
 
 	Timer print_freq;
 
-	void MainMenuBar();
+	void MainMenuBar(bool* p_open);
+	void DockSpace();
 	void SceneWindow();
 	void AboutWindow();
 	void ConsoleWindow();
