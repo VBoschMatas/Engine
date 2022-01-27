@@ -26,7 +26,6 @@ void Scene::Update(unsigned int program)
 	for (GameObject* go : children)
 	{
 		go->Update(program);
-		go->DebugDraw();
 	}
 }
 

@@ -15,6 +15,10 @@ public:
 	Quat getRot() { return Quat::FromEulerXYZ(rotation[0], rotation[1], rotation[2]); };
 	float3 getSca() { return float3(scale[0], scale[1], scale[2]); };
 
+	float3 getWorldPos() { return w_position; };
+	Quat getWorldRot() { return w_rotation; };
+	float3 getWorldSca() { return w_scale; };
+
 	void setPos(float x, float y, float z) { position[0] = x; position[1] = y; position[2] = z; };
 	void setPos(float3 xyz) { setPos(xyz.z, xyz.y, xyz.z); };
 	void setRot(float x, float y, float z) { rotation[0] = x; rotation[1] = y; rotation[2] = z; };
@@ -27,5 +31,9 @@ private:
 	float position [3];
 	float rotation [3];
 	float scale [3];
+
+	float3 w_position;
+	Quat w_rotation;
+	float3 w_scale;
 };
 

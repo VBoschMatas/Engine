@@ -26,6 +26,7 @@ public:
 	ImGuizmo::OPERATION transform_op = ImGuizmo::TRANSLATE;;
 
 	bool isFocusScene() { return scene_selected; };
+	bool isDebugDraw() { return debug_draw; };
 	Game_State getGameState() { return game_state; }
 
 private:

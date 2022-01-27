@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "Application.h"
 #include "ModuleScene.h"
+#include "ModuleEditor.h"
 #include "Scene.h"
 #include "MathGeoLib.h"
 #include "debugdraw.h"
@@ -52,6 +53,8 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 		console->AddLog("Creating empty object...");
 		break;
 	}
+	if (parent == nullptr)
+		console->AddLog("IM AN INDEPENDENT: %s", this->name.c_str());
 }
 
 void GameObject::Update(unsigned int program)
@@ -70,14 +73,9 @@ void GameObject::Update(unsigned int program)
 	}
 	else 
 	{
-		position = parent->Transform()->getPos();
-		rotation = parent->Transform()->getRot();
-		scale = parent->Transform()->getSca();
-	}
-
-	for (GameObject* ch : children)
-	{
-		ch->Update(program);
+		position = parent->Transform()->getWorldPos();
+		rotation = parent->Transform()->getWorldRot();
+		scale = parent->Transform()->getWorldSca();
 	}
 
 	for (Component* c : components)
@@ -85,9 +83,17 @@ void GameObject::Update(unsigned int program)
 		c->Update(program, position, rotation, scale);
 	}
 
+	for (GameObject* ch : children)
+	{
+		ch->Update(program);
+	}
+
 	// Bounding box Transform
 	world_bbox = local_bbox;
 	world_bbox.Transform(float4x4::FromTRS(position, rotation, scale));
+
+	if (active && (selected || App->editor->isDebugDraw()))
+		DebugDraw();
 }
 
 ComponentTransform* GameObject::Transform()
@@ -154,11 +160,11 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 
 
 	}
-	
 }
 
 void GameObject::DebugDraw()
 {
+
 	for (GameObject* ch : children)
 	{
 		ch->DebugDraw();

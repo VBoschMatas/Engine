@@ -20,6 +20,9 @@ void ComponentTransform::Update(unsigned int program, float3& position, Quat& ro
 	eulerRotation = eulerRotation * DEGTORAD;
 	rotation = Quat::FromEulerXYZ(eulerRotation.x, eulerRotation.y, eulerRotation.z);
 	scale = { scale.x * this->scale[0], scale.y * this->scale[1], scale.z * this->scale[2] };
+	w_position = position;
+	w_rotation = rotation;
+	w_scale = scale;
 }
 
 void ComponentTransform::setRot(float x, float y, float z, float w)
