@@ -38,7 +38,7 @@ void ComponentTransform::printComponentInfo()
 	if (ImGui::CollapsingHeader("Transform", header_flags))
 	{
 		ImGui::DragFloat3("Position", position, 0.005f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
-		ImGui::DragFloat3("Rotation", rotation, 0.005f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
-		ImGui::DragFloat3("Scale", scale, 0.005f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
+		ImGui::DragFloat3("Rotation", rotation, 0.1f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
+		ImGui::DragFloat3("Scale", scale, 0.001f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
 	}
 }

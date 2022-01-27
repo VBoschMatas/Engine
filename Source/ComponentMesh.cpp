@@ -60,13 +60,13 @@ void ComponentMesh::printComponentInfo()
 {
 	const ImVec4 yellow_colour(255, 255, 0, 255);
 	static ImGuiTreeNodeFlags header_flags = ImGuiTreeNodeFlags_DefaultOpen;
-	std::string itemid = "Mesh ##" + std::to_string(this->id);
-	if (ImGui::CollapsingHeader(itemid.c_str(), header_flags))
+	std::string itemid = "##" + std::to_string(this->id);
+	if (ImGui::CollapsingHeader(std::string("Mesh" + itemid).c_str(), header_flags))
 	{
 		ImGui::TextColored(yellow_colour, "Triangles: "); ImGui::SameLine();
 		ImGui::Text("%d  (V: %d  I: %d)", GetIndices() / 3, GetVertices(), GetIndices());
 
-		ImGui::Checkbox("Visible", &visible);
+		ImGui::Checkbox(std::string("Visible" + itemid).c_str(), &visible);
 	}
 }
 

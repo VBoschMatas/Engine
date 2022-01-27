@@ -180,7 +180,8 @@ void ComponentMaterial::printComponentInfo()
 		ImGui::TextColored(yellow_colour, "Number of textures: %d", material->getTextures().size());
 		for (unsigned int i = 0; i < material->getTextures().size(); ++i)
 		{
-			if (ImGui::TreeNodeEx((void*)i, texture_flags,"Texture"))
+			std::string sel_name = "##" + std::to_string(this->id) + "," + std::to_string(i);
+			if (ImGui::TreeNodeEx((void*)this, texture_flags, std::string("Texture").c_str()))
 			{
 				ImGui::Image((void*)(intptr_t)material->getTextures()[i]->id, ImVec2(80, 80));
 				ImGui::SameLine();
@@ -189,17 +190,15 @@ void ComponentMaterial::printComponentInfo()
 				ImGui::SameLine();
 				ImGui::Text("%dx%d", material->getTextures()[i]->width, material->getTextures()[i]->height);
 				ImGui::TextWrapped("Path: %s", material->getTextures()[i]->path.c_str());
-				if (ImGui::Button("Select texture"))
+				if (ImGui::Button(std::string("Select Texture" + sel_name).c_str()))
 				{
-					std::string sel_name = "SelectTex" + std::to_string(this->id);
-					if (!ImGui::IsPopupOpen(sel_name.c_str()))
-						ImGui::OpenPopup(sel_name.c_str());
-					//material->addTexture("textures/Lenna.png", i);
+					if (!ImGui::IsPopupOpen(std::string("Select Texture" + sel_name).c_str()))
+						ImGui::OpenPopup(std::string("Select Texture" + sel_name).c_str());
 					ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 					ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 				}
 				selectTexture(i);
-				if (ImGui::Button("Delete texture"))
+				if (ImGui::Button(std::string("Delete Texture" + sel_name).c_str()))
 				{
 					material->RemoveTexture(i);
 				}
@@ -213,7 +212,7 @@ void ComponentMaterial::printComponentInfo()
 
 void ComponentMaterial::selectTexture(unsigned int tex_id)
 {
-	std::string sel_name = "SelectTex" + std::to_string(this->id);
+	std::string sel_name = "Select Texture##" + std::to_string(this->id) + "," + std::to_string(tex_id);
 	if (ImGui::BeginPopupModal(sel_name.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("Select one of the scene's textures.");

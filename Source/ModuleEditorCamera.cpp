@@ -67,7 +67,7 @@ void ModuleEditorCamera::InitPerspectiveMatrix()
 	auto screen_surface = App->window->screen_surface;
 	SetAspectRatio(screen_surface->w, screen_surface->h);
 	SetFOV(70.0f);
-	SetPlaneDistances(0.1f, 100.0f);
+	SetPlaneDistances(0.10f, 1000.0f);
 	SetPosition(float3(0.0f, 1.0f, 10.0f));
 	float3x3 identity = float3x3::identity;
 	frustum.SetFront(identity.WorldZ());
