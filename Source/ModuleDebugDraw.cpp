@@ -612,8 +612,6 @@ bool ModuleDebugDraw::CleanUp()
 
 update_status  ModuleDebugDraw::Update()
 {
-    dd::axisTriad(float4x4::identity, 0.15f, 2.0f);
-    dd::xzSquareGrid(-50.0f, 50.0f, -0.05f, 1.0f, dd::colors::LightGray);
 
 	return UPDATE_CONTINUE;
 }

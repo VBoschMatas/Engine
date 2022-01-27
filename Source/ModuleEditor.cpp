@@ -17,6 +17,7 @@
 #include "imGui/imgui_impl_sdl.h"
 #include "imGui/imgui_impl_opengl3.h"
 #include "windows.h"
+#include "debugdraw.h"
 #include "FontAwesome/IconsFontAwesome.h"
 
 #define PRINTFREQ 200
@@ -338,7 +339,7 @@ void ModuleEditor::SceneWindow()
 
 	if (ImGui::BeginChild("SceneCanvas", ImVec2(0, 0), true, ImGuiWindowFlags_NoMove))
 	{
-		//focused = ImGui::IsWindowFocused();
+		scene_selected = ImGui::IsWindowFocused();
 
 
 		float width = ImGui::GetWindowContentRegionWidth();
@@ -346,19 +347,19 @@ void ModuleEditor::SceneWindow()
 
 		App->editorcamera->WindowResized(float(width), float(height));
 
-		/*if (draw_axis == true)
+		if (draw_axis == true)
 		{
-			dd::axisTriad(math::float4x4::identity, metric_proportion * 0.1f, metric_proportion, 0, false);
+			dd::axisTriad(float4x4::identity, 0.25f, 2.0f);
 		}
-		if (draw_plane == true)
+		if (draw_grid == true)
 		{
 			dd::xzSquareGrid(-100.0f, 100.0f, 0.0f, 1.0f, dd::colors::LightGray);
 		}
 
 		if (debug_draw == true)
 		{
-			App->DebugDraw();
-		}*/
+			//App->DebugDraw();
+		}
 
 		ImVec2 cursor = ImGui::GetCursorScreenPos();
 		ImVec2 mouse = ImGui::GetMousePos();
@@ -368,35 +369,6 @@ void ModuleEditor::SceneWindow()
 		{
 			PickSelection(camera, (int)rel_position.x, (int)rel_position.y);
 		}*/
-
-		//bool msaa = App->hints->GetBoolValue(ModuleHints::ENABLE_MSAA);
-
-		//Framebuffer* framebuffer = msaa ? framebuffers[FRAMEBUFFER_MSAA].framebuffer.get() : framebuffers[FRAMEBUFFER_NO_MSAA].framebuffer.get();
-		//Texture2D* texture_color = msaa ? framebuffers[FRAMEBUFFER_MSAA].texture_color.get() : framebuffers[FRAMEBUFFER_NO_MSAA].texture_color.get();
-
-
-		//framebuffer->Bind();
-
-		//glEnable(GL_STENCIL_TEST);
-		//glViewport(0, 0, fb_width, fb_height);
-		//glClearColor(camera->background.r, camera->background.g, camera->background.b, camera->background.a);
-
-		//glStencilMask(0x01);
-
-		////glClear(/*GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT*/);
-
-		//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-		//glStencilMask(0x00);
-		//glStencilFunc(GL_ALWAYS, 0, 0XFF);
-
-		//App->renderer->Draw(camera, culling, framebuffer, fb_width, fb_height);
-		//App->debug_draw->Draw(camera, framebuffer->Id(), fb_width, fb_height);
-
-		//DrawSelection(camera, framebuffer);
-
-		//App->renderer->GetPostprocess()->Execute(texture_color, framebuffers[FRAMEBUFFER_POSTPROCESS].framebuffer.get(), fb_width, fb_height);
-
-		//ShowTexture();
 
 		ImVec2 windowSize = ImGui::GetWindowSize();
 		ImGui::Image((ImTextureID)App->renderer->GetFBTexture(), windowSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -412,53 +384,121 @@ void ModuleEditor::SceneWindow()
 
 void ModuleEditor::SceneMenuBar()
 {
-	if (ImGui::BeginChild("SceneMenu", ImVec2(0, 1), true, ImGuiWindowFlags_NoMove))
+	if (ImGui::BeginChild("SceneMenu", ImVec2(0, 20), true, ImGuiWindowFlags_NoMove))
 	{
+		ImGui::Columns(3, "SceneToolbar", false);
+		GuizmosMenu();
+		ImGui::NextColumn();
+		PlayPauseMenu();
+		ImGui::NextColumn();
+		DebugDrawMenu();
+		ImGui::NextColumn();
+		ImGui::Columns(1);
 		ImGui::EndChild();
-		if (ImGui::IsKeyPressed(90))
-			transform_op = ImGuizmo::TRANSLATE;
-		if (ImGui::IsKeyPressed(69))
-			transform_op = ImGuizmo::ROTATE;
-		if (ImGui::IsKeyPressed(82)) // r Key
-			transform_op = ImGuizmo::SCALE;
-
-		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
-		if (ImGui::Button(ICON_FA_ARROWS))
-		{
-			transform_op = ImGuizmo::TRANSLATE;
-		}
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Translate");
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
-		if (ImGui::Button(ICON_FA_UNDO))
-		{
-			transform_op = ImGuizmo::ROTATE;
-		}
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Rotate");
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
-		if (ImGui::Button(ICON_FA_EXPAND))
-		{
-			transform_op = ImGuizmo::SCALE;
-		}
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Scale");
-		ImGui::PopStyleColor(3);
-		
-
 	}
+}
+
+void ModuleEditor::GuizmosMenu()
+{
+	if (ImGui::IsKeyPressed(90))
+		transform_op = ImGuizmo::TRANSLATE;
+	if (ImGui::IsKeyPressed(69))
+		transform_op = ImGuizmo::ROTATE;
+	if (ImGui::IsKeyPressed(82)) // r Key
+		transform_op = ImGuizmo::SCALE;
+
+	// GIZMOS OPTIONS
+
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(transform_op == ImGuizmo::TRANSLATE)));
+	if (ImGui::Button(ICON_FA_ARROWS))
+	{
+		transform_op = ImGuizmo::TRANSLATE;
+	}
+	ImGui::PopStyleColor(4);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Translate");
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(transform_op == ImGuizmo::ROTATE)));
+	if (ImGui::Button(ICON_FA_UNDO))
+	{
+		transform_op = ImGuizmo::ROTATE;
+	}
+	ImGui::PopStyleColor(4);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Rotate");
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(transform_op == ImGuizmo::SCALE)));
+	if (ImGui::Button(ICON_FA_EXPAND))
+	{
+		transform_op = ImGuizmo::SCALE;
+	}
+	ImGui::PopStyleColor(4);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Scale");
+}
+void ModuleEditor::PlayPauseMenu()
+{
+	ImGui::SameLine(ImGui::GetColumnWidth() / 2.0f - ((60.0f * 3.0f) / 2.0f));
+
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(game_state == Game_State::PLAY || game_state == Game_State::PAUSE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(game_state == Game_State::PLAY || game_state == Game_State::PAUSE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(game_state == Game_State::PLAY || game_state == Game_State::PAUSE)));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(game_state == Game_State::PLAY || game_state == Game_State::PAUSE)));
+	if (ImGui::Button(ICON_FA_PLAY, ImVec2(40, 0)))
+	{
+		game_state = Game_State::PLAY;
+	}
+	ImGui::PopStyleColor(4);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Play");
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(game_state == Game_State::PAUSE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(game_state == Game_State::PAUSE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(game_state == Game_State::PAUSE)));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(game_state == Game_State::PAUSE)));
+	if (ImGui::Button(ICON_FA_PAUSE, ImVec2(40, 0)))
+	{
+		if(game_state == Game_State::PLAY)
+			game_state = Game_State::PAUSE;
+		else if (game_state == Game_State::PAUSE)
+			game_state = Game_State::PLAY;
+	}
+	ImGui::PopStyleColor(4);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Pause");
+
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, 0.7f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, 0.7f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, 0.7f));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, 1.0f));
+	if (ImGui::Button(ICON_FA_STOP, ImVec2(40, 0)))
+	{
+		game_state = Game_State::STOP;
+	}
+	ImGui::PopStyleColor(4);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Stop");
+}
+void ModuleEditor::DebugDrawMenu()
+{
+	ImGui::Checkbox("Axis", &draw_axis);
+	ImGui::SameLine();
+	ImGui::Checkbox("Grid", &draw_grid);
+	ImGui::SameLine();
+	ImGui::Checkbox("Debug Draw", &debug_draw);
 }
 
 void ModuleEditor::HierarchyWindow()
@@ -489,4 +529,11 @@ float ModuleEditor::ToggleButtonColor(bool active)
 	if (active)
 		return 0.4f;
 	return 0.7f;
+}
+
+float ModuleEditor::ToggleTextColor(bool active)
+{
+	if (active)
+		return 0.6f;
+	return 1.0f;
 }

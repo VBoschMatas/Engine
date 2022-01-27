@@ -25,6 +25,14 @@ struct Vertex
 	float2 uv;
 };
 
+
+enum class Game_State
+{
+	PLAY,
+	PAUSE,
+	STOP
+};
+
 // Constants ----------
 #define LIBRARIES "SDL 2.0.16\nGLEW 2.1.0\nDear ImGui 1.86\nDevIL 1.8.0"
 #define REPOSITORY_LINK "https://github.com/VBoschMatas/Engine"
