@@ -61,6 +61,8 @@ bool ModuleEditor::Init()
 	print_freq.StartTime();
 
 	SetStyle();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	return true;
 }
@@ -71,7 +73,7 @@ update_status ModuleEditor::PreUpdate()
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
-	MainMenuBar();
+	MainMenuBar(&showAppDockspace);
 
 	ConfigurationWindow();
 
@@ -111,9 +113,27 @@ bool ModuleEditor::CleanUp() {
 	return true;
 }
 
-void ModuleEditor::MainMenuBar()
+void ModuleEditor::MainMenuBar(bool* p_open)
 {
-	if (ImGui::BeginMainMenuBar())
+	//Create a widow to contain all the docked elements
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->WorkPos);
+	ImGui::SetNextWindowSize(viewport->WorkSize);
+	ImGui::SetNextWindowViewport(viewport->ID);
+	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+	ImGui::Begin("Menu", p_open, window_flags);
+
+	//enable docking
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+	{
+		ImGui::DockSpace(ImGui::GetID("MyDockSpace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+	}
+
+	if (ImGui::BeginMenuBar())
 	{
 		if (ImGui::BeginMenu("Tools"))
 		{
@@ -157,8 +177,17 @@ void ModuleEditor::MainMenuBar()
 			ImGui::EndMenu();
 		}
 
-		ImGui::EndMainMenuBar();
+		ImGui::EndMenuBar();
 	}
+
+	ImGui::End();
+}
+
+void ModuleEditor::DockSpace()
+{
+	
+
+
 }
 
 void ModuleEditor::AboutWindow()
@@ -187,7 +216,7 @@ void ModuleEditor::AboutWindow()
 	ImGui::TextWrapped("\n");
 	ImGui::TextWrapped("Author(s)");
 	ImGui::Separator();
-	ImGui::TextWrapped("Vicenç Bosch Matas");
+	ImGui::TextWrapped("Vicenï¿½ Bosch Matas");
 
 	ImGui::TextWrapped("\n");
 	ImGui::TextWrapped("Libraries");

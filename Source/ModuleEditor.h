@@ -34,6 +34,7 @@ private:
 	bool about_window = false;
 	bool configuration_window = false; 
 	bool inspector_window = true;
+	bool showAppDockspace = true;
 
 	bool scene_selected = false;
 	bool draw_axis = false;
@@ -50,7 +51,8 @@ private:
 	ImVec2 currentWindowSize;
 	Timer print_freq;
 
-	void MainMenuBar();
+	void MainMenuBar(bool* p_open);
+	void DockSpace();
 	void SceneWindow();
 	void SceneMenuBar();
 	void AboutWindow();
