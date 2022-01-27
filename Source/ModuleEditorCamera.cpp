@@ -5,6 +5,7 @@
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
 #include "ModuleRender.h"
+#include "ModuleEditor.h"
 #include "Geometry/OBB.h"
 
 #define DEGTORAD pi / 180.0f

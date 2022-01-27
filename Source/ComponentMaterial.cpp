@@ -4,10 +4,10 @@
 #include "Scene.h"
 #include <map>
 
-ComponentMaterial::ComponentMaterial(const aiMesh* mesh)
+ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset)
 {
 	if (mesh->mMaterialIndex >= 0)
-		material = App->scene->getCurrentScene()->GetMaterials()[mesh->mMaterialIndex];
+		material = App->scene->getCurrentScene()->GetMaterials()[mesh->mMaterialIndex + offset];
 	else
 		material = nullptr;
 }
@@ -16,12 +16,14 @@ Material::Material(aiMaterial* material, const char* path, unsigned int id)
 {
 	id = App->scene->getCurrentScene()->getMaterialId();
 	textures = LoadTextures(material, aiTextureType_DIFFUSE, path);
+
+	bool temp;
+	default_texture = App->textures->LoadTexture("textures/default.png", temp);
+
 	if (textures.size() == 0)
 	{
-		bool temp;
-		default_texture = App->textures->LoadTexture("textures/default.jfif", temp);
+		textures.push_back(&default_texture); // CHANGE
 	}
-	textures.push_back(&default_texture); // CHANGE
 }
 
 // Move Load Textures to Mesh
@@ -37,7 +39,7 @@ std::vector<Texture*> Material::LoadTextures(aiMaterial* material, aiTextureType
 	{
 		//bool temp;
 		console->AddLog("This model has no textures!");
-		//textures.push_back( App->textures->LoadTexture("textures/default.jfif", temp));
+		//textures.push_back( App->textures->LoadTexture("textures/default.png", temp));
 		return {};
 	}
 
@@ -118,7 +120,7 @@ std::vector<Texture*> Material::LoadTextures(aiMaterial* material, aiTextureType
 			console->AddLog("		Textures not found!");
 			App->textures->UnloadTexture(1, &temp_texture.id);
 			return {};
-			//texture = App->textures->LoadTexture("textures/default.jfif", texture_found);
+			//texture = App->textures->LoadTexture("textures/default.png", texture_found);
 		}
 
 		// We save the texture if it is new
@@ -136,19 +138,60 @@ std::vector<Texture*> Material::LoadTextures(aiMaterial* material, aiTextureType
 	return textures;
 }
 
+void Material::addTexture(const char* path, unsigned int tex_id)
+{
+	if(textures[tex_id] != nullptr)
+		App->textures->UnloadTexture(1, &textures[tex_id]->id);
+
+	bool temp;
+	Texture temp_texture = App->textures->LoadTexture(path, temp);
+	unsigned int tex_hash = std::hash<std::string>{}(path);
+	textures[tex_id] = App->scene->getCurrentScene()->AddTexture(tex_hash, temp_texture);
+}
+
+void Material::RemoveTexture(unsigned int tex_id)
+{
+	if (tex_id == 0)
+	{
+		if(textures[tex_id] != &default_texture)
+			textures[tex_id] = &default_texture;
+	}
+	else
+	{
+		textures[tex_id] = nullptr;
+	}
+}
+
 void ComponentMaterial::printComponentInfo()
 {
-	const ImVec4 title_colour(255, 255, 0, 255);
+	const ImVec4 yellow_colour(255, 255, 0, 255);
+	static ImGuiTreeNodeFlags texture_flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen;
+	static ImGuiTreeNodeFlags header_flags = ImGuiTreeNodeFlags_DefaultOpen;
 
-	ImGui::TextColored(title_colour, "Mesh");
-
-	ImGui::TextWrapped("Number of textures: %d", material->getTextures().size());
-	for (Texture* t : material->getTextures())
+	if (ImGui::CollapsingHeader("Material", header_flags))
 	{
-		ImGui::TextWrapped("\n");
-		ImGui::Image((void*)(intptr_t)t->id, ImVec2(100, 100));
-		ImGui::TextWrapped("Path: %s", t->path.c_str());
-		ImGui::TextWrapped("%dx%d", t->width, t->height);
-		ImGui::TextWrapped("\n");
+		ImGui::TextColored(yellow_colour, "Number of textures: %d", material->getTextures().size());
+		for (unsigned int i = 0; i < material->getTextures().size(); ++i)
+		{
+			if (ImGui::TreeNodeEx((void*)i, texture_flags,"Texture"))
+			{
+				ImGui::Image((void*)(intptr_t)material->getTextures()[i]->id, ImVec2(80, 80));
+				ImGui::SameLine();
+				ImGui::BeginGroup();
+				ImGui::TextWrapped("Path: %s", material->getTextures()[i]->path.c_str());
+				ImGui::TextWrapped("%dx%d", material->getTextures()[i]->width, material->getTextures()[i]->height);
+				if (ImGui::Button("New texture"))
+				{
+					material->addTexture("textures/Lenna.png", i);
+				}
+				if (ImGui::Button("Delete texture"))
+				{
+					material->RemoveTexture(i);
+				}
+				ImGui::EndGroup();
+				ImGui::TextWrapped("\n");
+				ImGui::TreePop();
+			}
+		}
 	}
 }

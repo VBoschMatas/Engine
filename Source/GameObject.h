@@ -1,5 +1,7 @@
 #pragma once
 #include "Globals.h"
+#include "Geometry/AABB.h"
+#include "Geometry/OBB.h"
 #include <vector>
 
 enum class GoType
@@ -24,6 +26,7 @@ public:
 	void Load(const std::string &file_name = "", GoType _type = GoType::Empty);
 
 	void Update(unsigned int program);
+	void DebugDraw();
 
 	// Setters
 	void setName(const char* _name) { name = _name; };
@@ -59,9 +62,13 @@ public:
 	void printGameObjectInfo();
 	void printHierarchy(ImGuiTreeNodeFlags flags);
 private:
+
 	unsigned int id;
 	std::string name;
 	GoType type;
+
+	math::AABB local_bbox;
+	math::OBB world_bbox;
 
 	GameObject* parent;
 	std::vector<GameObject*> children;

@@ -1,5 +1,9 @@
 #include "Globals.h"
+#include "Application.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleScene.h"
+#include "Scene.h"
+#include "ComponentMesh.h"
 
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h"     // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
@@ -610,6 +614,7 @@ update_status  ModuleDebugDraw::Update()
 {
     dd::axisTriad(float4x4::identity, 0.15f, 2.0f);
     dd::xzSquareGrid(-50.0f, 50.0f, -0.05f, 1.0f, dd::colors::LightGray);
+
 	return UPDATE_CONTINUE;
 }
 

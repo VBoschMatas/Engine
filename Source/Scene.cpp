@@ -6,6 +6,8 @@ Scene::Scene(unsigned int _id)
 	name = "New Scene";
 	id = _id;
 	last_go_id = 0;
+	last_material_id = 0;
+	last_mesh_id = 0;
 };
 
 Scene::Scene(const char* _name, unsigned int _id) {
@@ -23,6 +25,7 @@ void Scene::Update(unsigned int program)
 	for (GameObject* go : children)
 	{
 		go->Update(program);
+		go->DebugDraw();
 	}
 }
 
@@ -50,7 +53,7 @@ GameObject* Scene::AddGameObject(const std::string file_name, GameObject* parent
 void Scene::printHierarchy()
 {
 
-	if (ImGui::CollapsingHeader(name.c_str()))
+	if (ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 
 		static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;

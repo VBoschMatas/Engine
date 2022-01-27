@@ -22,13 +22,20 @@ void ComponentTransform::Update(unsigned int program, float3& position, Quat& ro
 	scale = { scale.x * this->scale[0], scale.y * this->scale[1], scale.z * this->scale[2] };
 }
 
+void ComponentTransform::setRot(float x, float y, float z, float w)
+{
+	Quat t_quat(x, y, z, w);
+	float3 eulerRotation = t_quat.ToEulerXYZ()* RADTODEG;
+	setRot(eulerRotation);
+}
+
 void ComponentTransform::printComponentInfo()
 {
-	const ImVec4 title_colour(255, 255, 0, 255);
-
-	ImGui::TextColored(title_colour, "Transform");
-
-	ImGui::DragFloat3("Position", position, 0.005f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
-	ImGui::DragFloat3("Rotation", rotation, 0.005f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
-	ImGui::DragFloat3("Scale", scale, 0.005f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
+	static ImGuiTreeNodeFlags header_flags = ImGuiTreeNodeFlags_DefaultOpen;
+	if (ImGui::CollapsingHeader("Transform", header_flags))
+	{
+		ImGui::DragFloat3("Position", position, 0.005f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
+		ImGui::DragFloat3("Rotation", rotation, 0.005f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
+		ImGui::DragFloat3("Scale", scale, 0.005f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
+	}
 }

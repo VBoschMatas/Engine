@@ -23,8 +23,8 @@ Application::Application()
 	modules.push_back(program = new ModuleProgram());
 	modules.push_back(scene = new ModuleScene());
 	modules.push_back(renderer = new ModuleRender());
-	modules.push_back(dd = new ModuleDebugDraw());
 	modules.push_back(editor = new ModuleEditor());
+	modules.push_back(dd = new ModuleDebugDraw());
 }
 
 Application::~Application()

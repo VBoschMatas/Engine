@@ -134,12 +134,11 @@ update_status ModuleRender::Update()
 	//Draw inside the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
-
 	App->scene->Update(program);
 	/*if(model != nullptr)
 		model->Draw(program);*/
 
+	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return UPDATE_CONTINUE;

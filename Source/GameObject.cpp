@@ -6,6 +6,7 @@
 #include "ModuleScene.h"
 #include "Scene.h"
 #include "MathGeoLib.h"
+#include "debugdraw.h"
 
 GameObject::GameObject(unsigned int _id, GameObject* _parent)
 {
@@ -83,6 +84,10 @@ void GameObject::Update(unsigned int program)
 	{
 		c->Update(program, position, rotation, scale);
 	}
+
+	// Bounding box Transform
+	world_bbox = local_bbox;
+	world_bbox.Transform(float4x4::FromTRS(position, rotation, scale));
 }
 
 ComponentTransform* GameObject::Transform()
@@ -99,23 +104,19 @@ ComponentTransform* GameObject::Transform()
 	return nullptr;
 }
 
-
 /*
 	ImGui print for model info
 */
 void GameObject::printGameObjectInfo()
 {
-	const ImVec4 title_colour(255, 255, 0, 255);
+	const ImVec4 yellow_colour(255, 255, 0, 255);
 	ImGui::Checkbox("Active", &active); 
 	ImGui::InputText("Name", &name[0], 64);
-
-	ImGui::Separator();
 
 	for (Component* c : components)
 	{
 		c->printComponentInfo();
 
-		ImGui::Separator();
 	}
 }
 
@@ -155,4 +156,30 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 
 	}
 	
+}
+
+void GameObject::DebugDraw()
+{
+	for (GameObject* ch : children)
+	{
+		ch->DebugDraw();
+	}
+
+	for (Component* c : components)
+	{
+		float3 extreme_points[8];
+		c->getBoundingBox(local_bbox);
+		world_bbox.GetCornerPoints(&extreme_points[0]);
+		std::swap(extreme_points[2], extreme_points[5]);
+		std::swap(extreme_points[3], extreme_points[4]);
+		std::swap(extreme_points[4], extreme_points[5]);
+		std::swap(extreme_points[6], extreme_points[7]);
+		dd::box(extreme_points, dd::colors::White);
+	}
+
+	for (Component* c : components)
+	{
+		c->DebugDraw();
+	}
+
 }

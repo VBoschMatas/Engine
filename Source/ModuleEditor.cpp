@@ -17,6 +17,7 @@
 #include "imGui/imgui_impl_sdl.h"
 #include "imGui/imgui_impl_opengl3.h"
 #include "windows.h"
+#include "FontAwesome/IconsFontAwesome.h"
 
 #define PRINTFREQ 200
 
@@ -57,6 +58,8 @@ bool ModuleEditor::Init()
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer->context);
 	ImGui_ImplOpenGL3_Init();
 	print_freq.StartTime();
+
+	SetStyle();
 
 	return true;
 }
@@ -320,6 +323,7 @@ void ModuleEditor::InspectorWindow()
 {
 	ImGui::Begin("Inspector", &inspector_window);
 	GameObject* inspected = App->scene->getScene(App->scene->current_scene)->selected_gameObject;
+
 	if (inspected != nullptr)
 		inspected->printGameObjectInfo();
 
@@ -329,33 +333,132 @@ void ModuleEditor::InspectorWindow()
 void ModuleEditor::SceneWindow()
 {
 	ImGui::Begin("Scene");
-	//get the mouse position
-	ImVec2 pos = ImGui::GetCursorScreenPos();
-	ImVec2 newWindowSize = ImGui::GetWindowSize();
-	if (newWindowSize.x != currentWindowSize.x || newWindowSize.y != currentWindowSize.y) {
-		currentWindowSize = newWindowSize;
-		App->editorcamera->WindowResized(newWindowSize.x, newWindowSize.y);
-		App->renderer->WindowResized(newWindowSize.x, newWindowSize.y);
+
+	SceneMenuBar();
+
+	if (ImGui::BeginChild("SceneCanvas", ImVec2(0, 0), true, ImGuiWindowFlags_NoMove))
+	{
+		//focused = ImGui::IsWindowFocused();
+
+
+		float width = ImGui::GetWindowContentRegionWidth();
+		float height = ImGui::GetContentRegionAvail().y;
+
+		App->editorcamera->WindowResized(float(width), float(height));
+
+		/*if (draw_axis == true)
+		{
+			dd::axisTriad(math::float4x4::identity, metric_proportion * 0.1f, metric_proportion, 0, false);
+		}
+		if (draw_plane == true)
+		{
+			dd::xzSquareGrid(-100.0f, 100.0f, 0.0f, 1.0f, dd::colors::LightGray);
+		}
+
+		if (debug_draw == true)
+		{
+			App->DebugDraw();
+		}*/
+
+		ImVec2 cursor = ImGui::GetCursorScreenPos();
+		ImVec2 mouse = ImGui::GetMousePos();
+		ImVec2 rel_position = ImVec2(mouse.x - cursor.x, mouse.y - cursor.y);
+
+		/*if (focused && ImGui::IsMouseClicked(0, false) && rel_position.x >= 0 && rel_position.x <= width && rel_position.y >= 0 && rel_position.y <= height)
+		{
+			PickSelection(camera, (int)rel_position.x, (int)rel_position.y);
+		}*/
+
+		//bool msaa = App->hints->GetBoolValue(ModuleHints::ENABLE_MSAA);
+
+		//Framebuffer* framebuffer = msaa ? framebuffers[FRAMEBUFFER_MSAA].framebuffer.get() : framebuffers[FRAMEBUFFER_NO_MSAA].framebuffer.get();
+		//Texture2D* texture_color = msaa ? framebuffers[FRAMEBUFFER_MSAA].texture_color.get() : framebuffers[FRAMEBUFFER_NO_MSAA].texture_color.get();
+
+
+		//framebuffer->Bind();
+
+		//glEnable(GL_STENCIL_TEST);
+		//glViewport(0, 0, fb_width, fb_height);
+		//glClearColor(camera->background.r, camera->background.g, camera->background.b, camera->background.a);
+
+		//glStencilMask(0x01);
+
+		////glClear(/*GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT*/);
+
+		//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		//glStencilMask(0x00);
+		//glStencilFunc(GL_ALWAYS, 0, 0XFF);
+
+		//App->renderer->Draw(camera, culling, framebuffer, fb_width, fb_height);
+		//App->debug_draw->Draw(camera, framebuffer->Id(), fb_width, fb_height);
+
+		//DrawSelection(camera, framebuffer);
+
+		//App->renderer->GetPostprocess()->Execute(texture_color, framebuffers[FRAMEBUFFER_POSTPROCESS].framebuffer.get(), fb_width, fb_height);
+
+		//ShowTexture();
+
+		ImVec2 windowSize = ImGui::GetWindowSize();
+		ImGui::Image((ImTextureID)App->renderer->GetFBTexture(), windowSize, ImVec2(0, 1), ImVec2(1, 0));
+
+		//DrawGuizmo(camera);
+
 	}
-
-	//pass the texture of the FBO
-	//window.getRenderTexture() is the texture of the FBO
-	//the next parameter is the upper left corner for the uvs to be applied at
-	//the third parameter is the lower right corner
-	//the last two parameters are the UVs
-	//they have to be flipped (normally they would be (0,0);(1,1)
-
-	/*ImGui::GetWindowDrawList()->AddImage(
-		(void*)App->renderer->GetFBTexture(),
-		ImVec2(ImGui::GetCursorScreenPos()),
-		ImVec2(ImGui::GetCursorScreenPos().x + App->window->screen_surface->w,
-			ImGui::GetCursorScreenPos().y + App->window->screen_surface->h), ImVec2(0, 1), ImVec2(1, 0));*/
-
-	ImVec2 windowSize = ImGui::GetWindowSize();
-	ImGui::Image((ImTextureID)App->renderer->GetFBTexture(), windowSize, ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::EndChild();
 
 	//we are done working with this window
 	ImGui::End();
+}
+
+void ModuleEditor::SceneMenuBar()
+{
+	if (ImGui::BeginChild("SceneMenu", ImVec2(0, 1), true, ImGuiWindowFlags_NoMove))
+	{
+		ImGui::EndChild();
+		if (ImGui::IsKeyPressed(90))
+			transform_op = ImGuizmo::TRANSLATE;
+		if (ImGui::IsKeyPressed(69))
+			transform_op = ImGuizmo::ROTATE;
+		if (ImGui::IsKeyPressed(82)) // r Key
+			transform_op = ImGuizmo::SCALE;
+
+		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
+		if (ImGui::Button(ICON_FA_ARROWS))
+		{
+			transform_op = ImGuizmo::TRANSLATE;
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Translate");
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
+		if (ImGui::Button(ICON_FA_UNDO))
+		{
+			transform_op = ImGuizmo::ROTATE;
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Rotate");
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
+		if (ImGui::Button(ICON_FA_EXPAND))
+		{
+			transform_op = ImGuizmo::SCALE;
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Scale");
+		ImGui::PopStyleColor(3);
+		
+
+	}
 }
 
 void ModuleEditor::HierarchyWindow()
@@ -365,4 +468,25 @@ void ModuleEditor::HierarchyWindow()
 	App->scene->printHierarchy();
 
 	ImGui::End();
+}
+
+void ModuleEditor::SetStyle()
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.ChildBorderSize = 0.0f;
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontDefault();
+
+	// merge in icons from Font Awesome
+	static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+	ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
+	io.Fonts->AddFontFromFileTTF("fonts/FontAwesome/font.ttf", 11.0f, &icons_config, icons_ranges);
+}
+
+float ModuleEditor::ToggleButtonColor(bool active)
+{
+	if (active)
+		return 0.4f;
+	return 0.7f;
 }

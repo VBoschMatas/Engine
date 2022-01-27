@@ -3,13 +3,16 @@
 #include "ModuleScene.h"
 #include "ModuleProgram.h"
 #include "ModuleEditorCamera.h"
+#include "ModuleDebugDraw.h"
 #include "GL/glew.h"
 #include "Math/float2.h"
 #include "Math/float4x4.h"
+#include <array>
 
-ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name)
+ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name, const std::vector<float3>& obb_vertices)
 {
-	mesh = new Mesh(vertices, indices, material, name);
+	mesh = new Mesh(vertices, indices, material, name, obb_vertices);
+	App->scene->getCurrentScene()->AddMesh(mesh);
 	console->AddLog("NUMBER OF Indices: %d", indices.size());
 	type = CompType::Mesh;
 	visible = true;
@@ -47,24 +50,36 @@ void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotatio
 	glBindVertexArray(0);
 }
 
-void ComponentMesh::printComponentInfo()
+void ComponentMesh::getBoundingBox(math::AABB& bbox)
 {
-	const ImVec4 title_colour(255, 255, 0, 255);
-
-	ImGui::TextColored(title_colour, "Mesh");
-
-	ImGui::TextWrapped("Triangles: %d  (V: %d  I: %d)", GetIndices() / 3, GetVertices(), GetIndices());
-
-	ImGui::Checkbox("Visible", &visible);
+	bbox = mesh->getBoundingBox();
 }
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, Material* material, const char* name)
+void ComponentMesh::printComponentInfo()
+{
+	const ImVec4 yellow_colour(255, 255, 0, 255);
+	static ImGuiTreeNodeFlags header_flags = ImGuiTreeNodeFlags_DefaultOpen;
+
+	if (ImGui::CollapsingHeader("Mesh", header_flags))
+	{
+		ImGui::TextColored(yellow_colour, "Triangles: "); ImGui::SameLine();
+		ImGui::Text("%d  (V: %d  I: %d)", GetIndices() / 3, GetVertices(), GetIndices());
+
+		ImGui::Checkbox("Visible", &visible);
+	}
+}
+
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, Material* material, const char* name, const std::vector<float3>& obb_vertices)
 {
 	this->vertices = vertices;
 	this->indices = indices;
 	this->material_index = material;
 	this->name = name;
 	this->id = App->scene->getScene(App->scene->current_scene)->getMeshId();
+	console->AddLog("Creating OBB for the mesh");
+
+	bounding_box.SetNegativeInfinity();
+	bounding_box.Enclose(&obb_vertices[0], obb_vertices.size());
 
 	LoadVBO();
 	LoadEBO();

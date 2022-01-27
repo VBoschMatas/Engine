@@ -14,6 +14,10 @@ public:
 
 	Texture* getTexture(TexType type);
 	std::vector<Texture*> getTextures() { return textures; };
+
+	void addTexture(const char* path, unsigned int tex_id);
+	void RemoveTexture(unsigned int tex_id);
+
 	unsigned int getId() { return id; };
 
 private:
@@ -26,7 +30,7 @@ private:
 class ComponentMaterial : public Component
 {
 public:
-	ComponentMaterial(const aiMesh* mesh);
+	ComponentMaterial(const aiMesh* mesh, unsigned int offset);
 	virtual ~ComponentMaterial() = default;
 
 	//void Update(unsigned int program, float3 & position, Quat & rotation, float3 & scale) override;

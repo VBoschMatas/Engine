@@ -1,5 +1,6 @@
 #pragma once
 #include "Globals.h"
+#include "Geometry/AABB.h"
 
 enum class CompType
 {
@@ -18,7 +19,8 @@ public:
 	CompType getType() { return type; };
 
 	virtual void Update(unsigned int program, float3 &position, Quat &rotation, float3 &scale) {};
-	
+	virtual void DebugDraw() {};
+	virtual void getBoundingBox(math::AABB &bbox) {} ;
 	virtual void printComponentInfo() {};
 
 protected:

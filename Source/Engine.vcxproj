@@ -99,7 +99,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions); _CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\SDL\include;.\glew-2.1.0\include;.\imGui;.\MathGeoLib;.\\DevIL\include;.\assimp\include;.\optick\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\SDL\include;.\glew-2.1.0\include;.\imGui;.\MathGeoLib;.\\DevIL\include;.\assimp\include;.\optick\include;.\ImGuizmo;.\fonts</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

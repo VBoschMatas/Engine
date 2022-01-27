@@ -30,7 +30,7 @@ public:
 	std::vector<Mesh*> GetMeshes() { return meshes; };
 	void RemoveMesh(unsigned int id);
 
-	void AddMaterial(Material* _material) { scene_materials.push_back(_material); };
+	Material* AddMaterial(Material* _material) { scene_materials.push_back(_material); return scene_materials.back(); };
 	std::vector<Material*> GetMaterials() { return scene_materials; };
 	void RemoveMaterial(unsigned int id);
 
