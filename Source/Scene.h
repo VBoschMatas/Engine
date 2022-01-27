@@ -24,7 +24,7 @@ public:
 
 	GameObject* AddGameObject(const std::string file_name, GoType type = GoType::Empty);
 	GameObject* AddGameObject(const std::string file_name, GameObject* parent, GoType type = GoType::Empty);
-	void RemoveGameObject(unsigned int id);
+	void RemoveGameObject(GameObject* gameobj) { delete(gameobj); };
 
 	void AddMesh(Mesh* _mesh) { meshes.push_back(_mesh); };
 	std::vector<Mesh*> GetMeshes() { return meshes; };

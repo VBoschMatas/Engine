@@ -13,7 +13,8 @@ public:
 	~Material() = default;
 
 	Texture* getTexture(TexType type);
-	std::vector<Texture*> getTextures() { return textures; };
+	Texture** getTextures() { return textures; };
+	const char** getTexTypes() { return tex_types; };
 
 	void setTexture(Texture* texture, unsigned int tex_id);
 
@@ -24,9 +25,10 @@ public:
 
 private:
 	unsigned int id;
-	std::vector<Texture*> textures;
+	Texture* textures[4] = { nullptr, nullptr, nullptr, nullptr };
+	const char* tex_types[4] = { "diffuse", "normals", "specular", "lightmap"};
 	Texture default_texture;
-	std::vector<Texture*> LoadTextures(aiMaterial* material, aiTextureType type, const char* path);
+	Texture* LoadTextures(aiMaterial* material, aiTextureType type, const char* path);
 };
 
 class ComponentMaterial : public Component
@@ -38,6 +40,7 @@ public:
 	//void Update(unsigned int program, float3 & position, Quat & rotation, float3 & scale) override;
 
 	void printComponentInfo() override;
+	void showImage(unsigned int i);
 
 	void setMaterial(Material* _material) { material = _material; };
 	Material* getMaterial() { return material; };

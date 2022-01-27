@@ -37,12 +37,12 @@ void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotatio
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, (const float*)&view);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, (const float*)&proj);
 
-	for (unsigned int i = 0; i < mesh->getMaterial()->getTextures().size(); ++i)
-	{
-		glActiveTexture(GL_TEXTURE0 + i);
+	/*for (unsigned int i = 0; i < mesh->getMaterial()->getTextures().size(); ++i)
+	{*/
+		glActiveTexture(GL_TEXTURE0);
 		glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
-		glBindTexture(GL_TEXTURE_2D, mesh->getMaterial()->getTextures()[i]->id);
-	}
+		glBindTexture(GL_TEXTURE_2D, mesh->getMaterial()->getTextures()[0]->id);
+	//}
 
 	glActiveTexture(GL_TEXTURE0);
 

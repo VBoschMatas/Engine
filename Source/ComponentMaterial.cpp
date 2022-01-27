@@ -16,23 +16,23 @@ ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset, un
 Material::Material(aiMaterial* material, const char* path, unsigned int id)
 {
 	id = App->scene->getCurrentScene()->getMaterialId();
-	textures = LoadTextures(material, aiTextureType_DIFFUSE, path);
+	textures[0] = LoadTextures(material, aiTextureType_DIFFUSE, path);
+	textures[1] = LoadTextures(material, aiTextureType_NORMALS, path);
+	textures[2] = LoadTextures(material, aiTextureType_SPECULAR, path);
+	textures[3] = LoadTextures(material, aiTextureType_LIGHTMAP, path);
 
 	bool temp;
 	default_texture = App->textures->LoadTexture("textures/default.png", temp);
 
-	if (textures.size() == 0)
+	if (textures[0] == nullptr)
 	{
-		textures.push_back(&default_texture); // CHANGE
+		textures[0] = &default_texture; // CHANGE
 	}
 }
 
 // Move Load Textures to Mesh
-std::vector<Texture*> Material::LoadTextures(aiMaterial* material, aiTextureType type, const char* path)
+Texture* Material::LoadTextures(aiMaterial* material, aiTextureType type, const char* path)
 {
-	std::vector<Texture*> textures = {};
-
-	std::vector<unsigned int> tex_hash_vect;
 	unsigned int tex_hash;
 
 	unsigned int n_textures = material->GetTextureCount(type);
@@ -40,103 +40,96 @@ std::vector<Texture*> Material::LoadTextures(aiMaterial* material, aiTextureType
 	{
 		//bool temp;
 		console->AddLog("This model has no textures!");
-		//textures.push_back( App->textures->LoadTexture("textures/default.png", temp));
 		return {};
 	}
 
-	for (unsigned int i = 0; i < n_textures; ++i)
+	aiString ai_path;
+	material->GetTexture(type, 0, &ai_path);
+	bool texture_found = false;
+	bool already_exists = false;
+	// Searching in described path
+	console->AddLog("		Checking for textures in described path");
+	std::string mat_dir(path);
+	mat_dir.append(ai_path.C_Str());
+	Texture* texture = nullptr;
+	Texture temp_texture;
+
+	tex_hash = std::hash<std::string>{}(mat_dir);
+
+	std::map<unsigned int, Texture>::iterator it = App->scene->getCurrentScene()->GetTextures()->find(tex_hash);
+	std::map<unsigned int, Texture>::iterator end_it = App->scene->getCurrentScene()->GetTextures()->end();
+	if (it != end_it)
 	{
-		aiString ai_path;
-		material->GetTexture(type, i, &ai_path);
-		bool texture_found = false;
-		bool already_exists = false;
-		// Searching in described path
-		console->AddLog("		Checking for textures in described path");
-		std::string mat_dir(path);
-		mat_dir.append(ai_path.C_Str());
-		Texture* texture;
-		Texture temp_texture;
+		texture = &it->second;
+		already_exists = true;
+	}
 
-		tex_hash = std::hash<std::string>{}(mat_dir);
+	if (!already_exists)
+		temp_texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
 
+
+	std::string tex_name(ai_path.C_Str());
+	// Searching in the same dir as the model
+	if (!texture_found && !already_exists)
+	{
+		tex_name = tex_name.substr(0, tex_name.find_last_of('\\'));
+		App->textures->UnloadTexture(1, &temp_texture.id);
+		std::string same_dir(path);
+		same_dir.append(tex_name);
+		console->AddLog("		Checking for textures in same directory as object: %s", same_dir.c_str());
+
+		tex_hash = std::hash<std::string>{}(same_dir);
 		std::map<unsigned int, Texture>::iterator it = App->scene->getCurrentScene()->GetTextures()->find(tex_hash);
 		std::map<unsigned int, Texture>::iterator end_it = App->scene->getCurrentScene()->GetTextures()->end();
 		if (it != end_it)
 		{
-			texture = &it->second;
+			texture = &App->scene->getCurrentScene()->GetTextures()->find(tex_hash)->second;
 			already_exists = true;
 		}
 
 		if (!already_exists)
-			temp_texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
-
-
-		std::string tex_name(ai_path.C_Str());
-		// Searching in the same dir as the model
-		if (!texture_found && !already_exists)
-		{
-			tex_name = tex_name.substr(0, tex_name.find_last_of('\\'));
-			App->textures->UnloadTexture(1, &temp_texture.id);
-			std::string same_dir(path);
-			same_dir.append(tex_name);
-			console->AddLog("		Checking for textures in same directory as object: %s", same_dir.c_str());
-
-			tex_hash = std::hash<std::string>{}(same_dir);
-			std::map<unsigned int, Texture>::iterator it = App->scene->getCurrentScene()->GetTextures()->find(tex_hash);
-			std::map<unsigned int, Texture>::iterator end_it = App->scene->getCurrentScene()->GetTextures()->end();
-			if (it != end_it)
-			{
-				texture = &App->scene->getCurrentScene()->GetTextures()->find(tex_hash)->second;
-				already_exists = true;
-			}
-
-			if (!already_exists)
-				temp_texture = App->textures->LoadTexture(same_dir.c_str(), texture_found);
-		}
-
-		// Searching in the Game --> Textures dir
-		if (!texture_found && !already_exists)
-		{
-			console->AddLog("		Checking for textures in textures directory");
-			App->textures->UnloadTexture(1, &temp_texture.id);
-			std::string tex_dir;
-			tex_dir = "textures\\";
-			tex_dir.append(tex_name);
-
-			tex_hash = std::hash<std::string>{}(tex_dir);
-			std::map<unsigned int, Texture>::iterator it = App->scene->getCurrentScene()->GetTextures()->find(tex_hash);
-			std::map<unsigned int, Texture>::iterator end_it = App->scene->getCurrentScene()->GetTextures()->end();
-			if (it != end_it)
-			{
-				texture = &App->scene->getCurrentScene()->GetTextures()->find(tex_hash)->second;
-				already_exists = true;
-			}
-			if (!already_exists)
-				temp_texture = App->textures->LoadTexture(tex_dir.c_str(), texture_found);
-		}
-
-		// Texture not found
-		if (!texture_found && !already_exists)
-		{
-			console->AddLog("		Textures not found!");
-			App->textures->UnloadTexture(1, &temp_texture.id);
-			return {};
-			//texture = App->textures->LoadTexture("textures/default.png", texture_found);
-		}
-
-		// We save the texture if it is new
-		if (!already_exists)
-		{
-			texture = App->scene->getCurrentScene()->AddTexture(tex_hash, temp_texture);
-		}
-		else
-			console->AddLog("	This texture was used previously");
-
-		tex_hash_vect.push_back(tex_hash);
-		textures.push_back(texture);
+			temp_texture = App->textures->LoadTexture(same_dir.c_str(), texture_found);
 	}
 
-	return textures;
+	// Searching in the Game --> Textures dir
+	if (!texture_found && !already_exists)
+	{
+		console->AddLog("		Checking for textures in textures directory");
+		App->textures->UnloadTexture(1, &temp_texture.id);
+		std::string tex_dir;
+		tex_dir = "textures\\";
+		tex_dir.append(tex_name);
+
+		tex_hash = std::hash<std::string>{}(tex_dir);
+		std::map<unsigned int, Texture>::iterator it = App->scene->getCurrentScene()->GetTextures()->find(tex_hash);
+		std::map<unsigned int, Texture>::iterator end_it = App->scene->getCurrentScene()->GetTextures()->end();
+		if (it != end_it)
+		{
+			texture = &App->scene->getCurrentScene()->GetTextures()->find(tex_hash)->second;
+			already_exists = true;
+		}
+		if (!already_exists)
+			temp_texture = App->textures->LoadTexture(tex_dir.c_str(), texture_found);
+	}
+
+	// Texture not found
+	if (!texture_found && !already_exists)
+	{
+		console->AddLog("		Textures not found!");
+		App->textures->UnloadTexture(1, &temp_texture.id);
+		return {};
+		//texture = App->textures->LoadTexture("textures/default.png", texture_found);
+	}
+
+	// We save the texture if it is new
+	if (!already_exists)
+	{
+		texture = App->scene->getCurrentScene()->AddTexture(tex_hash, temp_texture);
+	}
+	else
+		console->AddLog("	This texture was used previously");
+
+	return texture;
 }
 
 void Material::addTexture(const char* path, unsigned int tex_id)
@@ -177,19 +170,12 @@ void ComponentMaterial::printComponentInfo()
 	std::string itemid = "Material ##" + std::to_string(this->id);
 	if (ImGui::CollapsingHeader(itemid.c_str(), header_flags))
 	{
-		ImGui::TextColored(yellow_colour, "Number of textures: %d", material->getTextures().size());
-		for (unsigned int i = 0; i < material->getTextures().size(); ++i)
+		for (unsigned int i = 0; i < 4; ++i)
 		{
 			std::string sel_name = "##" + std::to_string(this->id) + "," + std::to_string(i);
-			if (ImGui::TreeNodeEx((void*)this, texture_flags, std::string("Texture").c_str()))
+			if (ImGui::TreeNodeEx((void*)(this + i), texture_flags, material->getTexTypes()[i]))
 			{
-				ImGui::Image((void*)(intptr_t)material->getTextures()[i]->id, ImVec2(80, 80));
-				ImGui::SameLine();
-				ImGui::BeginGroup();
-				ImGui::TextColored(yellow_colour, material->getTextures()[i]->name.c_str());
-				ImGui::SameLine();
-				ImGui::Text("%dx%d", material->getTextures()[i]->width, material->getTextures()[i]->height);
-				ImGui::TextWrapped("Path: %s", material->getTextures()[i]->path.c_str());
+				showImage(i);
 				if (ImGui::Button(std::string("Select Texture" + sel_name).c_str()))
 				{
 					if (!ImGui::IsPopupOpen(std::string("Select Texture" + sel_name).c_str()))
@@ -207,6 +193,29 @@ void ComponentMaterial::printComponentInfo()
 				ImGui::TreePop();
 			}
 		}
+	}
+}
+
+void ComponentMaterial::showImage(unsigned int i)
+{
+	const ImVec4 yellow_colour(255, 255, 0, 255);
+	if (material->getTextures()[i] == nullptr)
+	{
+		ImGui::Image(nullptr, ImVec2(80, 80), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
+		ImGui::SameLine();
+		ImGui::BeginGroup();
+		ImGui::Text("");
+		ImGui::TextWrapped("Path: ");
+	}
+	else
+	{
+		ImGui::Image((void*)(intptr_t)material->getTextures()[i]->id, ImVec2(80, 80), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
+		ImGui::SameLine();
+		ImGui::BeginGroup();
+		ImGui::TextColored(yellow_colour, material->getTextures()[i]->name.c_str());
+		ImGui::SameLine();
+		ImGui::Text("%dx%d", material->getTextures()[i]->width, material->getTextures()[i]->height);
+		ImGui::TextWrapped("Path: %s", material->getTextures()[i]->path.c_str());
 	}
 }
 

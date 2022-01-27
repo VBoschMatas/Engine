@@ -20,6 +20,10 @@ GameObject::GameObject(unsigned int _id, GameObject* _parent)
 
 GameObject::~GameObject()
 {
+	parent->removeChild(this);
+
+	for (GameObject* ch : children)
+		delete(ch);
 	for (Component* c : components)
 		delete(c);
 }
@@ -135,9 +139,9 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 
 	if (children.size() > 0)
 	{
-		bool is_open = ImGui::TreeNodeEx((void*)this->id, node_flags, name.c_str());
+		bool is_open = ImGui::TreeNodeEx((void*)this, node_flags, name.c_str());
 
-		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen())
 			App->scene->getScene(App->scene->current_scene)->selected_gameObject = this;
 
 		if (is_open)
@@ -153,9 +157,9 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 	else
 	{
 		node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-		ImGui::TreeNodeEx((void*)this->id, node_flags, "%s", name.c_str());
+		ImGui::TreeNodeEx((void*)this, node_flags, "%s", name.c_str());
 
-		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+		if ((ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) && !ImGui::IsItemToggledOpen())
 			App->scene->getScene(App->scene->current_scene)->selected_gameObject = this;
 
 

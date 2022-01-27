@@ -35,6 +35,7 @@ private:
 	bool about_window = false;
 	bool configuration_window = false; 
 	bool inspector_window = true;
+	bool demo_window = true;
 	bool showAppDockspace = true;
 
 	bool scene_selected = false;
@@ -66,6 +67,7 @@ private:
 
 	float ToggleButtonColor(bool active);
 	float ToggleTextColor(bool active);
+	void HierarchyMenu();
 	void GuizmosMenu();
 	void PlayPauseMenu();
 	void DebugDrawMenu();

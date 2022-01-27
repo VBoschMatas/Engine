@@ -83,7 +83,8 @@ update_status ModuleEditor::PreUpdate()
 		ConsoleWindow();
 	if (inspector_window)
 		InspectorWindow();
-
+	if (demo_window)
+		ImGui::ShowDemoWindow();
 	SceneWindow();
 	HierarchyWindow();
 
@@ -369,7 +370,7 @@ void ModuleEditor::SceneWindow()
 	if (ImGui::BeginChild("SceneCanvas", ImVec2(0, 0), true, ImGuiWindowFlags_NoMove))
 	{
 		scene_selected = ImGui::IsWindowFocused();
-		if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+		if ((ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)) && ImGui::IsWindowHovered())
 			ImGui::SetWindowFocus();
 
 		float width = ImGui::GetWindowContentRegionWidth();
@@ -533,9 +534,49 @@ void ModuleEditor::HierarchyWindow()
 {
 	ImGui::Begin("Hierarchy");
 
+	HierarchyMenu();
+
+	if ((ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsMouseClicked(ImGuiMouseButton_Left)) && ImGui::IsWindowHovered())
+	{
+		App->scene->getCurrentScene()->selected_gameObject = nullptr;
+	}
+
 	App->scene->printHierarchy();
 
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered())
+	{
+		if(ImGui::IsWindowFocused())
+			ImGui::OpenPopup("Hierarchy Popup");
+		ImGui::SetWindowFocus(); // Doing this at the second left click the popup will open
+	}
+
+
 	ImGui::End();
+}
+
+void ModuleEditor::HierarchyMenu()
+{
+	if (ImGui::BeginPopup("Hierarchy Popup"))
+	{
+		if (ImGui::BeginMenu("New"))
+		{
+			if (ImGui::MenuItem("Empty GameObject"))
+			{
+				GameObject* temp = App->scene->getCurrentScene()->AddGameObject("EmptyObject", App->scene->getCurrentScene()->selected_gameObject);
+				if (App->scene->getCurrentScene()->selected_gameObject != nullptr)
+					App->scene->getCurrentScene()->selected_gameObject->addChild(temp);
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::Selectable("Remove", false))
+		{
+			if (App->scene->getCurrentScene()->selected_gameObject != nullptr)
+			{
+				App->scene->getCurrentScene()->RemoveGameObject(App->scene->getCurrentScene()->selected_gameObject);
+			}
+		}
+		ImGui::EndPopup();
+	}
 }
 
 void ModuleEditor::SetStyle()
