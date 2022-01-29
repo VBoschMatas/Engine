@@ -21,8 +21,14 @@ public:
 	bool            CleanUp();
 
     void            Draw(const float4x4& view, const float4x4& proj, unsigned width, unsigned height);
-private:
 
+    void            CheckRaycast(float3 begin, float3 end, float3 colour = { 255.0f , 255.0f, 0.0f });
+
+    bool check_raycast = false;
+private:
+    float3 begin_ray = { 0.0f, 0.0f, 0.0f };
+    float3 end_ray = { 0.0f , 0.0f, 0.0f };
+    float3 colour_ray = { 0.0f , 0.0f, 0.0f };
     static DDRenderInterfaceCoreGL* implementation;
 };
 

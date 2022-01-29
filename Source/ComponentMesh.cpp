@@ -9,6 +9,8 @@
 #include "Math/float4x4.h"
 #include <array>
 
+#include "debugdraw.h"
+
 ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id)
 {
 	this->id = id;
@@ -31,21 +33,31 @@ void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotatio
 	const float4x4 proj = App->editorcamera->getProjection();
 	float4x4 model = float4x4::FromTRS(position, rotation, scale);
 
+	/*std::vector<math::Triangle> tris = mesh->getTriangles();
+	for (math::Triangle const& tri : tris)
+	{
+		dd::line(tri.a, tri.b, dd::colors::Yellow);
+		dd::line(tri.b, tri.c, dd::colors::Yellow);
+		dd::line(tri.c, tri.a, dd::colors::Yellow);
+	}*/
+
 	glUseProgram(program);
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, (const float*)&model);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, (const float*)&view);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, (const float*)&proj);
 
-	/*for (unsigned int i = 0; i < mesh->getMaterial()->getTextures().size(); ++i)
-	{*/
-		glActiveTexture(GL_TEXTURE0);
-		glUniform1i(glGetUniformLocation(program, "diffuse"), 0);
-		glBindTexture(GL_TEXTURE_2D, mesh->getMaterial()->getTextures()[0]->id);
-	//}
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		if (mesh->getMaterial()->getTextures()[i] != nullptr)
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glUniform1i(glGetUniformLocation(program, mesh->getMaterial()->getTexTypes()[i]), 0);
+			glBindTexture(GL_TEXTURE_2D, mesh->getMaterial()->getTextures()[i]->id);
+		}
+	}
 
 	glActiveTexture(GL_TEXTURE0);
-
 	glBindVertexArray(mesh->getVAO());
 	glDrawElements(GL_TRIANGLES, mesh->getIndicesNum(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
@@ -66,8 +78,16 @@ void ComponentMesh::printComponentInfo()
 		ImGui::TextColored(yellow_colour, "Triangles: "); ImGui::SameLine();
 		ImGui::Text("%d  (V: %d  I: %d)", GetIndices() / 3, GetVertices(), GetIndices());
 
+		ImGui::TextColored(yellow_colour, "Using material: "); ImGui::SameLine();
+		ImGui::Text(mesh->getMaterial()->name.c_str());
+
 		ImGui::Checkbox(std::string("Visible" + itemid).c_str(), &visible);
 	}
+}
+
+void ComponentMesh::getTriangles(std::vector<math::Triangle> &triangles)
+{
+	triangles = mesh->getTriangles();
 }
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, Material* material, const char* name, const std::vector<float3>& obb_vertices)
@@ -127,4 +147,18 @@ void Mesh::CreateVAO()
 
 	glBindVertexArray(0);
 	console->AddLog("	VAO created with VBO and EBO");
+}
+
+std::vector<math::Triangle> Mesh::getTriangles()
+{
+	std::vector<math::Triangle> tris = {};
+
+	for (int i = 0; i < indices.size(); i += 3)
+	{
+		float3 p_1 = vertices[indices[i]].position;
+		float3 p_2 = vertices[indices[i + 1]].position;
+		float3 p_3 = vertices[indices[i + 2]].position;
+		tris.push_back(math::Triangle(p_1, p_2, p_3));
+	}
+	return tris;
 }

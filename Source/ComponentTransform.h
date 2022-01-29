@@ -19,6 +19,9 @@ public:
 	Quat getWorldRot() { return w_rotation; };
 	float3 getWorldSca() { return w_scale; };
 
+	float4x4 getWorldTransform();
+	float4x4 getLocalTransform();
+
 	void setPos(float x, float y, float z) { position[0] = x; position[1] = y; position[2] = z; };
 	void setPos(float3 xyz) { setPos(xyz.z, xyz.y, xyz.z); };
 	void setRot(float x, float y, float z) { rotation[0] = x; rotation[1] = y; rotation[2] = z; };

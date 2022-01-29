@@ -3,6 +3,7 @@
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
 #include "ModuleEditorCamera.h"
+#include "ModuleDebugDraw.h"
 #include "ModuleScene.h"
 #include "Model.h"
 #include "ComponentMesh.h"
@@ -75,6 +76,10 @@ update_status ModuleEditor::PreUpdate()
 
 	MainMenuBar(&showAppDockspace);
 
+	if (demo_window)
+		ImGui::ShowDemoWindow();
+
+	ResourcesWindow();
 	ConfigurationWindow();
 
 	if(about_window)
@@ -83,9 +88,9 @@ update_status ModuleEditor::PreUpdate()
 		ConsoleWindow();
 	if (inspector_window)
 		InspectorWindow();
-	if (demo_window)
-		ImGui::ShowDemoWindow();
+
 	SceneWindow();
+
 	HierarchyWindow();
 
 	return UPDATE_CONTINUE;
@@ -377,7 +382,6 @@ void ModuleEditor::SceneWindow()
 		{
 			float normalizedX = -1.0 + 2.0 * (ImGui::GetMousePos().x - ImGui::GetWindowPos().x) / ImGui::GetWindowWidth();
 			float normalizedY = 1.0 - 2.0 * (ImGui::GetMousePos().y - ImGui::GetWindowPos().y) / ImGui::GetWindowHeight();
-			console->AddLog("MOUSE X: %f   Y: %f", normalizedX, normalizedY);
 			App->editorcamera->ClickRaycast(normalizedX, normalizedY);
 		}
 
@@ -536,6 +540,8 @@ void ModuleEditor::DebugDrawMenu()
 	ImGui::Checkbox("Grid", &draw_grid);
 	ImGui::SameLine();
 	ImGui::Checkbox("Debug Draw", &debug_draw);
+	ImGui::SameLine();
+	ImGui::Checkbox("Check Raycast", &App->dd->check_raycast);
 }
 
 void ModuleEditor::HierarchyWindow()
@@ -585,6 +591,46 @@ void ModuleEditor::HierarchyMenu()
 		}
 		ImGui::EndPopup();
 	}
+}
+
+void ModuleEditor::ResourcesWindow()
+{
+	ImGui::Begin("Resources");
+
+	if (ImGui::CollapsingHeader("GameObjects"))
+	{
+		for (GameObject* go : App->scene->getCurrentScene()->getGameObjects())
+		{
+			ImGui::TextWrapped(go->getName().c_str());
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Meshes"))
+	{
+		for (Mesh* mesh : App->scene->getCurrentScene()->GetMeshes())
+		{
+			ImGui::TextWrapped(mesh->getName().c_str());
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Materials"))
+	{
+		for (Material* mat : App->scene->getCurrentScene()->GetMaterials())
+		{
+			ImGui::TextWrapped(mat->name.c_str());
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Textures"))
+	{
+		std::map<unsigned int, Texture>* temp_textures = App->scene->getCurrentScene()->GetTextures();
+		for (auto& tex : *temp_textures)
+		{
+			ImGui::TextWrapped(tex.second.name.c_str());
+		}
+	}
+
+	ImGui::End();
 }
 
 void ModuleEditor::SetStyle()

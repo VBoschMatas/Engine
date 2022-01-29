@@ -612,6 +612,8 @@ bool ModuleDebugDraw::CleanUp()
 
 update_status  ModuleDebugDraw::Update()
 {
+    if (check_raycast)
+        dd::line(begin_ray, end_ray, colour_ray);
 
 	return UPDATE_CONTINUE;
 }
@@ -623,6 +625,13 @@ void ModuleDebugDraw::Draw(const float4x4& view, const float4x4& proj, unsigned 
     implementation->mvpMatrix = proj * view;
 
     dd::flush();
+}
+
+void ModuleDebugDraw::CheckRaycast(float3 begin, float3 end, float3 colour)
+{
+    begin_ray = begin;
+    end_ray = end;
+    colour_ray = colour;
 }
 
 

@@ -10,6 +10,11 @@
 #include "Scene.h"
 #include "GameObject.h"
 #include "Geometry/OBB.h"
+#include "Geometry/Triangle.h"
+#include "DebugDraw.h"
+#include "ModuleDebugDraw.h"
+#include <algorithm>
+#include <functional>
 
 #define DEGTORAD pi / 180.0f
 #define RADTODEG 180.0f / pi
@@ -71,7 +76,7 @@ void ModuleEditorCamera::InitPerspectiveMatrix()
 	SetAspectRatio(screen_surface->w, screen_surface->h);
 	SetFOV(70.0f);
 	SetPlaneDistances(0.10f, 1000.0f);
-	SetPosition(float3(0.0f, 1.0f, 10.0f));
+	SetPosition(float3(0.0f, 10.0f, 50.0f));
 	float3x3 identity = float3x3::identity;
 	frustum.SetFront(identity.WorldZ());
 	frustum.SetUp(identity.WorldY());
@@ -280,12 +285,34 @@ void ModuleEditorCamera::FitNewModel()
 void ModuleEditorCamera::ClickRaycast(float normalizedX, float normalizedY)
 {
 	LineSegment ray = frustum.UnProjectLineSegment(normalizedX, normalizedY);
-	console->AddLog("START! %f %f %f", ray.a.x, ray.a.y, ray.a.z);
-	console->AddLog("END! %f %f %f", ray.b.x, ray.b.y, ray.b.z);
+	App->dd->CheckRaycast(ray.a, ray.b);
+	std::vector<GameObject*> hit_objects = {};
 	for (GameObject* go : App->scene->getCurrentScene()->getGameObjects())
 	{
 		bool hit = ray.Intersects(go->getBoundingBox());
 		if (hit)
-			console->AddLog("HIT! %s", go->getName().c_str());
+			hit_objects.push_back(go);
 	}
+	//std::sort(hit_objects.begin(), hit_objects.end(), std::greater<GameObject*>());
+	GameObject* closest_go = nullptr;
+	float closest_dist = FLT_MAX;
+	for (GameObject* go : hit_objects)
+	{
+		LineSegment ray_local_space;
+		ray_local_space = LineSegment(go->getInvertedTransform().TransformPos(ray.a), go->getInvertedTransform().TransformPos(ray.b));
+		std::vector<math::Triangle> tris = go->getTriangles();
+		float dist;
+		float3 hit_point;
+		for (math::Triangle const &tri : tris)
+		{
+			bool hit = ray_local_space.Intersects(tri, &dist, &hit_point);
+			if (hit && dist < closest_dist)
+			{
+				closest_dist = dist;
+				closest_go = go;
+			}
+		}
+	}
+
+	App->scene->getCurrentScene()->selected_gameObject = closest_go;
 }

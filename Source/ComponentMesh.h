@@ -6,6 +6,7 @@
 #include "Component.h"
 #include "ComponentMaterial.h"
 #include "MathGeoLib/Geometry/AABB.h"
+#include "Geometry/Triangle.h"
 
 class Mesh
 {
@@ -15,6 +16,7 @@ public:
 
 	std::vector<Vertex> getVertices() { return vertices; };
 	std::vector<unsigned int> getIndices() { return indices; };
+	std::vector<math::Triangle> getTriangles();
 	Material* getMaterial() { return material_index; };
 	std::string getName() { return name; };
 	unsigned int getId() { return id; };
@@ -54,6 +56,7 @@ public:
 	void Update(unsigned int program, float3& position, Quat& rotation, float3& scale) override;
 
 	void getBoundingBox(math::AABB& bbox) override;
+	void getTriangles(std::vector<math::Triangle> &triangles) override;
 
 	unsigned int GetVertices() { return mesh->getVerticesNum(); };
 	unsigned int GetIndices() { return mesh->getIndicesNum(); };

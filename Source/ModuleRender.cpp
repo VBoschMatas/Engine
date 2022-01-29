@@ -55,7 +55,6 @@ void __stdcall OurOpenGLErrorFunction(GLenum source, GLenum type, GLuint id, GLe
 	default: return;
 	};
 	DEBUG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
-	console->AddLog("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
 }
 
 // Called before render is available
@@ -135,10 +134,9 @@ update_status ModuleRender::Update()
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	App->scene->Update(program);
-	/*if(model != nullptr)
-		model->Draw(program);*/
 
 	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return UPDATE_CONTINUE;

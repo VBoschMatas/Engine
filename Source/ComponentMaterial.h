@@ -23,6 +23,8 @@ public:
 
 	unsigned int getId() { return id; };
 
+	std::string name;
+
 private:
 	unsigned int id;
 	Texture* textures[4] = { nullptr, nullptr, nullptr, nullptr };

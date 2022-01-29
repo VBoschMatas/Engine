@@ -3,6 +3,8 @@
 #include "Globals.h"
 #include "MathGeoLib.h"
 
+class GameObject;
+
 class ModuleEditorCamera: public Module
 {
 public:
@@ -18,8 +20,6 @@ public:
 private:
 	void InitPerspectiveMatrix();
 	void InitViewMatrix();
-
-	void SetPosition(const float3& position);
 	void LookAt(const float3& position);
 	void Rotate(float pitch, float yaw);
 	void SetAspectRatio(unsigned int screen_width, unsigned int screen_height);
@@ -46,6 +46,9 @@ public:
 	void WindowResized(unsigned int screen_width, unsigned int screen_height);
 	void ClickRaycast(float normalizedX, float normalizedY);
 	void FitNewModel();
+
+	void SetPosition(const float3& position);
+	float3 GetPosition() { return position; };
 
 	float4x4 getProjection() { return frustum.ProjectionMatrix(); };
 	float4x4 getView() { return float4x4(frustum.ViewMatrix()); };

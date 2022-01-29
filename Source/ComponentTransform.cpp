@@ -1,4 +1,5 @@
 #include "ComponentTransform.h"
+#include "Math/float4x4.h"
 #include <math.h>
 
 #define RADTODEG 180/math::pi
@@ -41,4 +42,14 @@ void ComponentTransform::printComponentInfo()
 		ImGui::DragFloat3("Rotation", rotation, 0.1f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
 		ImGui::DragFloat3("Scale", scale, 0.001f, -FLT_MAX, +FLT_MAX, "%.3f", 1.0f);
 	}
+}
+
+float4x4 ComponentTransform::getWorldTransform()
+{
+	return float4x4::FromTRS(w_position, w_rotation, w_scale);
+}
+
+float4x4 ComponentTransform::getLocalTransform()
+{
+	return float4x4::FromTRS(getPos(), getRot(), getSca());
 }

@@ -16,6 +16,7 @@ ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset, un
 Material::Material(aiMaterial* material, const char* path, unsigned int id)
 {
 	id = App->scene->getCurrentScene()->getMaterialId();
+	name = "NewMaterial" + std::to_string(id);
 	textures[0] = LoadTextures(material, aiTextureType_DIFFUSE, path);
 	textures[1] = LoadTextures(material, aiTextureType_NORMALS, path);
 	textures[2] = LoadTextures(material, aiTextureType_SPECULAR, path);
@@ -170,6 +171,7 @@ void ComponentMaterial::printComponentInfo()
 	std::string itemid = "Material ##" + std::to_string(this->id);
 	if (ImGui::CollapsingHeader(itemid.c_str(), header_flags))
 	{
+		ImGui::InputText("Name", &material->name[0], 64);
 		for (unsigned int i = 0; i < 4; ++i)
 		{
 			std::string sel_name = "##" + std::to_string(this->id) + "," + std::to_string(i);

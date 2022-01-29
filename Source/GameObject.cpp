@@ -5,8 +5,10 @@
 #include "Application.h"
 #include "ModuleScene.h"
 #include "ModuleEditor.h"
+#include "ModuleEditorCamera.h"
 #include "Scene.h"
 #include "MathGeoLib.h"
+#include "Math/float4x4.h"
 #include "debugdraw.h"
 
 GameObject::GameObject(unsigned int _id, GameObject* _parent)
@@ -32,7 +34,10 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 {
 	name = file_name;
 	type = _type;
+	local_bbox.SetNegativeInfinity();
+	world_bbox.SetNegativeInfinity();
 	components.clear();
+	children.clear();
 	// All gameObjects have a transform
 	ComponentTransform* transform = new ComponentTransform();
 	components.push_back(transform);
@@ -57,8 +62,6 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 		console->AddLog("Creating empty object...");
 		break;
 	}
-	if (parent == nullptr)
-		console->AddLog("IM AN INDEPENDENT: %s", this->name.c_str());
 }
 
 void GameObject::Update(unsigned int program)
@@ -85,6 +88,7 @@ void GameObject::Update(unsigned int program)
 	for (Component* c : components)
 	{
 		c->Update(program, position, rotation, scale);
+		c->getBoundingBox(local_bbox);
 	}
 
 	for (GameObject* ch : children)
@@ -93,8 +97,13 @@ void GameObject::Update(unsigned int program)
 	}
 
 	// Bounding box Transform
-	world_bbox = local_bbox;
-	world_bbox.Transform(float4x4::FromTRS(position, rotation, scale));
+	if (local_bbox.IsFinite())
+	{
+		world_bbox = local_bbox;
+		world_bbox.Transform(float4x4::FromTRS(position, rotation, scale));
+	}
+
+	selected = App->scene->getCurrentScene()->selected_gameObject == this;
 
 	if (active && (selected || App->editor->isDebugDraw()))
 		DebugDraw();
@@ -135,14 +144,12 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 	if(selected)
 		node_flags = ImGuiTreeNodeFlags_Selected;
 
-	selected = false;
-
 	if (children.size() > 0)
 	{
 		bool is_open = ImGui::TreeNodeEx((void*)this, node_flags, name.c_str());
 
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen())
-			App->scene->getScene(App->scene->current_scene)->selected_gameObject = this;
+			App->scene->getCurrentScene()->selected_gameObject = this;
 
 		if (is_open)
 		{
@@ -160,7 +167,7 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 		ImGui::TreeNodeEx((void*)this, node_flags, "%s", name.c_str());
 
 		if ((ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) && !ImGui::IsItemToggledOpen())
-			App->scene->getScene(App->scene->current_scene)->selected_gameObject = this;
+			App->scene->getCurrentScene()->selected_gameObject = this;
 
 
 	}
@@ -177,7 +184,6 @@ void GameObject::DebugDraw()
 	for (Component* c : components)
 	{
 		float3 extreme_points[8];
-		c->getBoundingBox(local_bbox);
 		world_bbox.GetCornerPoints(&extreme_points[0]);
 		std::swap(extreme_points[2], extreme_points[5]);
 		std::swap(extreme_points[3], extreme_points[4]);
@@ -191,4 +197,31 @@ void GameObject::DebugDraw()
 		c->DebugDraw();
 	}
 
+}
+
+bool GameObject::operator > (const GameObject*& str) const
+{
+	return world_bbox.Distance(App->editorcamera->GetPosition()) > str->world_bbox.Distance(App->editorcamera->GetPosition());
+}
+
+bool GameObject::operator < (const GameObject*& str) const
+{
+	return world_bbox.Distance(App->editorcamera->GetPosition()) < str->world_bbox.Distance(App->editorcamera->GetPosition());
+}
+
+float4x4 GameObject::getInvertedTransform()
+{
+	return  Transform()->getWorldTransform().Inverted();
+}
+
+std::vector<math::Triangle> GameObject::getTriangles()
+{
+	std::vector<math::Triangle> tris = {};
+	for (Component* c : components)
+	{
+		std::vector<math::Triangle> tris_aux = {};
+		c->getTriangles(tris_aux);
+		tris.insert(tris.end(), tris_aux.begin(), tris_aux.end());
+	}
+	return tris;
 }

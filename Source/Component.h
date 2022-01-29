@@ -1,5 +1,7 @@
 #pragma once
 #include "Globals.h"
+#include <vector>
+#include "Geometry/Triangle.h"
 #include "Geometry/AABB.h"
 
 enum class CompType
@@ -21,6 +23,7 @@ public:
 	virtual void Update(unsigned int program, float3 &position, Quat &rotation, float3 &scale) {};
 	virtual void DebugDraw() {};
 	virtual void getBoundingBox(math::AABB &bbox) {} ;
+	virtual void getTriangles(std::vector<math::Triangle> &triangles) {} ;
 	virtual void printComponentInfo() {};
 
 protected:

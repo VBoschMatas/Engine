@@ -2,6 +2,7 @@
 #include "ModuleWindow.h"
 #include "ModuleScene.h"
 #include "imgui.h"
+#include <array>
 #include "SDL.h"
 
 ModuleScene::ModuleScene()
@@ -86,9 +87,9 @@ void ModuleScene::DroppedModel(char* path)
 		getScene(App->scene->current_scene)->AddGameObject(path_name, GoType::Model);
 		return;
 	}
-
-	if (file_type == ".png" || file_type == ".jpeg" || file_type == ".jpg" ||
-		file_type == ".PNG" || file_type == ".JPEG" || file_type == ".JPG")
+	std::array<const char*, 14> img_formats {".png", ".jpeg",  ".jpg", ".tif", ".tiff", ".gif", ".bmp",
+											 ".PNG", ".JPEG",  ".JPG", ".TIF", ".TIFF", ".GIF", ".BMP" };
+	if (std::find(img_formats.begin(), img_formats.end(), file_type) != img_formats.end())
 	{
 		getScene(App->scene->current_scene)->NewTexture(path);
 		return;

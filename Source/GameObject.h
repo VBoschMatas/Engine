@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
+#include "Geometry/Triangle.h"
 #include <vector>
 
 enum class GoType
@@ -65,14 +66,21 @@ public:
 
 	void printGameObjectInfo();
 	void printHierarchy(ImGuiTreeNodeFlags flags);
+
+	float4x4 getInvertedTransform();
+	std::vector<math::Triangle> getTriangles();
+
+	bool operator > (const GameObject*& str) const;
+
+	bool operator < (const GameObject*& str) const;
 private:
 
 	unsigned int id;
 	std::string name;
 	GoType type;
 
-	math::AABB local_bbox;
-	math::OBB world_bbox;
+	math::AABB local_bbox = {};
+	math::OBB world_bbox = {};
 
 	GameObject* parent;
 	std::vector<GameObject*> children;
