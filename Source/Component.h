@@ -8,7 +8,9 @@ enum class CompType
 {
 	Transform = 0,
 	Mesh,
-	Material
+	Material,
+	Light,
+	Camera
 };
 
 class Component
@@ -25,6 +27,8 @@ public:
 	virtual void getBoundingBox(math::AABB &bbox) {} ;
 	virtual void getTriangles(std::vector<math::Triangle> &triangles) {} ;
 	virtual void printComponentInfo() {};
+
+	bool render = false;
 
 protected:
 	unsigned int id;

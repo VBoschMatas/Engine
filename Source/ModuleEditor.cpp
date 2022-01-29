@@ -81,6 +81,7 @@ update_status ModuleEditor::PreUpdate()
 
 	ResourcesWindow();
 	ConfigurationWindow();
+	EditorCamera();
 
 	if(about_window)
 		AboutWindow();
@@ -487,6 +488,19 @@ void ModuleEditor::GuizmosMenu()
 	ImGui::PopStyleColor(4);
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Scale");
+
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, 0.7f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, 0.7f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, 0.7f));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, 1.0f));
+	ImGui::SameLine(0.0f, 120.0f);
+	if (ImGui::Button(ICON_FA_CAMERA, ImVec2(30, 0)))
+	{
+		App->scene->getCurrentScene()->camera_culling = nullptr;
+	}
+	ImGui::PopStyleColor(4);
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Standard culling");
 }
 void ModuleEditor::PlayPauseMenu()
 {
@@ -580,6 +594,12 @@ void ModuleEditor::HierarchyMenu()
 				if (App->scene->getCurrentScene()->selected_gameObject != nullptr)
 					App->scene->getCurrentScene()->selected_gameObject->addChild(temp);
 			}
+			if (ImGui::MenuItem("Camera"))
+			{
+				GameObject* temp = App->scene->getCurrentScene()->AddGameObject("Camera", App->scene->getCurrentScene()->selected_gameObject, GoType::Camera);
+				if (App->scene->getCurrentScene()->selected_gameObject != nullptr)
+					App->scene->getCurrentScene()->selected_gameObject->addChild(temp);
+			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::Selectable("Remove", false))
@@ -629,6 +649,18 @@ void ModuleEditor::ResourcesWindow()
 			ImGui::TextWrapped(tex.second.name.c_str());
 		}
 	}
+
+	ImGui::End();
+}
+
+void ModuleEditor::EditorCamera()
+{
+	ImGui::Begin("Editor Camera");
+
+	ImGui::DragFloat("Field of View", &App->editorcamera->field_of_view, 0.1f, 0.1f, 179.0f, "%.1f", 1.0f);
+	ImGui::Text("\n");
+	ImGui::DragFloat("Near Plane", &App->editorcamera->near_distance, 0.05f, 0.0f, FLT_MAX, "%.3f", 1.0f);
+	ImGui::DragFloat("Far Plane", &App->editorcamera->far_distance, 0.05f, 0.0f, FLT_MAX, "%.3f", 1.0f);
 
 	ImGui::End();
 }

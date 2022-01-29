@@ -18,7 +18,6 @@ ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vec
 	App->scene->getCurrentScene()->AddMesh(mesh);
 	console->AddLog("NUMBER OF Indices: %d", indices.size());
 	type = CompType::Mesh;
-	visible = true;
 }
 
 ComponentMesh::~ComponentMesh()
@@ -26,7 +25,7 @@ ComponentMesh::~ComponentMesh()
 
 void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotation, float3& scale)
 {
-	if (!visible)
+	if (!render && !visible)
 		return;
 
 	const float4x4& view = App->editorcamera->getView();

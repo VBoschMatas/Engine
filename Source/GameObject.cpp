@@ -1,5 +1,6 @@
 #include "GameObject.h"
 #include "ComponentTransform.h"
+#include "ComponentCamera.h"
 #include "Model.h"
 #include "imgui.h"
 #include "Application.h"
@@ -53,8 +54,12 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 	}
 	break;
 	case GoType::Camera:
+	{
 		name = "Camera";
-		break;
+		ComponentCamera* camera = new ComponentCamera();
+		components.push_back(camera);
+	}
+	break;
 	case GoType::Text:
 		name = "Text";
 		break;
@@ -87,6 +92,7 @@ void GameObject::Update(unsigned int program)
 
 	for (Component* c : components)
 	{
+		c->render = render;
 		c->Update(program, position, rotation, scale);
 		c->getBoundingBox(local_bbox);
 	}

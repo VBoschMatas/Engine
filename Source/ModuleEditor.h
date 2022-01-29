@@ -65,6 +65,7 @@ private:
 	void ResourcesWindow();
 	void VirtualMemory(float& total, float& consumed);
 	void PhysicalMemory(float& total, float& consumed);
+	void EditorCamera();
 
 	float ToggleButtonColor(bool active);
 	float ToggleTextColor(bool active);

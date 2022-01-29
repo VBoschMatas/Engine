@@ -59,8 +59,9 @@ public:
 
 	math::OBB getBoundingBox() { return world_bbox; };
 
-	bool active;
-	bool selected;
+	bool active = true;
+	bool selected = false;
+	bool render = false;
 
 	unsigned int getCompId() { unsigned int temp_id = last_comp_id; ++last_comp_id; return temp_id; };
 

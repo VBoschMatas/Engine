@@ -4,6 +4,7 @@
 #include "ComponentMesh.h"
 #include "ModuleTexture.h"
 #include "ComponentMaterial.h"
+#include "ComponentCamera.h"
 #include <vector>
 #include <map>
 
@@ -51,6 +52,8 @@ public:
 	void printHierarchy();
 
 	GameObject* selected_gameObject = nullptr;
+	ComponentCamera* camera_culling = nullptr;
+
 
 	unsigned int getGoId() { unsigned int temp_id = last_go_id; ++last_go_id; return temp_id; };
 	unsigned int getMeshId() { unsigned int temp_id = last_mesh_id; ++last_mesh_id; return temp_id; };
@@ -70,5 +73,7 @@ private:
 	unsigned int last_go_id;
 	unsigned int last_mesh_id;
 	unsigned int last_material_id;
+
+	void Culling();
 };
 

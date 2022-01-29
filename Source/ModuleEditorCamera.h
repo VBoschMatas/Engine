@@ -33,22 +33,27 @@ private:
 	Frustum frustum;
 	float4x4 proj, view;
 
-	float aspect_ratio;
 	float horizontal_fov;
-	float near_distance;
-	float far_distance;
+	float aspect_ratio;
 	float3 look_position;
 	bool lock_view;
 	float lock_distance;
 	float3 position;
 
 public:
+	float field_of_view;
+	float near_distance;
+	float far_distance;
+
 	void WindowResized(unsigned int screen_width, unsigned int screen_height);
 	void ClickRaycast(float normalizedX, float normalizedY);
 	void FitNewModel();
 
 	void SetPosition(const float3& position);
 	float3 GetPosition() { return position; };
+	float getAspectRatio() { return aspect_ratio; };
+	Frustum getFrustum() { return frustum; };
+	void setCameraAs(Frustum _frustum);
 
 	float4x4 getProjection() { return frustum.ProjectionMatrix(); };
 	float4x4 getView() { return float4x4(frustum.ViewMatrix()); };

@@ -25,7 +25,13 @@
 
 ModuleEditorCamera::ModuleEditorCamera()
 {
-
+	lock_view = false;
+	lock_distance = 0.0f;
+	aspect_ratio = 0.0f;
+	field_of_view = 0.0f;
+	horizontal_fov = field_of_view * DEGTORAD;
+	near_distance = 0.1f;
+	far_distance = 1000.0f;
 }
 
 ModuleEditorCamera::~ModuleEditorCamera()
@@ -49,7 +55,12 @@ update_status ModuleEditorCamera::PreUpdate()
 update_status ModuleEditorCamera::Update()
 {
 	//LookAt(float3(0.0f, 0.0f, 0.0f));
+	horizontal_fov = field_of_view * DEGTORAD;
+	SetFOV(field_of_view);
+	frustum.SetViewPlaneDistances(near_distance, far_distance);
+
 	Controller();
+
 	if (lock_view) //For now all objects will be at 0, 0, 0. Once object selection is incorporated this will change
 	{
 		lock_distance = frustum.Pos().Distance(float3(0.0f, 0.0f, 0.0f));
@@ -80,7 +91,6 @@ void ModuleEditorCamera::InitPerspectiveMatrix()
 	float3x3 identity = float3x3::identity;
 	frustum.SetFront(identity.WorldZ());
 	frustum.SetUp(identity.WorldY());
-
 	proj = frustum.ProjectionMatrix();
 }
 
@@ -131,6 +141,7 @@ void ModuleEditorCamera::SetAspectRatio(unsigned int screen_width, unsigned int 
 
 void ModuleEditorCamera::SetFOV(float deg)
 {
+	field_of_view = deg;
 	horizontal_fov = deg * DEGTORAD;
 	frustum.SetHorizontalFovAndAspectRatio(horizontal_fov, aspect_ratio);
 }
@@ -315,4 +326,14 @@ void ModuleEditorCamera::ClickRaycast(float normalizedX, float normalizedY)
 	}
 
 	App->scene->getCurrentScene()->selected_gameObject = closest_go;
+}
+
+void ModuleEditorCamera::setCameraAs(Frustum _frustum)
+{
+	frustum.SetUp(_frustum.Up());
+	frustum.SetFront(_frustum.Front());
+	SetPosition(_frustum.Pos());
+	field_of_view = _frustum.HorizontalFov() * RADTODEG;
+	near_distance = _frustum.NearPlaneDistance();
+	far_distance = _frustum.FarPlaneDistance();
 }

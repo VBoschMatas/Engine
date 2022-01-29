@@ -1,4 +1,6 @@
 #include "Application.h"
+#include "Geometry/Frustum.h"
+#include "ModuleEditorCamera.h"
 #include "Scene.h"
 #include "Model.h"
 
@@ -23,9 +25,28 @@ Scene::Scene(const char* _name, unsigned int _id) {
 
 void Scene::Update(unsigned int program)
 {
+	Culling();
+
 	for (GameObject* go : children)
 	{
 		go->Update(program);
+	}
+}
+
+void Scene::Culling()
+{
+	Frustum frustum;
+	if (camera_culling == nullptr)
+		frustum = App->editorcamera->getFrustum();
+	else
+		frustum = camera_culling->getFrustum();
+
+	for (GameObject* go : game_objects)
+	{
+		if (go->getBoundingBox().IsFinite() && frustum.Intersects(go->getBoundingBox()))
+			go->render = true;
+		else
+			go->render = false;
 	}
 }
 
