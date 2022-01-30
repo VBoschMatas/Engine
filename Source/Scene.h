@@ -1,6 +1,7 @@
 #pragma once
 #include "Globals.h"
 #include "GameObject.h"
+#include "AmbientLight.h"
 #include "ComponentMesh.h"
 #include "ModuleTexture.h"
 #include "ComponentMaterial.h"
@@ -58,6 +59,11 @@ public:
 
 	void printHierarchy();
 
+	void AmbientLightInfo()
+	{
+		ambient_light.printGameObjectInfo();
+	}
+
 	GameObject* selected_gameObject = nullptr;
 	ComponentCamera* camera_culling = nullptr;
 	EngineQuadtree quadtree;
@@ -71,7 +77,8 @@ private:
 	std::string name;
 	std::vector<GameObject*> children; // GameObjects that are directly attached to the root
 
-	// List of all GameObjects, Meshes, Textures and Materials used in the scene
+	// Resources used in the scene
+	AmbientLight ambient_light;
 	std::vector<GameObject*> game_objects;
 	std::vector<Mesh*> meshes;
 	std::map<unsigned int, Texture> scene_textures;

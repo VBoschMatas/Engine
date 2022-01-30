@@ -34,6 +34,8 @@ void Scene::Load()
 	game_objects = {};
 	scene_textures = {};
 	scene_materials = {};
+
+	ambient_light = AmbientLight();
 }
 
 void Scene::UpdateTransform()
@@ -54,6 +56,8 @@ void Scene::UpdateBoundingBox()
 
 void Scene::Update(unsigned int program)
 {
+	ambient_light.Update(program);
+
 	Culling();
 
 	for (GameObject* go : children)

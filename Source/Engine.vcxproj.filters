@@ -204,6 +204,9 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="EngineQuadTree.cpp" />
+    <ClCompile Include="AmbientLight.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -517,6 +520,9 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="EngineQuadTree.h" />
+    <ClInclude Include="AmbientLight.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imGui">

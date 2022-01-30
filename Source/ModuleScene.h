@@ -134,6 +134,10 @@ public: // Functions that will act on the current scene, used to simplify calls 
 	{
 		Scenes[current_scene]->quadtree = _quadtree;
 	}
+	void AmbientLightInfo() const
+	{
+		Scenes[current_scene]->AmbientLightInfo();
+	}
 
 	unsigned int getGoId() const { return Scenes[current_scene]->getGoId(); };
 	unsigned int getMeshId() const { return Scenes[current_scene]->getMeshId(); };

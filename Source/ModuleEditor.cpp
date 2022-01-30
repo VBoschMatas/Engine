@@ -82,6 +82,7 @@ update_status ModuleEditor::PreUpdate()
 	ResourcesWindow();
 	ConfigurationWindow();
 	EditorCamera();
+	AmbientLight();
 
 	if(about_window)
 		AboutWindow();
@@ -662,6 +663,15 @@ void ModuleEditor::EditorCamera()
 	ImGui::Text("\n");
 	ImGui::DragFloat("Near Plane", &App->editorcamera->near_distance, 0.05f, 0.0f, FLT_MAX, "%.3f", 1.0f);
 	ImGui::DragFloat("Far Plane", &App->editorcamera->far_distance, 0.05f, 0.0f, FLT_MAX, "%.3f", 1.0f);
+
+	ImGui::End();
+}
+
+void ModuleEditor::AmbientLight()
+{
+	ImGui::Begin("Ambient Light");
+
+	App->scene->AmbientLightInfo();
 
 	ImGui::End();
 }

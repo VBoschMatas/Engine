@@ -8,8 +8,7 @@ enum class LightType
 	Spot
 };
 
-class ComponentLight :
-	public Component
+class ComponentLight : public Component
 {
 
 public:
@@ -19,7 +18,7 @@ public:
 	unsigned int getId() { return id; };
 
 	float3 color;
-	LightType type;
+	LightType Ltype;
 private:
 	unsigned int id;
 };

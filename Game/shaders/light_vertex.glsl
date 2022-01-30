@@ -13,7 +13,7 @@ out vec2 uv0;
 
 void main()
 {
-	worldNormal = transpose(inverse(mat3(model))) * normal;
+	worldNormal = mat3(transpose(inverse(model))) * normal;
 	gl_Position = proj*view*model*vec4(vertex_position, 1.0);
 	uv0 = vertex_uv0;
 }
