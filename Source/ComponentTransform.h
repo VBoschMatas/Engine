@@ -8,7 +8,7 @@ public:
 	ComponentTransform();
 	~ComponentTransform() {};
 
-	void Update(unsigned int program, float3& position, Quat& rotation, float3& scale) override;
+	void UpdateTransform(float3& position, Quat& rotation, float3& scale) override;
 	void printComponentInfo() override;
 
 	float3 getPos() { return float3(position[0], position[1], position[2]); };

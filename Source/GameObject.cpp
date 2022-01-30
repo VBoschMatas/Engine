@@ -23,7 +23,11 @@ GameObject::GameObject(unsigned int _id, GameObject* _parent)
 
 GameObject::~GameObject()
 {
+	if (App->scene->getCurrentScene()->selected_gameObject == this)
+		App->scene->getCurrentScene()->selected_gameObject = nullptr;
 	parent->removeChild(this);
+
+	App->scene->getCurrentScene()->RemoveGameObjectFromQuadtree(this);
 
 	for (GameObject* ch : children)
 		delete(ch);
@@ -67,12 +71,23 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 		console->AddLog("Creating empty object...");
 		break;
 	}
+
+
+	for (Component* c : components)
+	{
+		c->getBoundingBox(local_bbox);
+	}
+
+	if (local_bbox.IsFinite())
+	{
+		world_bbox = local_bbox;
+		world_bbox.Transform(Transform()->getWorldTransform());
+	}
 }
 
-void GameObject::Update(unsigned int program)
+void GameObject::UpdateTransform()
 {
-	if (!active)
-		return;
+	selected = App->scene->getCurrentScene()->selected_gameObject == this;
 
 	float3 position, scale;
 	Quat rotation;
@@ -83,7 +98,7 @@ void GameObject::Update(unsigned int program)
 		rotation = Quat::FromEulerXYZ(0.0f, 0.0f, 0.0f);
 		scale = { 1.0f, 1.0f, 1.0f };
 	}
-	else 
+	else
 	{
 		position = parent->Transform()->getWorldPos();
 		rotation = parent->Transform()->getWorldRot();
@@ -93,26 +108,64 @@ void GameObject::Update(unsigned int program)
 	for (Component* c : components)
 	{
 		c->render = render;
-		c->Update(program, position, rotation, scale);
+		c->UpdateTransform(position, rotation, scale);
 		c->getBoundingBox(local_bbox);
 	}
 
 	for (GameObject* ch : children)
 	{
-		ch->Update(program);
+		ch->UpdateTransform();
+	}
+}
+
+void GameObject::UpdateBoundingBox()
+{
+	for (Component* c : components)
+	{
+		c->getBoundingBox(local_bbox);
+	}
+
+	for (GameObject* ch : children)
+	{
+		ch->UpdateBoundingBox();
 	}
 
 	// Bounding box Transform
 	if (local_bbox.IsFinite())
 	{
 		world_bbox = local_bbox;
-		world_bbox.Transform(float4x4::FromTRS(position, rotation, scale));
+		world_bbox.Transform(Transform()->getWorldTransform());
+	}
+}
+
+void GameObject::Update(unsigned int program)
+{
+	if (!active)
+		return;
+
+	float3 position = Transform()->getWorldPos();
+	Quat rotation = Transform()->getWorldRot();
+	float3 scale = Transform()->getWorldSca();
+
+	for (Component* c : components)
+	{
+		c->selected = selected;
+		c->render = render;
+		c->Update(program, position, rotation, scale);
 	}
 
-	selected = App->scene->getCurrentScene()->selected_gameObject == this;
+	for (GameObject* ch : children)
+	{
+		if(selected)
+			ch->selected = true;
+		ch->Update(program);
+	}
 
-	if (active && (selected || App->editor->isDebugDraw()))
+	if (active && App->editor->isDebugDraw())
 		DebugDraw();
+
+	render = false;
+	App->scene->getCurrentScene()->AddGameObjectIntoQuadtree(this);
 }
 
 ComponentTransform* GameObject::Transform()
@@ -181,12 +234,6 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 
 void GameObject::DebugDraw()
 {
-
-	for (GameObject* ch : children)
-	{
-		ch->DebugDraw();
-	}
-
 	for (Component* c : components)
 	{
 		float3 extreme_points[8];

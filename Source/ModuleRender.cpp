@@ -91,6 +91,7 @@ bool ModuleRender::Init()
 	// Textures params
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
+	glEnable(GL_STENCIL_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	SDL_Surface* screen_surface = App->window->screen_surface;
@@ -99,13 +100,14 @@ bool ModuleRender::Init()
 	LoadFrameBuffer();
 
 	program = App->program->CreateProgram("shaders/light_vertex.glsl", "shaders/light_fragment.glsl");
+	App->program->CreateOutlineProgram("shaders/outline_vertex.glsl", "shaders/outline_fragment.glsl");
 
 	//model = new Model();
 	//model->Load("BakerHouse.fbx");
 
 	App->scene->AddScene("Scene 1");
-
-	App->scene->getScene(0)->AddGameObject("BakerHouse.fbx", GoType::Model);
+	App->scene->getCurrentScene()->Load();
+	App->scene->getCurrentScene()->AddGameObject("BakerHouse.fbx", GoType::Model);
 	//App->scene->getScene(0)->AddGameObject("models/WoodenCrate01.fbx", GoType::Model);
 
 	//App->scene->AddGameObject(GoType::Model, "models/WoodenCrate01.fbx");
@@ -118,8 +120,10 @@ update_status ModuleRender::PreUpdate()
 	SDL_Surface* screen_surface = App->window->screen_surface;
 	glViewport(0, 0, screen_surface->w, screen_surface->h);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	ClearFrameBuffer();
+	
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	return UPDATE_CONTINUE;
 }
 
@@ -133,7 +137,7 @@ update_status ModuleRender::Update()
 	//Draw inside the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	App->scene->Update(program);
+	App->scene->Draw(program);
 
 	App->dd->Draw(App->editorcamera->getView(), App->editorcamera->getProjection(), screen_surface->w, screen_surface->h);
 
@@ -209,6 +213,6 @@ void ModuleRender::ClearFrameBuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glViewport(0, 0, App->window->screen_surface->w, App->window->screen_surface->h);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

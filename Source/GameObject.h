@@ -26,6 +26,8 @@ public:
 
 	void Load(const std::string &file_name = "", GoType _type = GoType::Empty);
 
+	void UpdateTransform();
+	void UpdateBoundingBox();
 	void Update(unsigned int program);
 	void DebugDraw();
 
@@ -57,11 +59,11 @@ public:
 	std::vector<GameObject*> getChildren() { return children; };
 	std::vector<Component*> getComponents() { return components; };
 
-	math::OBB getBoundingBox() { return world_bbox; };
-
 	bool active = true;
 	bool selected = false;
 	bool render = false;
+
+	math::OBB world_bbox = {};
 
 	unsigned int getCompId() { unsigned int temp_id = last_comp_id; ++last_comp_id; return temp_id; };
 
@@ -81,7 +83,6 @@ private:
 	GoType type;
 
 	math::AABB local_bbox = {};
-	math::OBB world_bbox = {};
 
 	GameObject* parent;
 	std::vector<GameObject*> children;

@@ -53,7 +53,8 @@ public:
 	ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id);
 	~ComponentMesh();
 
-	void Update(unsigned int program, float3& position, Quat& rotation, float3& scale) override;
+	void Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale) override;
+	void Draw(unsigned int program, const float3& position, const Quat& rotation, const float3& scale);
 
 	void getBoundingBox(math::AABB& bbox) override;
 	void getTriangles(std::vector<math::Triangle> &triangles) override;

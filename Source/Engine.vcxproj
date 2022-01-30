@@ -145,6 +145,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="ComponentCamera.cpp" />
     <ClCompile Include="ComponentLight.cpp" />
+    <ClCompile Include="EngineQuadTree.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="imGui\imgui.cpp" />
     <ClCompile Include="imGui\imgui_demo.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="ComponentLight.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Dummy.h" />
+    <ClInclude Include="EngineQuadTree.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="imGui\imconfig.h" />

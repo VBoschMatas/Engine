@@ -22,13 +22,15 @@ public:
 	unsigned int getId() { return id; };
 	CompType getType() { return type; };
 
-	virtual void Update(unsigned int program, float3 &position, Quat &rotation, float3 &scale) {};
+	virtual void UpdateTransform(float3& position, Quat& rotation, float3& scale) {};
+	virtual void Update(unsigned int program, const float3 &position, const Quat &rotation, const float3 &scale) {};
 	virtual void DebugDraw() {};
 	virtual void getBoundingBox(math::AABB &bbox) {} ;
 	virtual void getTriangles(std::vector<math::Triangle> &triangles) {} ;
 	virtual void printComponentInfo() {};
 
 	bool render = false;
+	bool selected = false;
 
 protected:
 	unsigned int id;

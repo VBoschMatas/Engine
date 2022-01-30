@@ -489,10 +489,11 @@ void ModuleEditor::GuizmosMenu()
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Scale");
 
-	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, 0.7f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, 0.7f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, 0.7f));
-	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, 1.0f));
+	bool curr_culling_editor = App->scene->getCurrentScene()->camera_culling == nullptr;
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(curr_culling_editor)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(curr_culling_editor)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(curr_culling_editor)));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(curr_culling_editor)));
 	ImGui::SameLine(0.0f, 120.0f);
 	if (ImGui::Button(ICON_FA_CAMERA, ImVec2(30, 0)))
 	{
@@ -500,7 +501,7 @@ void ModuleEditor::GuizmosMenu()
 	}
 	ImGui::PopStyleColor(4);
 	if (ImGui::IsItemHovered())
-		ImGui::SetTooltip("Standard culling");
+		ImGui::SetTooltip("Editor cam culling");
 }
 void ModuleEditor::PlayPauseMenu()
 {

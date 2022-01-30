@@ -28,7 +28,7 @@ ComponentCamera::ComponentCamera()
 	frustum.SetUp(identity.WorldY());
 }
 
-void ComponentCamera::Update(unsigned int program, float3& position, Quat& rotation, float3& scale)
+void ComponentCamera::Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
 {
 	aspect_ratio = App->editorcamera->getAspectRatio();
 	setFOV(field_of_view);

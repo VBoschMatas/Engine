@@ -12,7 +12,7 @@ public:
 	float near_distance;
 	float far_distance;
 
-	void Update(unsigned int program, float3& position, Quat& rotation, float3& scale) override;
+	void Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale) override;
 	void DebugDraw() override;
 	void printComponentInfo() override;
 

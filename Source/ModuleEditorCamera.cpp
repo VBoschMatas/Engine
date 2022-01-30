@@ -86,8 +86,8 @@ void ModuleEditorCamera::InitPerspectiveMatrix()
 	auto screen_surface = App->window->screen_surface;
 	SetAspectRatio(screen_surface->w, screen_surface->h);
 	SetFOV(70.0f);
-	SetPlaneDistances(0.10f, 1000.0f);
-	SetPosition(float3(0.0f, 10.0f, 50.0f));
+	SetPlaneDistances(0.10f, 2000.0f);
+	SetPosition(float3(0.0f, 50.0f, 100.0f));
 	float3x3 identity = float3x3::identity;
 	frustum.SetFront(identity.WorldZ());
 	frustum.SetUp(identity.WorldY());
@@ -300,7 +300,7 @@ void ModuleEditorCamera::ClickRaycast(float normalizedX, float normalizedY)
 	std::vector<GameObject*> hit_objects = {};
 	for (GameObject* go : App->scene->getCurrentScene()->getGameObjects())
 	{
-		bool hit = ray.Intersects(go->getBoundingBox());
+		bool hit = ray.Intersects(go->world_bbox);
 		if (hit)
 			hit_objects.push_back(go);
 	}

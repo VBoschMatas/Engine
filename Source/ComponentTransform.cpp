@@ -13,7 +13,7 @@ ComponentTransform::ComponentTransform()
 	scale[0] = 1.0f; scale[1] = 1.0f; scale[2] = 1.0f;
 }
 
-void ComponentTransform::Update(unsigned int program, float3& position, Quat& rotation, float3& scale)
+void ComponentTransform::UpdateTransform(float3& position, Quat& rotation, float3& scale)
 {
 	position = { position.x + this->position[0], position.y + this->position[1], position.z + this->position[2] };
 	float3 eulerRotation = rotation.ToEulerXYZ() * RADTODEG;

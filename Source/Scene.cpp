@@ -11,6 +11,7 @@ Scene::Scene(unsigned int _id)
 	last_go_id = 0;
 	last_material_id = 0;
 	last_mesh_id = 0;
+	GenerateQuadtree();
 };
 
 Scene::Scene(const char* _name, unsigned int _id) {
@@ -21,7 +22,35 @@ Scene::Scene(const char* _name, unsigned int _id) {
 	last_mesh_id = 0;
 };
 
+void Scene::Load()
+{
+	GenerateQuadtree();
 
+	last_go_id = 0;
+	last_material_id = 0;
+	last_mesh_id = 0;
+
+	meshes = {};
+	game_objects = {};
+	scene_textures = {};
+	scene_materials = {};
+}
+
+void Scene::UpdateTransform()
+{
+	for (GameObject* go : children)
+	{
+		go->UpdateTransform();
+	}
+}
+
+void Scene::UpdateBoundingBox()
+{
+	for (GameObject* go : children)
+	{
+		go->UpdateBoundingBox();
+	}
+}
 
 void Scene::Update(unsigned int program)
 {
@@ -41,12 +70,26 @@ void Scene::Culling()
 	else
 		frustum = camera_culling->getFrustum();
 
+	std::vector<GameObject*> quad_objects = {};
+	quadtree.CollectIntersections(quad_objects, frustum);
+
+	std::vector<GameObject*> quad_full = {};
+	quadtree.CollectObjects(quad_full);
+
+	for (GameObject* go : quad_objects)
+	{
+		go->render = true;
+	}
+}
+
+void Scene::GenerateQuadtree()
+{
+	quadtree.SetBoundaries(AABB(float3(-500, -30, -500), float3(500, 30, 500)));
+
 	for (GameObject* go : game_objects)
 	{
-		if (go->getBoundingBox().IsFinite() && frustum.Intersects(go->getBoundingBox()))
-			go->render = true;
-		else
-			go->render = false;
+		if (go->world_bbox.IsFinite())
+			quadtree.Insert(go);
 	}
 }
 
@@ -62,13 +105,27 @@ GameObject* Scene::AddGameObject(const std::string file_name, GameObject* parent
 	GameObject* go = new GameObject(last_go_id, parent);
 
 	go->Load(file_name, type);
-
 	game_objects.push_back(go);
+
+	if(go->world_bbox.IsFinite())
+		quadtree.Insert(go);
 
 	if(parent == nullptr)
 		children.push_back(go);
 
 	return go;
+}
+
+void Scene::AddGameObjectIntoQuadtree(GameObject* gameobject)
+{
+	quadtree.Erase(gameobject);
+	if (gameobject->world_bbox.IsFinite())
+		quadtree.Insert(gameobject);
+}
+
+void Scene::RemoveGameObjectFromQuadtree(GameObject* gameobject)
+{
+	quadtree.Erase(gameobject);
 }
 
 void Scene::NewTexture(const char* path)

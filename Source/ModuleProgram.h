@@ -21,8 +21,10 @@ public:
 	bool CleanUp();
 
 	GLuint program;
+	GLuint outline_program;
 
 	GLuint CreateProgram(const char* source_1, const char* source_2);
+	GLuint CreateOutlineProgram(const char* source_1, const char* source_2);
 
 private:
 	void* context;

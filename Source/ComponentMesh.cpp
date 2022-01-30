@@ -18,27 +18,56 @@ ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vec
 	App->scene->getCurrentScene()->AddMesh(mesh);
 	console->AddLog("NUMBER OF Indices: %d", indices.size());
 	type = CompType::Mesh;
+	visible = true;
 }
 
 ComponentMesh::~ComponentMesh()
 {}
 
-void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotation, float3& scale)
+void ComponentMesh::Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
 {
-	if (!render && !visible)
+	if (!render || !visible)
 		return;
 
-	const float4x4& view = App->editorcamera->getView();
-	const float4x4 proj = App->editorcamera->getProjection();
-	float4x4 model = float4x4::FromTRS(position, rotation, scale);
+	if (selected)
+	{
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
+	} 
+	else
+	{
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0x00);
+	}
 
-	/*std::vector<math::Triangle> tris = mesh->getTriangles();
-	for (math::Triangle const& tri : tris)
+	Draw(program, position, rotation, scale);
+
+	if (!selected)
+		return;
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilMask(0x00);
+
+	glDisable(GL_DEPTH_TEST);
+	//Draw(program, position, rotation, scale * 1.02f);
+	//std::vector<math::Triangle> tris = mesh->getTriangles();
+	/*for (math::Triangle const& tri : tris)
 	{
 		dd::line(tri.a, tri.b, dd::colors::Yellow);
 		dd::line(tri.b, tri.c, dd::colors::Yellow);
 		dd::line(tri.c, tri.a, dd::colors::Yellow);
 	}*/
+	Draw(App->program->outline_program, position, rotation, scale*1.02);
+	glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 0, 0xFF);
+	glEnable(GL_DEPTH_TEST);
+
+}
+
+void ComponentMesh::Draw(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
+{
+	const float4x4& view = App->editorcamera->getView();
+	const float4x4 proj = App->editorcamera->getProjection();
+	float4x4 model = float4x4::FromTRS(position, rotation, scale);
 
 	glUseProgram(program);
 
@@ -61,6 +90,7 @@ void ComponentMesh::Update(unsigned int program, float3& position, Quat& rotatio
 	glDrawElements(GL_TRIANGLES, mesh->getIndicesNum(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
+
 
 void ComponentMesh::getBoundingBox(math::AABB& bbox)
 {

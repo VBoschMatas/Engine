@@ -28,6 +28,8 @@ bool ModuleScene::Init()
 
 update_status ModuleScene::PreUpdate()
 {
+	Scenes[current_scene]->UpdateTransform();
+	Scenes[current_scene]->UpdateBoundingBox();
 	return UPDATE_CONTINUE;
 }
 
@@ -69,13 +71,9 @@ Scene* ModuleScene::getScene(unsigned int id)
 	return Scenes[id];
 }
 
-void ModuleScene::Update(unsigned int program)
+void ModuleScene::Draw(unsigned int program)
 {
 	Scenes[current_scene]->Update(program);
-	/*for (int i = 0; i < Scenes.size(); ++i)
-	{
-		Scenes[i]->Update(program);
-	}*/
 }
 
 void ModuleScene::DroppedModel(char* path)

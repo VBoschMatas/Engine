@@ -5,6 +5,7 @@
 #include "ModuleTexture.h"
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
+#include "EngineQuadTree.h"
 #include <vector>
 #include <map>
 
@@ -18,6 +19,10 @@ public:
 	~Scene() {};
 
 	void setName(const char* _name) { name = _name; };
+
+	void Load();
+	void UpdateTransform();
+	void UpdateBoundingBox();
 	void Update(unsigned int program);
 
 	unsigned int getId() { return id; };
@@ -25,7 +30,9 @@ public:
 
 	GameObject* AddGameObject(const std::string file_name, GoType type = GoType::Empty);
 	GameObject* AddGameObject(const std::string file_name, GameObject* parent, GoType type = GoType::Empty);
+	void AddGameObjectIntoQuadtree(GameObject* gameobject);
 	void RemoveGameObject(GameObject* gameobj) { game_objects.erase(std::find(game_objects.begin(), game_objects.end(), gameobj)); delete(gameobj); };
+	void RemoveGameObjectFromQuadtree(GameObject* gameobj);
 
 	void AddMesh(Mesh* _mesh) { meshes.push_back(_mesh); };
 	std::vector<Mesh*> GetMeshes() { return meshes; };
@@ -65,6 +72,7 @@ private:
 	std::vector<GameObject*> children; // GameObjects that are directly attached to the root
 
 	// List of all GameObjects, Meshes, Textures and Materials used in the scene
+	EngineQuadtree quadtree;
 	std::vector<GameObject*> game_objects;
 	std::vector<Mesh*> meshes;
 	std::map<unsigned int, Texture> scene_textures;
@@ -75,5 +83,6 @@ private:
 	unsigned int last_material_id;
 
 	void Culling();
+	void GenerateQuadtree();
 };
 

@@ -97,7 +97,6 @@ std::vector<GameObject*> Model::Load(const std::string &file_name, GameObject* r
 	root->Transform()->setPos(position.x, position.y, position.z);
 	root->Transform()->setSca(scale.x, scale.y, scale.z);
 	root->Transform()->setRot(rotation.x, rotation.y, rotation.z, rotation.w);
-	console->AddLog("P) x: %f y: %f z: %f  R) x: %f y: %f z: %f  S) x: %f y: %f z: %f", position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, rotation.w, scale.x, scale.y, scale.z);
 
 	return children;
 }
@@ -110,7 +109,8 @@ std::vector<GameObject*> Model::LoadChildren(aiNode* aiParent, GameObject* goPar
 		std::vector<Component*> comp_list = {};
 
 		aiNode* new_go = aiParent->mChildren[i];
-		GameObject* new_child = App->scene->getScene(App->scene->current_scene)->AddGameObject(new_go->mName.C_Str(), goParent, GoType::Empty);
+		// We create an empty object
+		GameObject* new_child = App->scene->getCurrentScene()->AddGameObject(new_go->mName.C_Str(), goParent, GoType::Empty);
 		children.push_back(new_child);
 
 		std::vector<GameObject*> grandchildren = {};
@@ -121,7 +121,13 @@ std::vector<GameObject*> Model::LoadChildren(aiNode* aiParent, GameObject* goPar
 		new_child->addComponent(comp_list);
 		new_child->addChildren(grandchildren);
 
-		//std::vector<Component*> compo = children.back()->getComponents();
+		aiMatrix4x4 object_transform = new_go->mTransformation;
+		aiVector3D position, scale;
+		aiQuaternion rotation;
+		object_transform.Decompose(scale, rotation, position);
+		new_child->Transform()->setPos(position.x, position.y, position.z);
+		new_child->Transform()->setSca(scale.x, scale.y, scale.z);
+		new_child->Transform()->setRot(rotation.x, rotation.y, rotation.z, rotation.w);
 	}
 	return children;
 }
