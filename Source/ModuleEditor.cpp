@@ -359,7 +359,7 @@ void ModuleEditor::PhysicalMemory(float& total, float& consumed)
 void ModuleEditor::InspectorWindow()
 {
 	ImGui::Begin("Inspector", &inspector_window);
-	GameObject* inspected = App->scene->getScene(App->scene->current_scene)->selected_gameObject;
+	GameObject* inspected = App->scene->getSelectedGameObject();
 
 	if (inspected != nullptr)
 		inspected->printGameObjectInfo();
@@ -489,7 +489,7 @@ void ModuleEditor::GuizmosMenu()
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Scale");
 
-	bool curr_culling_editor = App->scene->getCurrentScene()->camera_culling == nullptr;
+	bool curr_culling_editor = App->scene->getCameraCulling() == nullptr;
 	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(curr_culling_editor)));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(curr_culling_editor)));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(curr_culling_editor)));
@@ -497,7 +497,7 @@ void ModuleEditor::GuizmosMenu()
 	ImGui::SameLine(0.0f, 120.0f);
 	if (ImGui::Button(ICON_FA_CAMERA, ImVec2(30, 0)))
 	{
-		App->scene->getCurrentScene()->camera_culling = nullptr;
+		App->scene->setCameraCulling(nullptr);
 	}
 	ImGui::PopStyleColor(4);
 	if (ImGui::IsItemHovered())
@@ -567,7 +567,7 @@ void ModuleEditor::HierarchyWindow()
 
 	if ((ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsMouseClicked(ImGuiMouseButton_Left)) && ImGui::IsWindowHovered())
 	{
-		App->scene->getCurrentScene()->selected_gameObject = nullptr;
+		App->scene->setSelectedGameObject(nullptr);
 	}
 
 	App->scene->printHierarchy();
@@ -591,23 +591,23 @@ void ModuleEditor::HierarchyMenu()
 		{
 			if (ImGui::MenuItem("Empty GameObject"))
 			{
-				GameObject* temp = App->scene->getCurrentScene()->AddGameObject("EmptyObject", App->scene->getCurrentScene()->selected_gameObject);
-				if (App->scene->getCurrentScene()->selected_gameObject != nullptr)
-					App->scene->getCurrentScene()->selected_gameObject->addChild(temp);
+				GameObject* temp = App->scene->AddGameObject("EmptyObject", App->scene->getSelectedGameObject());
+				if (App->scene->getSelectedGameObject() != nullptr)
+					App->scene->getSelectedGameObject()->addChild(temp);
 			}
 			if (ImGui::MenuItem("Camera"))
 			{
-				GameObject* temp = App->scene->getCurrentScene()->AddGameObject("Camera", App->scene->getCurrentScene()->selected_gameObject, GoType::Camera);
-				if (App->scene->getCurrentScene()->selected_gameObject != nullptr)
-					App->scene->getCurrentScene()->selected_gameObject->addChild(temp);
+				GameObject* temp = App->scene->AddGameObject("Camera", App->scene->getSelectedGameObject(), GoType::Camera);
+				if (App->scene->getSelectedGameObject() != nullptr)
+					App->scene->getSelectedGameObject()->addChild(temp);
 			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::Selectable("Remove", false))
 		{
-			if (App->scene->getCurrentScene()->selected_gameObject != nullptr)
+			if (App->scene->getSelectedGameObject() != nullptr)
 			{
-				App->scene->getCurrentScene()->RemoveGameObject(App->scene->getCurrentScene()->selected_gameObject);
+				App->scene->RemoveGameObject(App->scene->getSelectedGameObject());
 			}
 		}
 		ImGui::EndPopup();
@@ -620,7 +620,7 @@ void ModuleEditor::ResourcesWindow()
 
 	if (ImGui::CollapsingHeader("GameObjects"))
 	{
-		for (GameObject* go : App->scene->getCurrentScene()->getGameObjects())
+		for (GameObject* go : App->scene->getGameObjects())
 		{
 			ImGui::TextWrapped(go->getName().c_str());
 		}
@@ -628,7 +628,7 @@ void ModuleEditor::ResourcesWindow()
 
 	if (ImGui::CollapsingHeader("Meshes"))
 	{
-		for (Mesh* mesh : App->scene->getCurrentScene()->GetMeshes())
+		for (Mesh* mesh : App->scene->GetMeshes())
 		{
 			ImGui::TextWrapped(mesh->getName().c_str());
 		}
@@ -636,7 +636,7 @@ void ModuleEditor::ResourcesWindow()
 
 	if (ImGui::CollapsingHeader("Materials"))
 	{
-		for (Material* mat : App->scene->getCurrentScene()->GetMaterials())
+		for (Material* mat : App->scene->GetMaterials())
 		{
 			ImGui::TextWrapped(mat->name.c_str());
 		}
@@ -644,7 +644,7 @@ void ModuleEditor::ResourcesWindow()
 
 	if (ImGui::CollapsingHeader("Textures"))
 	{
-		std::map<unsigned int, Texture>* temp_textures = App->scene->getCurrentScene()->GetTextures();
+		std::map<unsigned int, Texture>* temp_textures = App->scene->GetTextures();
 		for (auto& tex : *temp_textures)
 		{
 			ImGui::TextWrapped(tex.second.name.c_str());

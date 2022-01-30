@@ -60,7 +60,7 @@ public:
 
 	GameObject* selected_gameObject = nullptr;
 	ComponentCamera* camera_culling = nullptr;
-
+	EngineQuadtree quadtree;
 
 	unsigned int getGoId() { unsigned int temp_id = last_go_id; ++last_go_id; return temp_id; };
 	unsigned int getMeshId() { unsigned int temp_id = last_mesh_id; ++last_mesh_id; return temp_id; };
@@ -72,7 +72,6 @@ private:
 	std::vector<GameObject*> children; // GameObjects that are directly attached to the root
 
 	// List of all GameObjects, Meshes, Textures and Materials used in the scene
-	EngineQuadtree quadtree;
 	std::vector<GameObject*> game_objects;
 	std::vector<Mesh*> meshes;
 	std::map<unsigned int, Texture> scene_textures;

@@ -8,7 +8,6 @@
 #include "Geometry/OBB.h"
 #include "Component.h"
 #include "GameObject.h"
-#include "Scene.h"
 
 class Model
 {

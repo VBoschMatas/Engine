@@ -106,8 +106,7 @@ bool ModuleRender::Init()
 	//model->Load("BakerHouse.fbx");
 
 	App->scene->AddScene("Scene 1");
-	App->scene->getCurrentScene()->Load();
-	App->scene->getCurrentScene()->AddGameObject("BakerHouse.fbx", GoType::Model);
+	App->scene->AddGameObject("BakerHouse.fbx", GoType::Model);
 	//App->scene->getScene(0)->AddGameObject("models/WoodenCrate01.fbx", GoType::Model);
 
 	//App->scene->AddGameObject(GoType::Model, "models/WoodenCrate01.fbx");

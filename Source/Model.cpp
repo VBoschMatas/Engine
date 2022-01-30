@@ -39,7 +39,7 @@ std::vector<GameObject*> Model::Load(const std::string &file_name, GameObject* r
 		model_name.end());
 
 	// We check if we had materials from previous objects, and set them as offset
-	material_offset = App->scene->getCurrentScene()->GetMaterials().size();
+	material_offset = App->scene->GetMaterials().size();
 
 	console->AddLog("Reading object: %s", model_name.c_str());
 
@@ -71,7 +71,7 @@ std::vector<GameObject*> Model::Load(const std::string &file_name, GameObject* r
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 	{
 		Material* material = new Material(scene->mMaterials[i], directory.c_str(), i);
-		App->scene->getScene(App->scene->current_scene)->AddMaterial(material);
+		App->scene->AddMaterial(material);
 	}
 
 
@@ -110,7 +110,7 @@ std::vector<GameObject*> Model::LoadChildren(aiNode* aiParent, GameObject* goPar
 
 		aiNode* new_go = aiParent->mChildren[i];
 		// We create an empty object
-		GameObject* new_child = App->scene->getCurrentScene()->AddGameObject(new_go->mName.C_Str(), goParent, GoType::Empty);
+		GameObject* new_child = App->scene->AddGameObject(new_go->mName.C_Str(), goParent, GoType::Empty);
 		children.push_back(new_child);
 
 		std::vector<GameObject*> grandchildren = {};

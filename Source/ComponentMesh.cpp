@@ -15,7 +15,7 @@ ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vec
 {
 	this->id = id;
 	mesh = new Mesh(vertices, indices, material, name, obb_vertices);
-	App->scene->getCurrentScene()->AddMesh(mesh);
+	App->scene->AddMesh(mesh);
 	console->AddLog("NUMBER OF Indices: %d", indices.size());
 	type = CompType::Mesh;
 	visible = true;
@@ -125,7 +125,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 	this->indices = indices;
 	this->material_index = material;
 	this->name = name;
-	this->id = App->scene->getScene(App->scene->current_scene)->getMeshId();
+	this->id = App->scene->getMeshId();
 	console->AddLog("Creating OBB for the mesh");
 
 	bounding_box.SetNegativeInfinity();

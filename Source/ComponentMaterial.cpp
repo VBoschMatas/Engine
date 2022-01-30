@@ -1,21 +1,20 @@
 #include "ComponentMaterial.h"
 #include "Application.h"
 #include "ModuleScene.h"
-#include "Scene.h"
 #include <map>
 
 ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset, unsigned int id)
 {
 	this->id = id;
 	if (mesh->mMaterialIndex >= 0)
-		material = App->scene->getCurrentScene()->GetMaterials()[((size_t)mesh->mMaterialIndex + (size_t)offset)];
+		material = App->scene->GetMaterials()[((size_t)mesh->mMaterialIndex + (size_t)offset)];
 	else
 		material = nullptr;
 }
 
 Material::Material(aiMaterial* material, const char* path, unsigned int id)
 {
-	id = App->scene->getCurrentScene()->getMaterialId();
+	id = App->scene->getMaterialId();
 	name = "NewMaterial" + std::to_string(id);
 	textures[0] = LoadTextures(material, aiTextureType_DIFFUSE, path);
 	textures[1] = LoadTextures(material, aiTextureType_NORMALS, path);
@@ -57,8 +56,8 @@ Texture* Material::LoadTextures(aiMaterial* material, aiTextureType type, const 
 
 	tex_hash = std::hash<std::string>{}(mat_dir);
 
-	std::map<unsigned int, Texture>::iterator it = App->scene->getCurrentScene()->GetTextures()->find(tex_hash);
-	std::map<unsigned int, Texture>::iterator end_it = App->scene->getCurrentScene()->GetTextures()->end();
+	std::map<unsigned int, Texture>::iterator it = App->scene->GetTextures()->find(tex_hash);
+	std::map<unsigned int, Texture>::iterator end_it = App->scene->GetTextures()->end();
 	if (it != end_it)
 	{
 		texture = &it->second;
@@ -80,11 +79,11 @@ Texture* Material::LoadTextures(aiMaterial* material, aiTextureType type, const 
 		console->AddLog("		Checking for textures in same directory as object: %s", same_dir.c_str());
 
 		tex_hash = std::hash<std::string>{}(same_dir);
-		std::map<unsigned int, Texture>::iterator it = App->scene->getCurrentScene()->GetTextures()->find(tex_hash);
-		std::map<unsigned int, Texture>::iterator end_it = App->scene->getCurrentScene()->GetTextures()->end();
+		std::map<unsigned int, Texture>::iterator it = App->scene->GetTextures()->find(tex_hash);
+		std::map<unsigned int, Texture>::iterator end_it = App->scene->GetTextures()->end();
 		if (it != end_it)
 		{
-			texture = &App->scene->getCurrentScene()->GetTextures()->find(tex_hash)->second;
+			texture = &App->scene->GetTextures()->find(tex_hash)->second;
 			already_exists = true;
 		}
 
@@ -102,11 +101,11 @@ Texture* Material::LoadTextures(aiMaterial* material, aiTextureType type, const 
 		tex_dir.append(tex_name);
 
 		tex_hash = std::hash<std::string>{}(tex_dir);
-		std::map<unsigned int, Texture>::iterator it = App->scene->getCurrentScene()->GetTextures()->find(tex_hash);
-		std::map<unsigned int, Texture>::iterator end_it = App->scene->getCurrentScene()->GetTextures()->end();
+		std::map<unsigned int, Texture>::iterator it = App->scene->GetTextures()->find(tex_hash);
+		std::map<unsigned int, Texture>::iterator end_it = App->scene->GetTextures()->end();
 		if (it != end_it)
 		{
-			texture = &App->scene->getCurrentScene()->GetTextures()->find(tex_hash)->second;
+			texture = &App->scene->GetTextures()->find(tex_hash)->second;
 			already_exists = true;
 		}
 		if (!already_exists)
@@ -125,7 +124,7 @@ Texture* Material::LoadTextures(aiMaterial* material, aiTextureType type, const 
 	// We save the texture if it is new
 	if (!already_exists)
 	{
-		texture = App->scene->getCurrentScene()->AddTexture(tex_hash, temp_texture);
+		texture = App->scene->AddTexture(tex_hash, temp_texture);
 	}
 	else
 		console->AddLog("	This texture was used previously");
@@ -141,7 +140,7 @@ void Material::addTexture(const char* path, unsigned int tex_id)
 	bool temp;
 	Texture temp_texture = App->textures->LoadTexture(path, temp);
 	unsigned int tex_hash = std::hash<std::string>{}(path);
-	textures[tex_id] = App->scene->getCurrentScene()->AddTexture(tex_hash, temp_texture);
+	textures[tex_id] = App->scene->AddTexture(tex_hash, temp_texture);
 }
 
 void Material::RemoveTexture(unsigned int tex_id)
@@ -230,7 +229,7 @@ void ComponentMaterial::selectTexture(unsigned int tex_id)
 		ImGui::Text("You can add new textures by dropping them.");
 		if (ImGui::BeginChildFrame(ImGui::GetID("frame"), ImVec2(-FLT_MIN, 250)))
 		{
-			std::map<unsigned int, Texture>* temp_textures = App->scene->getCurrentScene()->GetTextures();
+			std::map<unsigned int, Texture>* temp_textures = App->scene->GetTextures();
 			for (auto & t : *temp_textures)
 			{
 				std::string itemid = "##texsel" + std::to_string(t.second.id);

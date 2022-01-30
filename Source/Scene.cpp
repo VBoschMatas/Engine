@@ -73,9 +73,6 @@ void Scene::Culling()
 	std::vector<GameObject*> quad_objects = {};
 	quadtree.CollectIntersections(quad_objects, frustum);
 
-	std::vector<GameObject*> quad_full = {};
-	quadtree.CollectObjects(quad_full);
-
 	for (GameObject* go : quad_objects)
 	{
 		go->render = true;
@@ -118,9 +115,11 @@ GameObject* Scene::AddGameObject(const std::string file_name, GameObject* parent
 
 void Scene::AddGameObjectIntoQuadtree(GameObject* gameobject)
 {
-	quadtree.Erase(gameobject);
 	if (gameobject->world_bbox.IsFinite())
+	{
+		quadtree.Erase(gameobject);
 		quadtree.Insert(gameobject);
+	}
 }
 
 void Scene::RemoveGameObjectFromQuadtree(GameObject* gameobject)

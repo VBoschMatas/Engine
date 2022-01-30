@@ -1,7 +1,6 @@
 #include "Application.h"
 #include "ModuleEditorCamera.h"
 #include "ModuleScene.h"
-#include "Scene.h"
 #include "ComponentCamera.h"
 #include "debugdraw.h"
 
@@ -56,7 +55,7 @@ void ComponentCamera::printComponentInfo()
 
 		if (ImGui::Button("Set as Culling"))
 		{
-			App->scene->getCurrentScene()->camera_culling = this;
+			App->scene->setCameraCulling(this);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Place Camera"))

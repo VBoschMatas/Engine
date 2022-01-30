@@ -7,7 +7,6 @@
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
 #include "ModuleScene.h"
-#include "Scene.h"
 #include "GameObject.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Triangle.h"
@@ -298,13 +297,7 @@ void ModuleEditorCamera::ClickRaycast(float normalizedX, float normalizedY)
 	LineSegment ray = frustum.UnProjectLineSegment(normalizedX, normalizedY);
 	App->dd->CheckRaycast(ray.a, ray.b);
 	std::vector<GameObject*> hit_objects = {};
-	for (GameObject* go : App->scene->getCurrentScene()->getGameObjects())
-	{
-		bool hit = ray.Intersects(go->world_bbox);
-		if (hit)
-			hit_objects.push_back(go);
-	}
-	//std::sort(hit_objects.begin(), hit_objects.end(), std::greater<GameObject*>());
+	App->scene->getQuadtree()->CollectIntersections(hit_objects, ray);
 	GameObject* closest_go = nullptr;
 	float closest_dist = FLT_MAX;
 	for (GameObject* go : hit_objects)
@@ -325,7 +318,7 @@ void ModuleEditorCamera::ClickRaycast(float normalizedX, float normalizedY)
 		}
 	}
 
-	App->scene->getCurrentScene()->selected_gameObject = closest_go;
+	App->scene->setSelectedGameObject(closest_go);
 }
 
 void ModuleEditorCamera::setCameraAs(Frustum _frustum)

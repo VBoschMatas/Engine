@@ -2,7 +2,6 @@
 #include "Application.h"
 #include "ModuleDebugDraw.h"
 #include "ModuleScene.h"
-#include "Scene.h"
 #include "ComponentMesh.h"
 
 #define DEBUG_DRAW_IMPLEMENTATION

@@ -7,7 +7,6 @@
 #include "ModuleScene.h"
 #include "ModuleEditor.h"
 #include "ModuleEditorCamera.h"
-#include "Scene.h"
 #include "MathGeoLib.h"
 #include "Math/float4x4.h"
 #include "debugdraw.h"
@@ -23,12 +22,11 @@ GameObject::GameObject(unsigned int _id, GameObject* _parent)
 
 GameObject::~GameObject()
 {
-	if (App->scene->getCurrentScene()->selected_gameObject == this)
-		App->scene->getCurrentScene()->selected_gameObject = nullptr;
+	if (App->scene->getSelectedGameObject() == this)
+		App->scene->setSelectedGameObject(nullptr);
 	parent->removeChild(this);
-
-	App->scene->getCurrentScene()->RemoveGameObjectFromQuadtree(this);
-
+	App->scene->RemoveGameObjectFromQuadtree(this);
+	App->scene->RemoveGameObject(this);
 	for (GameObject* ch : children)
 		delete(ch);
 	for (Component* c : components)
@@ -87,7 +85,7 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 
 void GameObject::UpdateTransform()
 {
-	selected = App->scene->getCurrentScene()->selected_gameObject == this;
+	selected = App->scene->getSelectedGameObject() == this;
 
 	float3 position, scale;
 	Quat rotation;
@@ -109,7 +107,6 @@ void GameObject::UpdateTransform()
 	{
 		c->render = render;
 		c->UpdateTransform(position, rotation, scale);
-		c->getBoundingBox(local_bbox);
 	}
 
 	for (GameObject* ch : children)
@@ -120,6 +117,7 @@ void GameObject::UpdateTransform()
 
 void GameObject::UpdateBoundingBox()
 {
+
 	for (Component* c : components)
 	{
 		c->getBoundingBox(local_bbox);
@@ -136,6 +134,15 @@ void GameObject::UpdateBoundingBox()
 		world_bbox = local_bbox;
 		world_bbox.Transform(Transform()->getWorldTransform());
 	}
+
+	if (!active)
+	{
+		//world_bbox.SetNegativeInfinity();
+		App->scene->RemoveGameObjectFromQuadtree(this);
+		return;
+	}
+
+	App->scene->AddGameObjectIntoQuadtree(this);
 }
 
 void GameObject::Update(unsigned int program)
@@ -165,7 +172,6 @@ void GameObject::Update(unsigned int program)
 		DebugDraw();
 
 	render = false;
-	App->scene->getCurrentScene()->AddGameObjectIntoQuadtree(this);
 }
 
 ComponentTransform* GameObject::Transform()
@@ -208,7 +214,7 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 		bool is_open = ImGui::TreeNodeEx((void*)this, node_flags, name.c_str());
 
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen())
-			App->scene->getCurrentScene()->selected_gameObject = this;
+			App->scene->setSelectedGameObject(this);
 
 		if (is_open)
 		{
@@ -226,7 +232,7 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 		ImGui::TreeNodeEx((void*)this, node_flags, "%s", name.c_str());
 
 		if ((ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) && !ImGui::IsItemToggledOpen())
-			App->scene->getCurrentScene()->selected_gameObject = this;
+			App->scene->setSelectedGameObject(this);
 
 
 	}
