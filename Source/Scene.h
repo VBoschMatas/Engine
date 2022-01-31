@@ -24,6 +24,7 @@ public:
 	void Load();
 	void UpdateTransform();
 	void UpdateBoundingBox();
+	void UpdateLights(unsigned int program);
 	void Update(unsigned int program);
 
 	unsigned int getId() { return id; };

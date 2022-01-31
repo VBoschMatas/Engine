@@ -12,6 +12,7 @@
 #include "Geometry/Triangle.h"
 #include "DebugDraw.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleProgram.h"
 #include <algorithm>
 #include <functional>
 
@@ -57,7 +58,6 @@ update_status ModuleEditorCamera::Update()
 	horizontal_fov = field_of_view * DEGTORAD;
 	SetFOV(field_of_view);
 	frustum.SetViewPlaneDistances(near_distance, far_distance);
-
 	Controller();
 
 	if (lock_view) //For now all objects will be at 0, 0, 0. Once object selection is incorporated this will change

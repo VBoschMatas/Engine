@@ -376,6 +376,7 @@ void ModuleEditor::SceneWindow()
 
 	if (ImGui::BeginChild("SceneCanvas", ImVec2(0, 0), true, ImGuiWindowFlags_NoMove))
 	{
+		scene_size = float2(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
 		scene_selected = ImGui::IsWindowFocused();
 		if ((ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)) && ImGui::IsWindowHovered())
 			ImGui::SetWindowFocus();
@@ -596,11 +597,28 @@ void ModuleEditor::HierarchyMenu()
 				if (App->scene->getSelectedGameObject() != nullptr)
 					App->scene->getSelectedGameObject()->addChild(temp);
 			}
+			if (ImGui::MenuItem("Cube"))
+			{
+				GameObject* temp = App->scene->AddGameObject("Cube", App->scene->getSelectedGameObject(), GoType::Cube);
+				if (App->scene->getSelectedGameObject() != nullptr)
+					App->scene->getSelectedGameObject()->addChild(temp);
+			}
 			if (ImGui::MenuItem("Camera"))
 			{
 				GameObject* temp = App->scene->AddGameObject("Camera", App->scene->getSelectedGameObject(), GoType::Camera);
 				if (App->scene->getSelectedGameObject() != nullptr)
 					App->scene->getSelectedGameObject()->addChild(temp);
+			}
+			if (ImGui::BeginMenu("Light"))
+			{
+				if (ImGui::MenuItem("Directional"))
+				{
+					GameObject* temp = App->scene->AddGameObject("Directional Light", App->scene->getSelectedGameObject(), GoType::DirectionalLight);
+					if (App->scene->getSelectedGameObject() != nullptr)
+						App->scene->getSelectedGameObject()->addChild(temp);
+				}
+
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}

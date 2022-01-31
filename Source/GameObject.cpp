@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "ComponentTransform.h"
 #include "ComponentCamera.h"
+#include "ComponentLight.h"
 #include "Model.h"
 #include "imgui.h"
 #include "Application.h"
@@ -60,6 +61,32 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 		name = "Camera";
 		ComponentCamera* camera = new ComponentCamera();
 		components.push_back(camera);
+	}
+	break;
+	case GoType::DirectionalLight:
+	{
+		name = "Light";
+		ComponentLight* light = new ComponentLight(LightType::Directional);
+		components.push_back(light);
+	}
+	break;
+	case GoType::PointLight:
+	{
+		name = "Light";
+		ComponentLight* light = new ComponentLight(LightType::Point);
+		components.push_back(light);
+	}
+	break;
+	case GoType::SpotLight:
+	{
+		name = "Light";
+		ComponentLight* light = new ComponentLight(LightType::Spot);
+		components.push_back(light);
+	}
+	break; case GoType::Cube:
+	{
+		name = "Cube";
+		LoadCube();
 	}
 	break;
 	case GoType::Text:
@@ -143,6 +170,23 @@ void GameObject::UpdateBoundingBox()
 	}
 
 	App->scene->AddGameObjectIntoQuadtree(this);
+}
+
+void GameObject::UpdateLights(unsigned int program)
+{
+	float3 position = Transform()->getWorldPos();
+	Quat rotation = Transform()->getWorldRot();
+	float3 scale = Transform()->getWorldSca();
+
+	for (Component* c : components)
+	{
+		c->UpdateLight(program, position, rotation, scale);
+	}
+
+	for (GameObject* ch : children)
+	{
+		ch->UpdateLights(program);
+	}
 }
 
 void GameObject::Update(unsigned int program)
@@ -283,4 +327,184 @@ std::vector<math::Triangle> GameObject::getTriangles()
 		tris.insert(tris.end(), tris_aux.begin(), tris_aux.end());
 	}
 	return tris;
+}
+
+void GameObject::LoadCube()
+{
+	float3 positions [] = {
+		float3(-0.5f, -0.5f, -0.5f),
+		float3(0.5f, -0.5f, -0.5f),
+		float3(0.5f,  0.5f, -0.5f),
+		float3(0.5f,  0.5f, -0.5f),
+		float3(-0.5f,  0.5f, -0.5f),
+		float3(-0.5f, -0.5f, -0.5f),
+
+		float3(-0.5f, -0.5f,  0.5f),
+		float3(0.5f, -0.5f,  0.5f),
+		float3(0.5f,  0.5f,  0.5f),
+		float3(0.5f,  0.5f,  0.5f),
+		float3(-0.5f,  0.5f,  0.5f),
+		float3(-0.5f, -0.5f,  0.5f),
+
+		float3(-0.5f,  0.5f,  0.5f),
+		float3(-0.5f,  0.5f, -0.5f),
+		float3(-0.5f, -0.5f, -0.5f),
+		float3(-0.5f, -0.5f, -0.5f),
+		float3(-0.5f, -0.5f,  0.5f),
+		float3(-0.5f,  0.5f,  0.5f),
+
+		float3(0.5f,  0.5f,  0.5f),
+		float3(0.5f,  0.5f, -0.5f),
+		float3(0.5f, -0.5f, -0.5f),
+		float3(0.5f, -0.5f, -0.5f),
+		float3(0.5f, -0.5f,  0.5f),
+		float3(0.5f,  0.5f,  0.5f),
+
+		float3(-0.5f, -0.5f, -0.5f),
+		float3(0.5f, -0.5f, -0.5f),
+		float3(0.5f, -0.5f,  0.5f),
+		float3(0.5f, -0.5f,  0.5f),
+		float3(-0.5f, -0.5f,  0.5f),
+		float3(-0.5f, -0.5f, -0.5f),
+
+		float3(-0.5f,  0.5f, -0.5f),
+		float3(0.5f,  0.5f, -0.5f),
+		float3(0.5f,  0.5f,  0.5f),
+		float3(0.5f,  0.5f,  0.5f),
+		float3(-0.5f,  0.5f,  0.5f),
+		float3(-0.5f,  0.5f, -0.5f),
+	};
+
+	unsigned int ind[] = {
+		5, 4, 3, 2, 1, 0,
+		6, 7, 8, 9, 10, 11,
+		12, 13, 14, 15, 16, 17,
+		23, 22, 21, 20, 19, 18,
+		24, 25, 26, 27, 28, 29,
+		35, 34, 33, 32, 31, 30
+	};
+
+	float3 normals[] = {
+		float3(0.0f,  0.0f, -1.0f),
+		float3(0.0f,  0.0f, -1.0f),
+		float3(0.0f,  0.0f, -1.0f),
+		float3(0.0f,  0.0f, -1.0f),
+		float3(0.0f,  0.0f, -1.0f),
+		float3(0.0f,  0.0f, -1.0f),
+
+		float3(0.0f,  0.0f,  1.0f),
+		float3(0.0f,  0.0f,  1.0f),
+		float3(0.0f,  0.0f,  1.0f),
+		float3(0.0f,  0.0f,  1.0f),
+		float3(0.0f,  0.0f,  1.0f),
+		float3(0.0f,  0.0f,  1.0f),
+
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+		float3(1.0f,  0.0f,  0.0f),
+
+		float3(0.0f, -1.0f,  0.0f),
+		float3(0.0f, -1.0f,  0.0f),
+		float3(0.0f, -1.0f,  0.0f),
+		float3(0.0f, -1.0f,  0.0f),
+		float3(0.0f, -1.0f,  0.0f),
+		float3(0.0f, -1.0f,  0.0f),
+
+		float3(0.0f,  1.0f,  0.0f),
+		float3(0.0f,  1.0f,  0.0f),
+		float3(0.0f,  1.0f,  0.0f),
+		float3(0.0f,  1.0f,  0.0f),
+		float3(0.0f,  1.0f,  0.0f),
+		float3(0.0f,  1.0f,  0.0f),
+	};
+
+	float2 uv[] = {
+		float2(0.0f,  0.0f),
+		float2(1.0f,  0.0f),
+		float2(1.0f,  1.0f),
+		float2(1.0f,  1.0f),
+		float2(0.0f,  1.0f),
+		float2(0.0f,  0.0f),
+
+		float2(0.0f,  0.0f),
+		float2(1.0f,  0.0f),
+		float2(1.0f,  1.0f),
+		float2(1.0f,  1.0f),
+		float2(0.0f,  1.0f),
+		float2(0.0f,  0.0f),
+
+		float2(1.0f,  0.0f),
+		float2(1.0f,  1.0f),
+		float2(0.0f,  1.0f),
+		float2(0.0f,  1.0f),
+		float2(0.0f,  0.0f),
+		float2(1.0f,  0.0f),
+
+		float2(1.0f,  0.0f),
+		float2(1.0f,  1.0f),
+		float2(0.0f,  1.0f),
+		float2(0.0f,  1.0f),
+		float2(0.0f,  0.0f),
+		float2(1.0f,  0.0f),
+
+		float2(0.0f,  1.0f),
+		float2(1.0f,  1.0f),
+		float2(1.0f,  0.0f),
+		float2(1.0f,  0.0f),
+		float2(0.0f,  0.0f),
+		float2(0.0f,  1.0f),
+
+		float2(0.0f,  1.0f),
+		float2(1.0f,  1.0f),
+		float2(1.0f,  0.0f),
+		float2(1.0f,  0.0f),
+		float2(0.0f,  0.0f),
+		float2(0.0f,  1.0f),
+	};
+
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+	std::vector<float3> comb_vertices;
+
+	for (unsigned int i = 0; i < 36; ++i)
+	{
+		Vertex vertex;
+		float3 p_vector;
+
+		p_vector.x = positions[i].x;
+		p_vector.y = positions[i].y;
+		p_vector.z = positions[i].z;
+		vertex.position = p_vector;
+		comb_vertices.push_back(p_vector);
+
+		p_vector.x = normals[i].x;
+		p_vector.y = normals[i].y;
+		p_vector.z = normals[i].z;
+		vertex.normal = p_vector;
+
+		float2 t_vector;
+		t_vector.x = uv[i].x;
+		t_vector.y = uv[i].y;
+		vertex.uv = t_vector;
+
+		vertices.push_back(vertex);
+
+		indices.push_back(ind[i]);
+	}
+	ComponentMaterial* material = new ComponentMaterial(nullptr, 0, this->getCompId());
+	material->setMaterial(new Material());
+	ComponentMesh* c_mesh = new ComponentMesh(vertices, indices, material->getMaterial(), "Cube", comb_vertices, this->getCompId());
+
+	components.push_back(material);
+	components.push_back(c_mesh);
 }

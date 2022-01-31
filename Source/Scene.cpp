@@ -46,6 +46,16 @@ void Scene::UpdateTransform()
 	}
 }
 
+void Scene::UpdateLights(unsigned int program)
+{
+	ambient_light.Update(program);
+
+	for (GameObject* go : children)
+	{
+		go->UpdateLights(program);
+	}
+}
+
 void Scene::UpdateBoundingBox()
 {
 	for (GameObject* go : children)
@@ -56,7 +66,9 @@ void Scene::UpdateBoundingBox()
 
 void Scene::Update(unsigned int program)
 {
-	ambient_light.Update(program);
+	UpdateTransform();
+	UpdateLights(program);
+	UpdateBoundingBox();
 
 	Culling();
 

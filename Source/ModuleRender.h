@@ -26,8 +26,6 @@ public:
 	void LoadFrameBuffer();
 	void ClearFrameBuffer();
 
-	void TempLight();
-
 	void* context;
 	Model* model;
 

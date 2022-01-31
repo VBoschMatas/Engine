@@ -9,7 +9,8 @@
 class Material
 {
 public:
-	Material(aiMaterial* material, const char* path, unsigned int id);
+	Material();
+	Material(aiMaterial* material, const char* path);
 	~Material() = default;
 
 	Texture* getTexture(TexType type);
@@ -24,11 +25,16 @@ public:
 	unsigned int getId() { return id; };
 
 	std::string name;
-
+	float3 ambient;
+	float3 diffuse;
+	float3 specular;
+	float shininess;
 private:
 	unsigned int id;
-	Texture* textures[4] = { nullptr, nullptr, nullptr, nullptr };
-	const char* tex_types[4] = { "diffuse", "normals", "specular", "lightmap"};
+	//Texture* textures[4] = { nullptr, nullptr, nullptr, nullptr };
+	Texture* textures[2] = { nullptr, nullptr };
+	const char* tex_types[2] = { "diffuse", "specular"};
+	//const char* tex_types[4] = { "diffuse", "normals", "specular", "lightmap"};
 	Texture default_texture;
 	Texture* LoadTextures(aiMaterial* material, aiTextureType type, const char* path);
 };

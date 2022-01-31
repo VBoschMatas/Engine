@@ -79,7 +79,6 @@ Texture ModuleTexture::LoadTexture(const char *path, bool &texture_found)
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	ilDeleteImages(1, &img_id);
-
 	return tex;
 }
 

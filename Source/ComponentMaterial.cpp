@@ -6,27 +6,48 @@
 ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset, unsigned int id)
 {
 	this->id = id;
-	if (mesh->mMaterialIndex >= 0)
+	if (mesh != nullptr && mesh->mMaterialIndex >= 0)
 		material = App->scene->GetMaterials()[((size_t)mesh->mMaterialIndex + (size_t)offset)];
 	else
 		material = nullptr;
 }
 
-Material::Material(aiMaterial* material, const char* path, unsigned int id)
+Material::Material()
+{
+	id = App->scene->getMaterialId();
+	name = "NewMaterial" + std::to_string(id);
+	textures[1] = nullptr;
+
+	ambient = float3(1.0f, 1.0f, 1.0f);
+	diffuse = float3(1.0f, 1.0f, 1.0f);
+	specular = float3(1.0f, 1.0f, 1.0f);
+	shininess = 32.0f;
+
+	bool temp;
+	default_texture = App->textures->LoadTexture("textures/default.png", temp);
+	textures[0] = &default_texture;
+}
+
+Material::Material(aiMaterial* material, const char* path)
 {
 	id = App->scene->getMaterialId();
 	name = "NewMaterial" + std::to_string(id);
 	textures[0] = LoadTextures(material, aiTextureType_DIFFUSE, path);
-	textures[1] = LoadTextures(material, aiTextureType_NORMALS, path);
-	textures[2] = LoadTextures(material, aiTextureType_SPECULAR, path);
-	textures[3] = LoadTextures(material, aiTextureType_LIGHTMAP, path);
+	textures[1] = LoadTextures(material, aiTextureType_SPECULAR, path);
+	//textures[2] = LoadTextures(material, aiTextureType_SPECULAR, path);
+	//textures[3] = LoadTextures(material, aiTextureType_LIGHTMAP, path);
+
+	ambient = float3(1.0f, 1.0f, 1.0f);
+	diffuse = float3(1.0f, 1.0f, 1.0f);
+	specular = float3(1.0f, 1.0f, 1.0f);
+	shininess = 32.0f;
 
 	bool temp;
 	default_texture = App->textures->LoadTexture("textures/default.png", temp);
 
 	if (textures[0] == nullptr)
 	{
-		textures[0] = &default_texture; // CHANGE
+		textures[0] = &default_texture;
 	}
 }
 
@@ -171,7 +192,13 @@ void ComponentMaterial::printComponentInfo()
 	if (ImGui::CollapsingHeader(itemid.c_str(), header_flags))
 	{
 		ImGui::InputText("Name", &material->name[0], 64);
-		for (unsigned int i = 0; i < 4; ++i)
+
+		ImGui::DragFloat3("Ambient", (float*)&material->ambient, 0.005f, 0.0f, +FLT_MAX, "%.3f", 1.0f);
+		ImGui::DragFloat3("Diffuse", (float*)&material->diffuse, 0.005f, 0.0f, +FLT_MAX, "%.3f", 1.0f);
+		ImGui::DragFloat3("Specular", (float*)&material->specular, 0.005f, 0.0f, +FLT_MAX, "%.3f", 1.0f);
+		ImGui::DragFloat("Shininess", &material->shininess, 0.005f, 0.0f, +FLT_MAX, "%.3f", 1.0f);
+
+		for (unsigned int i = 0; i < 2; ++i)
 		{
 			std::string sel_name = "##" + std::to_string(this->id) + "," + std::to_string(i);
 			if (ImGui::TreeNodeEx((void*)(this + i), texture_flags, material->getTexTypes()[i]))

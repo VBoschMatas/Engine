@@ -1,68 +1,117 @@
 #include "ComponentLight.h"
 #include "Application.h"
-#include "ModuleEditorCamera.h"
-#include "ModuleScene.h"
+#include "GL/glew.h"
 #include "debugdraw.h"
+#include "ModuleEditorCamera.h"
+#include "ModuleEditor.h"
 
 #include "Math/float4x4.h"
+#include "Math/Quat.h"
 
 #define DEGTORAD pi / 180.0f
 #define RADTODEG 180.0f / pi
 
-//ComponentLight::ComponentLight()
-//{
-//	type = CompType::Light;
+ComponentLight::ComponentLight(LightType _type)
+{
+	type = CompType::Light;
+	Ltype = _type;
+	color = float3(1.0f, 1.0f, 1.0f);
+	intensity = 1.0f;
+}
 //
-//	field_of_view = 70.0f;
-//	near_distance = 1.0f;
-//	far_distance = 20.0f;
-//
-//	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-//	aspect_ratio = App->editorcamera->getAspectRatio();
-//	setFOV(field_of_view);
-//	frustum.SetViewPlaneDistances(near_distance, far_distance);
-//	frustum.SetPos(float3(0.0f, 0.0f, 0.0f));
-//	float3x3 identity = float3x3::identity;
-//	frustum.SetFront(identity.WorldZ());
-//	frustum.SetUp(identity.WorldY());
-//}
-//
-//void ComponentLight::Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
-//{
-//	aspect_ratio = App->editorcamera->getAspectRatio();
-//	setFOV(field_of_view);
-//	frustum.SetViewPlaneDistances(near_distance, far_distance);
-//	frustum.SetPos(position);
-//	frustum.SetFront(rotation.Mul(float3(0.0f, 0.0f, 1.0f)).Normalized());
-//	frustum.SetUp(rotation.Mul(float3(0.0f, 1.0f, 0.0f)).Normalized());
-//}
-//
+void ComponentLight::UpdateLight(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
+{
+	switch (Ltype)
+	{
+		case LightType::Directional:
+		{
+			UpdateDirectional(program, position, rotation, scale);
+		}
+		break;
+		case LightType::Point:
+		{
+			UpdatePoint(program, position, rotation, scale);
+		}
+		break;
+		case LightType::Spot:
+		{
+			UpdateSpot(program, position, rotation, scale);
+		}
+		break;
+	}
+}
+
+void ComponentLight::Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
+{
+	if (!selected)
+		return;
+
+	switch (Ltype)
+	{
+	case LightType::Directional:
+	{
+		float3 dir = rotation * float3(0.0f, 0.0f, 1.0f);
+		dd::circle(position, dir, dd::colors::Yellow, 1.0f, 16.0f);
+		float3 points[8] = {
+			float3(1.0f, 0.0f, 0.0f),
+			float3(0.0f, 1.0f, 0.0f),
+			float3(-1.0f, 0.0f, 0.0f),
+			float3(0.0f, -1.0f, 0.0f),
+			float3(0.70710f, 0.70710f, 0.0f),
+			float3(-0.70710f, -0.70710f, 0.0f),
+			float3(-0.70710f, 0.70710f, 0.0f),
+			float3(0.70710f, -0.70710f, 0.0f)
+		};
+		for (float3 p : points) {
+			float3 offset = rotation * p;
+			dd::line(position + offset, dir*5.0f + position + offset, dd::colors::Yellow);
+		}
+	}
+	break;
+	case LightType::Point:
+	{
+		UpdatePoint(program, position, rotation, scale);
+	}
+	break;
+	case LightType::Spot:
+	{
+		UpdateSpot(program, position, rotation, scale);
+	}
+	break;
+	}
+}
+
+void ComponentLight::UpdateDirectional(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
+{
+	float3 paint_color = color * intensity;
+	glUniform3fv(glGetUniformLocation(program, "directionalColor"), 1, (const float*)&paint_color);
+	float3 light_direction = rotation * float3(0.0f, 0.0f, 1.0f) * -1.0f;
+	glUniform3fv(glGetUniformLocation(program, "directionalDir"), 1, (const float*)&light_direction);
+	//console->AddLog("DIR  X %f  Y %f  Z %f", light_direction.x, light_direction.y, light_direction.z);
+}
+
+void ComponentLight::UpdatePoint(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
+{
+
+}
+
+void ComponentLight::UpdateSpot(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
+{
+
+}
+
 //void ComponentLight::DebugDraw()
 //{
 //	dd::cone(frustum.Pos(), frustum.Front(), dd::colors::White, 0.5f, 0.0f);
 //	dd::frustum(frustum.ViewProjMatrix().Inverted(), dd::colors::Red);
 //}
-//
-//void ComponentLight::printComponentInfo()
-//{
-//	static ImGuiTreeNodeFlags header_flags = ImGuiTreeNodeFlags_DefaultOpen;
-//	if (ImGui::CollapsingHeader("Camera", header_flags))
-//	{
-//		ImGui::DragFloat("Field of View", &field_of_view, 0.1f, 0.1f, 179.0f, "%.1f", 1.0f);
-//		ImGui::Text("\n");
-//		ImGui::DragFloat("Near Plane", &near_distance, 0.05f, 0.0f, FLT_MAX, "%.3f", 1.0f);
-//		ImGui::DragFloat("Far Plane", &far_distance, 0.05f, 0.0f, FLT_MAX, "%.3f", 1.0f);
-//
-//		if (ImGui::Button("Set as Culling"))
-//		{
-//			App->scene->setCameraCulling(this);
-//		}
-//		ImGui::SameLine();
-//		if (ImGui::Button("Place Camera"))
-//		{
-//			App->editorcamera->setCameraAs(frustum);
-//		}
-//		if (ImGui::IsItemHovered())
-//			ImGui::SetTooltip("Sets the editor camera parameters as this camera");
-//	}
-//}
+
+void ComponentLight::printComponentInfo()
+{
+	static ImGuiTreeNodeFlags header_flags = ImGuiTreeNodeFlags_DefaultOpen;
+	if (ImGui::CollapsingHeader("Light", header_flags))
+	{
+		ImGui::ColorEdit3("Color", (float*)&color, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float);
+		ImGui::DragFloat("Intensity", &intensity, 0.05f, 0.0f, FLT_MAX, "%.3f", 1.0f);
+	}
+}

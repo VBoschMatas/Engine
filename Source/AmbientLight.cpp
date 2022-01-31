@@ -19,5 +19,5 @@ void AmbientLight::Update(unsigned int program)
 void AmbientLight::printGameObjectInfo()
 {
 	ImGui::ColorEdit3("Color", (float*)&color, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float);
-	ImGui::SliderFloat("Color strength", &strength, 0.0f, 1.0f);
+	ImGui::DragFloat("Intensity", &strength, 0.05f, 0.0f, FLT_MAX, "%.3f", 1.0f);
 }

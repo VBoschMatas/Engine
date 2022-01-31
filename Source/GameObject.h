@@ -11,7 +11,10 @@ enum class GoType
 	Model,
 	Camera,
 	Text,
-	Light
+	DirectionalLight,
+	PointLight,
+	SpotLight,
+	Cube
 };
 
 class Component;
@@ -28,6 +31,7 @@ public:
 
 	void UpdateTransform();
 	void UpdateBoundingBox();
+	void UpdateLights(unsigned int program);
 	void Update(unsigned int program);
 	void DebugDraw();
 
@@ -87,6 +91,8 @@ private:
 	GameObject* parent;
 	std::vector<GameObject*> children;
 	std::vector<Component*> components;
+
+	void LoadCube();
 
 	unsigned int last_comp_id = 0;
 };

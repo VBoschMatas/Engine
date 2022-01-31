@@ -67,25 +67,39 @@ void ComponentMesh::Draw(unsigned int program, const float3& position, const Qua
 {
 	const float4x4& view = App->editorcamera->getView();
 	const float4x4 proj = App->editorcamera->getProjection();
+	const float3 cam_pos = App->editorcamera->GetPosition();
 	float4x4 model = float4x4::FromTRS(position, rotation, scale);
-
 	glUseProgram(program);
 
+	glUniform3fv(glGetUniformLocation(program, "viewPosition"), 1, (const float*)&cam_pos);
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, (const float*)&model);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, (const float*)&view);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, (const float*)&proj);
 
-	for (unsigned int i = 0; i < 4; ++i)
+	// Material properties
+	glUniform3fv(glGetUniformLocation(program, "material.ambient"), 1, (const float*)&mesh->getMaterial()->ambient);
+	glUniform3fv(glGetUniformLocation(program, "material.diffuse"), 1, (const float*)&mesh->getMaterial()->diffuse);
+	glUniform3fv(glGetUniformLocation(program, "material.specular"), 1, (const float*)&mesh->getMaterial()->specular);
+	glUniform1f(glGetUniformLocation(program, "material.shininess"), mesh->getMaterial()->shininess);
+
+	glUniform1i(glGetUniformLocation(program, "material.diffuse_map"), 0);
+	//glUniform1i(glGetUniformLocation(program, "material.normals_map"), 1);
+	glUniform1i(glGetUniformLocation(program, "material.specular_map"), 1);
+	//glUniform1i(glGetUniformLocation(program, "material.occlusion_map"), 3);
+
+	for (unsigned int i = 0; i < 2; ++i)
 	{
+		std::string map = mesh->getMaterial()->getTexTypes()[i];
+
 		if (mesh->getMaterial()->getTextures()[i] != nullptr)
 		{
 			glActiveTexture(GL_TEXTURE0 + i);
-			glUniform1i(glGetUniformLocation(program, mesh->getMaterial()->getTexTypes()[i]), 0);
 			glBindTexture(GL_TEXTURE_2D, mesh->getMaterial()->getTextures()[i]->id);
 		}
+		std::string has_map = "material.has_" + map+ "_map";
+		glUniform1i(glGetUniformLocation(program, has_map.c_str()), mesh->getMaterial()->getTextures()[i] != nullptr);
 	}
 
-	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(mesh->getVAO());
 	glDrawElements(GL_TRIANGLES, mesh->getIndicesNum(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

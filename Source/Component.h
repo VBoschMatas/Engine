@@ -16,13 +16,14 @@ enum class CompType
 class Component
 {
 public:
-	Component() = default;
+	Component() { id = 0; type = CompType::Transform; };
 	virtual ~Component() = default;
 
 	unsigned int getId() { return id; };
 	CompType getType() { return type; };
 
 	virtual void UpdateTransform(float3& position, Quat& rotation, float3& scale) {};
+	virtual void UpdateLight(unsigned int program, const float3& position, const Quat& rotation, const float3& scale) {};
 	virtual void Update(unsigned int program, const float3 &position, const Quat &rotation, const float3 &scale) {};
 	virtual void DebugDraw() {};
 	virtual void getBoundingBox(math::AABB &bbox) {} ;

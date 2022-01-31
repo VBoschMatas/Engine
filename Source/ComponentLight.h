@@ -12,14 +12,22 @@ class ComponentLight : public Component
 {
 
 public:
-	ComponentLight();
+	ComponentLight(LightType _type);
 	~ComponentLight() = default;
 
-	unsigned int getId() { return id; };
+	void UpdateLight(unsigned int program, const float3& position, const Quat& rotation, const float3& scale) override;
+	void Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale) override;
+
+	void printComponentInfo() override;
 
 	float3 color;
 	LightType Ltype;
 private:
+	void UpdateDirectional(unsigned int program, const float3& position, const Quat& rotation, const float3& scale);
+	void UpdatePoint(unsigned int program, const float3& position, const Quat& rotation, const float3& scale);
+	void UpdateSpot(unsigned int program, const float3& position, const Quat& rotation, const float3& scale);
+
 	unsigned int id;
+	float intensity;
 };
 

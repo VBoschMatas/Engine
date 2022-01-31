@@ -29,6 +29,8 @@ public:
 	bool isDebugDraw() { return debug_draw; };
 	Game_State getGameState() { return game_state; }
 
+	float2 scene_size = float2(0.0f, 0.0f);
+
 private:
 	//Windows
 	bool console_window = true;

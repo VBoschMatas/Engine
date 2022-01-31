@@ -177,12 +177,6 @@ void ModuleRender::GetHardware(char*& vendor, char*& renderer, char*& opengl, ch
 	glew = (char*) glewGetString(GLEW_VERSION);
 }
 
-void ModuleRender::TempLight()
-{
-	glUniform3f(glGetUniformLocation(program, "lightDir"), 0.2f, 0.9f, 0.7f);
-	glUniform3f(glGetUniformLocation(program, "ambientColor"), 1.0f, 1.0f, 1.0f);
-}
-
 void ModuleRender::LoadFrameBuffer()
 {
 	glGenFramebuffers(1, &fbo);

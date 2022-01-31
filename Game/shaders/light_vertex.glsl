@@ -10,10 +10,12 @@ uniform mat4 model;
 
 out vec3 worldNormal;
 out vec2 uv0;
+out vec3 fragPosition;
 
 void main()
 {
 	worldNormal = mat3(transpose(inverse(model))) * normal;
 	gl_Position = proj*view*model*vec4(vertex_position, 1.0);
+	fragPosition = vec3(model * vec4(vertex_position, 1.0));
 	uv0 = vertex_uv0;
 }
