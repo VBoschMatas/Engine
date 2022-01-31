@@ -28,6 +28,11 @@ private:
 	void UpdateSpot(unsigned int program, const float3& position, const Quat& rotation, const float3& scale);
 
 	unsigned int id;
+	float constant;
+	float linear;
+	float quadratic;
 	float intensity;
+	float innerAngle;
+	float outerAngle;
 };
 

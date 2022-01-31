@@ -28,7 +28,6 @@ void ComponentMesh::Update(unsigned int program, const float3& position, const Q
 {
 	if (!render || !visible)
 		return;
-
 	if (selected)
 	{
 		glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -44,21 +43,14 @@ void ComponentMesh::Update(unsigned int program, const float3& position, const Q
 
 	if (!selected)
 		return;
+
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 
 	glDisable(GL_DEPTH_TEST);
-	//Draw(program, position, rotation, scale * 1.02f);
-	//std::vector<math::Triangle> tris = mesh->getTriangles();
-	/*for (math::Triangle const& tri : tris)
-	{
-		dd::line(tri.a, tri.b, dd::colors::Yellow);
-		dd::line(tri.b, tri.c, dd::colors::Yellow);
-		dd::line(tri.c, tri.a, dd::colors::Yellow);
-	}*/
 	Draw(App->program->outline_program, position, rotation, scale*1.02);
 	glStencilMask(0xFF);
-	glStencilFunc(GL_ALWAYS, 0, 0xFF);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -69,6 +61,7 @@ void ComponentMesh::Draw(unsigned int program, const float3& position, const Qua
 	const float4x4 proj = App->editorcamera->getProjection();
 	const float3 cam_pos = App->editorcamera->GetPosition();
 	float4x4 model = float4x4::FromTRS(position, rotation, scale);
+
 	glUseProgram(program);
 
 	glUniform3fv(glGetUniformLocation(program, "viewPosition"), 1, (const float*)&cam_pos);

@@ -72,6 +72,14 @@ public:
 	unsigned int getGoId() { unsigned int temp_id = last_go_id; ++last_go_id; return temp_id; };
 	unsigned int getMeshId() { unsigned int temp_id = last_mesh_id; ++last_mesh_id; return temp_id; };
 	unsigned int getMaterialId() { unsigned int temp_id = last_material_id; ++last_material_id; return temp_id; };
+	unsigned int getCurrentPointLight() { unsigned int temp_id = current_pointlight; ++current_pointlight; return temp_id; }
+	unsigned int getCurrentSpotLight() { unsigned int temp_id = current_spotlight; ++current_spotlight; return temp_id; }
+
+
+	unsigned int last_pointlight_num = 0; // How many lights there are
+	unsigned int current_pointlight = 0; // Current light updating
+	unsigned int last_spotlight_num = 0;
+	unsigned int current_spotlight = 0;
 
 private:
 	unsigned int id;

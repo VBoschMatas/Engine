@@ -138,6 +138,22 @@ public: // Functions that will act on the current scene, used to simplify calls 
 	{
 		Scenes[current_scene]->AmbientLightInfo();
 	}
+	unsigned int getNumPointLights() const
+	{
+		return Scenes[current_scene]->last_pointlight_num;
+	}
+	unsigned int getNumSpotLights() const
+	{
+		return Scenes[current_scene]->last_spotlight_num;
+	}
+	unsigned int getCurrentPointLight() const
+	{
+		return Scenes[current_scene]->getCurrentPointLight();
+	}
+	unsigned int getCurrentSpotLight() const
+	{
+		return Scenes[current_scene]->getCurrentSpotLight();
+	}
 
 	unsigned int getGoId() const { return Scenes[current_scene]->getGoId(); };
 	unsigned int getMeshId() const { return Scenes[current_scene]->getMeshId(); };
