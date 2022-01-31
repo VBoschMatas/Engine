@@ -17,6 +17,7 @@ public:
 
 	void UpdateLight(unsigned int program, const float3& position, const Quat& rotation, const float3& scale) override;
 	void Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale) override;
+	void DebugDraw() override;
 
 	void printComponentInfo() override;
 
@@ -26,6 +27,8 @@ private:
 	void UpdateDirectional(unsigned int program, const float3& position, const Quat& rotation, const float3& scale);
 	void UpdatePoint(unsigned int program, const float3& position, const Quat& rotation, const float3& scale);
 	void UpdateSpot(unsigned int program, const float3& position, const Quat& rotation, const float3& scale);
+
+	bool debug_draw = false;
 
 	unsigned int id;
 	float constant;

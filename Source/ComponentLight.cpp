@@ -51,7 +51,7 @@ void ComponentLight::UpdateLight(unsigned int program, const float3& position, c
 
 void ComponentLight::Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
 {
-	if (!selected)
+	if (!selected && !debug_draw)
 		return;
 
 	switch (Ltype)
@@ -72,7 +72,7 @@ void ComponentLight::Update(unsigned int program, const float3& position, const 
 		};
 		for (float3 p : points) {
 			float3 offset = rotation * p;
-			dd::line(position + offset, dir*5.0f + position + offset, dd::colors::Yellow);
+			dd::line(position + offset, dir*10.0f + position + offset, dd::colors::Yellow);
 		}
 	}
 	break;
@@ -96,10 +96,42 @@ void ComponentLight::Update(unsigned int program, const float3& position, const 
 	break;
 	case LightType::Spot:
 	{
+		//float3 dir = rotation * float3(0.0f, 0.0f, 1.0f);
+		float3 outerPoints[8] = {
+			float3(1.0f * math::Sin(outerAngle * DEGTORAD), 0.0f, 1.0f),
+			float3(0.0f, 1.0f * math::Sin(outerAngle * DEGTORAD), 1.0f),
+			float3(-1.0f * math::Sin(outerAngle * DEGTORAD), 0.0f, 1.0f),
+			float3(0.0f, -1.0f * math::Sin(outerAngle * DEGTORAD), 1.0f),
+			float3(0.70710f * math::Sin(outerAngle * DEGTORAD), 0.70710f * math::Sin(outerAngle * DEGTORAD), 1.0f),
+			float3(-0.70710f * math::Sin(outerAngle * DEGTORAD), -0.70710f * math::Sin(outerAngle * DEGTORAD), 1.0f),
+			float3(-0.70710f * math::Sin(outerAngle * DEGTORAD), 0.70710f * math::Sin(outerAngle * DEGTORAD), 1.0f),
+			float3(0.70710f * math::Sin(outerAngle * DEGTORAD), -0.70710f * math::Sin(outerAngle * DEGTORAD), 1.0f)
+		};
+		float3 innerPoints[8] = {
+			float3(1.0f * math::Sin(innerAngle * DEGTORAD), 0.0f, 1.0f),
+			float3(0.0f, 1.0f * math::Sin(innerAngle * DEGTORAD), 1.0f),
+			float3(-1.0f * math::Sin(innerAngle * DEGTORAD), 0.0f, 1.0f),
+			float3(0.0f, -1.0f * math::Sin(innerAngle * DEGTORAD), 1.0f),
+			float3(0.70710f * math::Sin(innerAngle * DEGTORAD), 0.70710f * math::Sin(innerAngle * DEGTORAD), 1.0f),
+			float3(-0.70710f * math::Sin(innerAngle * DEGTORAD), -0.70710f * math::Sin(innerAngle * DEGTORAD), 1.0f),
+			float3(-0.70710f * math::Sin(innerAngle * DEGTORAD), 0.70710f * math::Sin(innerAngle * DEGTORAD), 1.0f),
+			float3(0.70710f * math::Sin(innerAngle * DEGTORAD), -0.70710f * math::Sin(innerAngle * DEGTORAD), 1.0f)
+		};
 
+		for (int i = 0; i < 8; ++i) {
+			dd::line(position, rotation * outerPoints[i] * 20.0f + position, dd::colors::Yellow);
+			dd::line(position, rotation * innerPoints[i] * 20.0f + position, dd::colors::White);
+		}
 	}
 	break;
 	}
+
+	debug_draw = false;
+}
+
+void ComponentLight::DebugDraw()
+{
+	debug_draw = true;
 }
 
 void ComponentLight::UpdateDirectional(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
@@ -123,7 +155,17 @@ void ComponentLight::UpdatePoint(unsigned int program, const float3& position, c
 
 void ComponentLight::UpdateSpot(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
 {
-
+	std::string spotLight = "spotLights[" + std::to_string(App->scene->getCurrentSpotLight()) + "].";
+	float3 paint_color = color * intensity;
+	glUniform3fv(glGetUniformLocation(program, std::string(spotLight + "color").c_str()), 1, (const float*)&paint_color);
+	glUniform3fv(glGetUniformLocation(program, std::string(spotLight + "position").c_str()), 1, (const float*)&position);
+	float3 light_direction = rotation * float3(0.0f, 0.0f, 1.0f);
+	glUniform3fv(glGetUniformLocation(program, std::string(spotLight + "direction").c_str()), 1, (const float*)&light_direction);
+	glUniform1f(glGetUniformLocation(program, std::string(spotLight + "constant").c_str()), constant);
+	glUniform1f(glGetUniformLocation(program, std::string(spotLight + "linear").c_str()), linear);
+	glUniform1f(glGetUniformLocation(program, std::string(spotLight + "quadratic").c_str()), quadratic);
+	glUniform1f(glGetUniformLocation(program, std::string(spotLight + "cutOff").c_str()), math::Cos(innerAngle * DEGTORAD));
+	glUniform1f(glGetUniformLocation(program, std::string(spotLight + "outerCutOff").c_str()), math::Cos(outerAngle * DEGTORAD));
 }
 
 //void ComponentLight::DebugDraw()

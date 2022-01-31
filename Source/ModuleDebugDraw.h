@@ -22,7 +22,7 @@ public:
 
     void            Draw(const float4x4& view, const float4x4& proj, unsigned width, unsigned height);
 
-    void            CheckRaycast(float3 begin, float3 end, float3 colour = { 255.0f , 255.0f, 0.0f });
+    void            CheckRaycast(float3 begin, float3 end, float3 colour = { 255.0f, 0.0f, 0.0f });
 
     bool check_raycast = false;
 private:
