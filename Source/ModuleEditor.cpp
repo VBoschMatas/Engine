@@ -17,6 +17,7 @@
 #include "imGui/imgui.h"
 #include "imGui/imgui_impl_sdl.h"
 #include "imGui/imgui_impl_opengl3.h"
+#include "ImGuizmo/ImGuizmo.h"
 #include "windows.h"
 #include "debugdraw.h"
 #include "FontAwesome/IconsFontAwesome.h"
@@ -66,6 +67,7 @@ bool ModuleEditor::Init()
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
+
 	return true;
 }
 
@@ -74,6 +76,7 @@ update_status ModuleEditor::PreUpdate()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 
 	MainMenuBar(&showAppDockspace);
 
@@ -190,13 +193,6 @@ void ModuleEditor::MainMenuBar(bool* p_open)
 	}
 
 	ImGui::End();
-}
-
-void ModuleEditor::DockSpace()
-{
-	
-
-
 }
 
 void ModuleEditor::AboutWindow()
