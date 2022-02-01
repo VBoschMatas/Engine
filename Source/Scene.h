@@ -60,7 +60,7 @@ public:
 
 	std::vector<GameObject*> getChildren() { return children; };
 
-	GameObject* getGameObject();
+	GameObject* getGameObject(unsigned int id);
 	std::vector<GameObject*> getGameObjects() { return game_objects; };
 
 	void printHierarchy();

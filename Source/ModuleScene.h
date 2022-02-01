@@ -154,7 +154,10 @@ public: // Functions that will act on the current scene, used to simplify calls 
 	{
 		return Scenes[current_scene]->getCurrentSpotLight();
 	}
-
+	GameObject* getGameObject(unsigned int id) const
+	{
+		return Scenes[current_scene]->getGameObject(id);
+	}
 	unsigned int getGoId() const { return Scenes[current_scene]->getGoId(); };
 	unsigned int getMeshId() const { return Scenes[current_scene]->getMeshId(); };
 	unsigned int getMaterialId() const { return Scenes[current_scene]->getMaterialId(); };

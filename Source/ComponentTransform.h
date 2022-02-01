@@ -29,6 +29,7 @@ public:
 	void setRot(float x, float y, float z, float w);
 	void setSca(float x, float y, float z) { scale[0] = x; scale[1] = y; scale[2] = z; };
 	void setSca(float3 xyz) { setRot(xyz.z, xyz.y, xyz.z); };
+	void setTransform(float4x4 _transform);
 
 private:
 	float position [3];

@@ -19,9 +19,9 @@
 #define DEGTORAD pi / 180.0f
 #define RADTODEG 180.0f / pi
 
-#define MOVE_SPEED 4.0f
+#define MOVE_SPEED 10.0f
 #define ROTATION_SPEED 0.5f
-#define SHIFT_ACCELERATION 2
+#define SHIFT_ACCELERATION 5
 
 ModuleEditorCamera::ModuleEditorCamera()
 {

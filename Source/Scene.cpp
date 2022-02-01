@@ -41,9 +41,10 @@ void Scene::Load()
 
 void Scene::UpdateTransform()
 {
-	for (GameObject* go : children)
+	for (int i = 0; i < children.size(); ++i)
 	{
-		go->UpdateTransform();
+		if (children[i] == nullptr) break;
+		children[i]->UpdateTransform();
 	}
 }
 
@@ -54,9 +55,10 @@ void Scene::UpdateLights(unsigned int program)
 
 	ambient_light.Update(program);
 
-	for (GameObject* go : children)
+	for (int i = 0; i < children.size(); ++i)
 	{
-		go->UpdateLights(program);
+		if (children[i] == nullptr) break;
+		children[i]->UpdateLights(program);
 	}
 
 	glUniform1i(glGetUniformLocation(program, "n_points"), current_pointlight);
@@ -65,9 +67,10 @@ void Scene::UpdateLights(unsigned int program)
 
 void Scene::UpdateBoundingBox()
 {
-	for (GameObject* go : children)
+	for (int i = 0; i < children.size(); ++i)
 	{
-		go->UpdateBoundingBox();
+		if (children[i] == nullptr) break;
+		children[i]->UpdateBoundingBox();
 	}
 }
 
@@ -79,9 +82,10 @@ void Scene::Update(unsigned int program)
 
 	Culling();
 
-	for (GameObject* go : children)
+	for (int i = 0; i < children.size(); ++i)
 	{
-		go->Update(program);
+		if (children[i] == nullptr) break;
+		children[i]->Update(program);
 	}
 }
 
@@ -166,6 +170,15 @@ void Scene::NewTexture(const char* path)
 	AddTexture(tex_hash, texture);
 }
 
+GameObject* Scene::getGameObject(unsigned int id)
+{ 
+	auto it = std::find_if(game_objects.begin(), game_objects.end(), [&id](GameObject* obj) {return obj->getID() == id; });
+	if (it != game_objects.end())
+		return *it;
+	else
+		return nullptr;
+}
+
 void Scene::printHierarchy()
 {
 
@@ -176,10 +189,23 @@ void Scene::printHierarchy()
 
 		static int selection_mask = (1 << 2);
 
-		for (GameObject* go : children)
+		for (int i = 0; i < children.size(); ++i)
 		{
-			go->printHierarchy(base_flags);
+			if (children[i] == nullptr) break;
+			children[i]->printHierarchy(base_flags);
 		}
+
+		/*if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GameObject"))
+			{
+				IM_ASSERT(payload->DataSize == sizeof(GameObject*));
+				GameObject* payload_n = (GameObject*)payload->Data;
+				payload_n->getParent()->removeChild(payload_n);
+				payload_n->setParent(nullptr);
+			}
+			ImGui::EndDragDropTarget();
+		}*/
 
 		if (selected_gameObject != nullptr)
 		{

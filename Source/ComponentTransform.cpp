@@ -53,3 +53,13 @@ float4x4 ComponentTransform::getLocalTransform()
 {
 	return float4x4::FromTRS(getPos(), getRot(), getSca());
 }
+
+void ComponentTransform::setTransform(float4x4 _transform)
+{
+	console->AddLog("POSITION %f  %f  %f", _transform.Row3(0).x, _transform.Row3(0).y, _transform.Row3(0).z);
+	console->AddLog("POSITION %f  %f  %f", _transform.Row3(1).x, _transform.Row3(1).y, _transform.Row3(1).z);
+	console->AddLog("POSITION %f  %f  %f", _transform.Row3(2).x, _transform.Row3(2).y, _transform.Row3(2).z);
+	//setPos(_transform.Row3(0));
+	//setRot(_transform.Row3(1));
+	//setSca(_transform.Row3(2));
+}

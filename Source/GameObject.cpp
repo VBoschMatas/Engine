@@ -136,9 +136,10 @@ void GameObject::UpdateTransform()
 		c->UpdateTransform(position, rotation, scale);
 	}
 
-	for (GameObject* ch : children)
+	for (int i = 0; i < children.size(); ++i)
 	{
-		ch->UpdateTransform();
+		if (children[i] == nullptr) break;
+		children[i]->UpdateTransform();
 	}
 }
 
@@ -150,12 +151,13 @@ void GameObject::UpdateBoundingBox()
 		c->getBoundingBox(local_bbox);
 	}
 
-	for (GameObject* ch : children)
+	for (int i = 0; i < children.size(); ++i)
 	{
-		ch->UpdateBoundingBox();
+		if (children[i] == nullptr) break;
+		children[i]->UpdateBoundingBox();
 		if (!active)
 		{
-			App->scene->RemoveGameObjectFromQuadtree(ch);
+			App->scene->RemoveGameObjectFromQuadtree(children[i]);
 		}
 	}
 
@@ -186,9 +188,10 @@ void GameObject::UpdateLights(unsigned int program)
 		c->UpdateLight(program, position, rotation, scale);
 	}
 
-	for (GameObject* ch : children)
+	for (int i = 0; i < children.size(); ++i)
 	{
-		ch->UpdateLights(program);
+		if (children[i] == nullptr) break;
+		children[i]->UpdateLights(program);
 	}
 }
 
@@ -208,11 +211,12 @@ void GameObject::Update(unsigned int program)
 		c->Update(program, position, rotation, scale);
 	}
 
-	for (GameObject* ch : children)
+	for (int i = 0; i < children.size(); ++i)
 	{
+		if (children[i] == nullptr) break;
 		if(selected)
-			ch->selected = true;
-		ch->Update(program);
+			children[i]->selected = true;
+		children[i]->Update(program);
 	}
 
 	if (active && App->editor->isDebugDraw())
@@ -220,6 +224,23 @@ void GameObject::Update(unsigned int program)
 
 	render = false;
 }
+
+void GameObject::setParent(GameObject* _parent)
+{
+	parent = _parent;
+	if (_parent != nullptr)
+	{
+		_parent->addChild(this);
+		this->Transform()->setPos(this->Transform()->getPos() - _parent->Transform()->getPos());
+		this->Transform()->setRot(this->Transform()->getRot() - _parent->Transform()->getRot());
+		this->Transform()->setSca(this->Transform()->getSca() - _parent->Transform()->getSca());
+	}
+	else
+	{
+
+	}
+}
+
 
 ComponentTransform* GameObject::Transform()
 {
@@ -253,6 +274,9 @@ void GameObject::printGameObjectInfo()
 void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 {
 	ImGuiTreeNodeFlags node_flags = flags;
+
+	ImGui::PushID(this);
+
 	if(selected)
 		node_flags = ImGuiTreeNodeFlags_Selected;
 
@@ -263,11 +287,13 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 		if ((ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) && !ImGui::IsItemToggledOpen())
 			App->scene->setSelectedGameObject(this);
 
+		DragAndDrop();
 		if (is_open)
 		{
-			for (GameObject* go : children)
+			for (int i = 0; i < children.size(); ++i)
 			{
-				go->printHierarchy(flags);
+				if(children[i] != nullptr)
+					children[i]->printHierarchy(flags);
 			}
 
 			ImGui::TreePop();
@@ -281,7 +307,32 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 		if ((ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) && !ImGui::IsItemToggledOpen())
 			App->scene->setSelectedGameObject(this);
 
+		DragAndDrop();
+	}
 
+	ImGui::PopID();
+}
+
+void GameObject::DragAndDrop()
+{
+
+	if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+	{
+		ImGui::SetDragDropPayload("GameObject", &this->id, sizeof(std::intptr_t*));
+		ImGui::Text("%s", this->name.c_str());
+		ImGui::EndDragDropSource();
+	}
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GameObject"))
+		{
+			IM_ASSERT(payload->DataSize == sizeof(std::intptr_t*));
+			GameObject* payload_n = App->scene->getGameObject(*(unsigned int*)payload->Data);
+			payload_n->getParent()->removeChild(payload_n);
+			payload_n->setParent(this);
+			payload_n->Transform()->setTransform(this->Transform()->getWorldTransform());
+		}
+		ImGui::EndDragDropTarget();
 	}
 }
 
