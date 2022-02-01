@@ -66,6 +66,11 @@ Texture ModuleTexture::LoadTexture(const char *path, bool &texture_found)
 	texture_found = ilLoadImage(path);
 	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 
+	std::string path_name(path);
+	std::string file_type = path_name.substr(path_name.find_last_of('.'));
+	if(file_type == ".tif" || file_type == ".tiff" || file_type == ".TIF" || file_type == ".TIFF")
+		iluRotate(180.0f);
+
 	glGenTextures(1, &tex.id);
 	glBindTexture(GL_TEXTURE_2D, tex.id);
 

@@ -17,12 +17,14 @@ Material::Material()
 	id = App->scene->getMaterialId();
 	name = "NewMaterial" + std::to_string(id);
 	textures[1] = nullptr;
-
+	App->scene->AddMaterial(this);
 	ambient = float3(1.0f, 1.0f, 1.0f);
 	diffuse = float3(1.0f, 1.0f, 1.0f);
 	specular = float3(1.0f, 1.0f, 1.0f);
-	shininess = 32.0f;
 
+	metallic = 0.0f;
+	albedo = 1.0f;
+	smoothness = 0.4f;
 	bool temp;
 	default_texture = App->textures->LoadTexture("textures/default.png", temp);
 	textures[0] = &default_texture;
@@ -36,12 +38,14 @@ Material::Material(aiMaterial* material, const char* path)
 	textures[1] = LoadTextures(material, aiTextureType_SPECULAR, path);
 	//textures[2] = LoadTextures(material, aiTextureType_SPECULAR, path);
 	//textures[3] = LoadTextures(material, aiTextureType_LIGHTMAP, path);
-
+	App->scene->AddMaterial(this);
 	ambient = float3(1.0f, 1.0f, 1.0f);
 	diffuse = float3(1.0f, 1.0f, 1.0f);
 	specular = float3(1.0f, 1.0f, 1.0f);
-	shininess = 32.0f;
 
+	metallic = 0.0f;
+	albedo = 1.0f;
+	smoothness = 0.4f;
 	bool temp;
 	default_texture = App->textures->LoadTexture("textures/default.png", temp);
 
@@ -192,12 +196,15 @@ void ComponentMaterial::printComponentInfo()
 	if (ImGui::CollapsingHeader(itemid.c_str(), header_flags))
 	{
 		ImGui::InputText("Name", &material->name[0], 64);
-
+		ImGui::Text("");
 		ImGui::DragFloat3("Ambient", (float*)&material->ambient, 0.005f, 0.0f, +FLT_MAX, "%.3f", 1.0f);
 		ImGui::DragFloat3("Diffuse", (float*)&material->diffuse, 0.005f, 0.0f, +FLT_MAX, "%.3f", 1.0f);
 		ImGui::DragFloat3("Specular", (float*)&material->specular, 0.005f, 0.0f, +FLT_MAX, "%.3f", 1.0f);
-		ImGui::DragFloat("Shininess", &material->shininess, 0.005f, 0.0f, +FLT_MAX, "%.3f", 1.0f);
-
+		ImGui::Text("");
+		ImGui::SliderFloat("Albedo", &material->albedo, 0.0f, 1.0, "%.3f", 1.0f);
+		ImGui::SliderFloat("Metallic", &material->metallic, 0.0f, 1.0, "%.3f", 1.0f);
+		ImGui::SliderFloat("Smoothness", &material->smoothness, 0.0f, 1.0, "%.3f", 1.0f);
+		ImGui::Text("");
 		for (unsigned int i = 0; i < 2; ++i)
 		{
 			std::string sel_name = "##" + std::to_string(this->id) + "," + std::to_string(i);

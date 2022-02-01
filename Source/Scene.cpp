@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Geometry/Frustum.h"
 #include "ModuleEditorCamera.h"
+#include "GL/glew.h"
 #include "Scene.h"
 #include "Model.h"
 
@@ -48,12 +49,18 @@ void Scene::UpdateTransform()
 
 void Scene::UpdateLights(unsigned int program)
 {
+	current_pointlight = 0;
+	current_spotlight = 0;
+
 	ambient_light.Update(program);
 
 	for (GameObject* go : children)
 	{
 		go->UpdateLights(program);
 	}
+
+	glUniform1i(glGetUniformLocation(program, "n_points"), current_pointlight);
+	glUniform1i(glGetUniformLocation(program, "n_spots"), current_spotlight);
 }
 
 void Scene::UpdateBoundingBox()

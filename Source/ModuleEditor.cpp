@@ -23,6 +23,7 @@
 #include "FontAwesome/IconsFontAwesome.h"
 
 #define PRINTFREQ 200
+#define MAX_LIGHTS 8
 
 ModuleEditor::ModuleEditor()
 {
@@ -552,9 +553,9 @@ void ModuleEditor::DebugDrawMenu()
 	ImGui::SameLine();
 	ImGui::Checkbox("Grid", &draw_grid);
 	ImGui::SameLine();
-	ImGui::Checkbox("Debug Draw", &debug_draw);
+	ImGui::Checkbox("Dbg Draw", &debug_draw);
 	ImGui::SameLine();
-	ImGui::Checkbox("Check Raycast", &App->dd->check_raycast);
+	ImGui::Checkbox("Check Click", &App->dd->check_raycast);
 }
 
 void ModuleEditor::HierarchyWindow()
@@ -610,6 +611,18 @@ void ModuleEditor::HierarchyMenu()
 				if (ImGui::MenuItem("Directional"))
 				{
 					GameObject* temp = App->scene->AddGameObject("Directional Light", App->scene->getSelectedGameObject(), GoType::DirectionalLight);
+					if (App->scene->getSelectedGameObject() != nullptr)
+						App->scene->getSelectedGameObject()->addChild(temp);
+				}
+				if (ImGui::MenuItem("Point", "", false, App->scene->getNumPointLights() < MAX_LIGHTS))
+				{
+					GameObject* temp = App->scene->AddGameObject("Point Light", App->scene->getSelectedGameObject(), GoType::PointLight);
+					if (App->scene->getSelectedGameObject() != nullptr)
+						App->scene->getSelectedGameObject()->addChild(temp);
+				}
+				if (ImGui::MenuItem("Spot", "", false, App->scene->getNumSpotLights() < MAX_LIGHTS))
+				{
+					GameObject* temp = App->scene->AddGameObject("Spot Light", App->scene->getSelectedGameObject(), GoType::SpotLight);
 					if (App->scene->getSelectedGameObject() != nullptr)
 						App->scene->getSelectedGameObject()->addChild(temp);
 				}

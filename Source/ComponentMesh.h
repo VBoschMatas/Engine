@@ -18,6 +18,7 @@ public:
 	std::vector<unsigned int> getIndices() { return indices; };
 	std::vector<math::Triangle> getTriangles();
 	Material* getMaterial() { return material_index; };
+	void setMaterial(Material* _material) { material_index = _material; };
 	std::string getName() { return name; };
 	unsigned int getId() { return id; };
 	unsigned int getVAO() { return vao; };
@@ -50,7 +51,7 @@ private:
 class ComponentMesh : public Component
 {
 public:
-	ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id);
+	ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, ComponentMaterial* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id);
 	~ComponentMesh();
 
 	void Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale) override;
@@ -63,9 +64,11 @@ public:
 	unsigned int GetIndices() { return mesh->getIndicesNum(); };
 
 	void printComponentInfo() override;
+	void selectMaterial();
 
 	bool visible;
 
 private:
+	ComponentMaterial* comp_material;
 	Mesh* mesh;
 };

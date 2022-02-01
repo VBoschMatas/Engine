@@ -11,10 +11,11 @@
 
 #include "debugdraw.h"
 
-ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, Material* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id)
+ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, ComponentMaterial* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id)
 {
 	this->id = id;
-	mesh = new Mesh(vertices, indices, material, name, obb_vertices);
+	mesh = new Mesh(vertices, indices, material->getMaterial(), name, obb_vertices);
+	comp_material = material;
 	App->scene->AddMesh(mesh);
 	console->AddLog("NUMBER OF Indices: %d", indices.size());
 	type = CompType::Mesh;
@@ -28,7 +29,6 @@ void ComponentMesh::Update(unsigned int program, const float3& position, const Q
 {
 	if (!render || !visible)
 		return;
-
 	if (selected)
 	{
 		glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -44,21 +44,14 @@ void ComponentMesh::Update(unsigned int program, const float3& position, const Q
 
 	if (!selected)
 		return;
+
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 
 	glDisable(GL_DEPTH_TEST);
-	//Draw(program, position, rotation, scale * 1.02f);
-	//std::vector<math::Triangle> tris = mesh->getTriangles();
-	/*for (math::Triangle const& tri : tris)
-	{
-		dd::line(tri.a, tri.b, dd::colors::Yellow);
-		dd::line(tri.b, tri.c, dd::colors::Yellow);
-		dd::line(tri.c, tri.a, dd::colors::Yellow);
-	}*/
 	Draw(App->program->outline_program, position, rotation, scale*1.02);
 	glStencilMask(0xFF);
-	glStencilFunc(GL_ALWAYS, 0, 0xFF);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -69,6 +62,7 @@ void ComponentMesh::Draw(unsigned int program, const float3& position, const Qua
 	const float4x4 proj = App->editorcamera->getProjection();
 	const float3 cam_pos = App->editorcamera->GetPosition();
 	float4x4 model = float4x4::FromTRS(position, rotation, scale);
+
 	glUseProgram(program);
 
 	glUniform3fv(glGetUniformLocation(program, "viewPosition"), 1, (const float*)&cam_pos);
@@ -80,7 +74,10 @@ void ComponentMesh::Draw(unsigned int program, const float3& position, const Qua
 	glUniform3fv(glGetUniformLocation(program, "material.ambient"), 1, (const float*)&mesh->getMaterial()->ambient);
 	glUniform3fv(glGetUniformLocation(program, "material.diffuse"), 1, (const float*)&mesh->getMaterial()->diffuse);
 	glUniform3fv(glGetUniformLocation(program, "material.specular"), 1, (const float*)&mesh->getMaterial()->specular);
-	glUniform1f(glGetUniformLocation(program, "material.shininess"), mesh->getMaterial()->shininess);
+
+	glUniform1f(glGetUniformLocation(program, "material.metallic"), mesh->getMaterial()->metallic);
+	glUniform1f(glGetUniformLocation(program, "material.albedo"), mesh->getMaterial()->albedo);
+	glUniform1f(glGetUniformLocation(program, "material.smoothness"), mesh->getMaterial()->smoothness);
 
 	glUniform1i(glGetUniformLocation(program, "material.diffuse_map"), 0);
 	//glUniform1i(glGetUniformLocation(program, "material.normals_map"), 1);
@@ -124,7 +121,50 @@ void ComponentMesh::printComponentInfo()
 		ImGui::TextColored(yellow_colour, "Using material: "); ImGui::SameLine();
 		ImGui::Text(mesh->getMaterial()->name.c_str());
 
+		if (ImGui::Button(std::string("Select Material" + itemid).c_str()))
+		{
+			if (!ImGui::IsPopupOpen(std::string("Select Material" + itemid).c_str()))
+				ImGui::OpenPopup(std::string("Select Material" + itemid).c_str());
+			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		}
+		selectMaterial();
+		ImGui::SameLine();
+		if (ImGui::Button(std::string("New Material" + itemid).c_str()))
+		{
+			//material->RemoveTexture(i);
+		}
 		ImGui::Checkbox(std::string("Visible" + itemid).c_str(), &visible);
+	}
+}
+
+void ComponentMesh::selectMaterial()
+{
+	std::string sel_name = "Select Material##" + std::to_string(this->id);
+	if (ImGui::BeginPopupModal(sel_name.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Select one of the scene's materials.");
+		if (ImGui::BeginChildFrame(ImGui::GetID("frame"), ImVec2(-FLT_MIN, 250)))
+		{
+			std::vector<Material*> temp_materials = App->scene->GetMaterials();
+			for (Material* const &t : temp_materials)
+			{
+				std::string itemid = t->name + "##" + std::to_string(t->getId());
+				if (ImGui::Selectable(itemid.c_str(), false, 0, ImVec2(0, 40))) {
+					mesh->setMaterial(t);
+					comp_material->setMaterial(t);
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::EndChildFrame();
+		}
+
+		ImVec2 button_size(ImGui::GetFontSize() * 7.0f, 0.0f);
+		if (ImGui::Button("Cancel", button_size))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
 	}
 }
 

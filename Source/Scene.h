@@ -33,7 +33,12 @@ public:
 	GameObject* AddGameObject(const std::string file_name, GoType type = GoType::Empty);
 	GameObject* AddGameObject(const std::string file_name, GameObject* parent, GoType type = GoType::Empty);
 	void AddGameObjectIntoQuadtree(GameObject* gameobject);
-	void RemoveGameObject(GameObject* gameobj) { game_objects.erase(std::find(game_objects.begin(), game_objects.end(), gameobj)); delete(gameobj); };
+	void RemoveGameObject(GameObject* gameobj)
+	{
+		game_objects.erase(std::find(game_objects.begin(), game_objects.end(), gameobj));
+		children.erase(std::find(children.begin(), children.end(), gameobj));
+		delete(gameobj);
+	}
 	void RemoveGameObjectFromQuadtree(GameObject* gameobj);
 
 	void AddMesh(Mesh* _mesh) { meshes.push_back(_mesh); };
@@ -72,6 +77,14 @@ public:
 	unsigned int getGoId() { unsigned int temp_id = last_go_id; ++last_go_id; return temp_id; };
 	unsigned int getMeshId() { unsigned int temp_id = last_mesh_id; ++last_mesh_id; return temp_id; };
 	unsigned int getMaterialId() { unsigned int temp_id = last_material_id; ++last_material_id; return temp_id; };
+	unsigned int getCurrentPointLight() { unsigned int temp_id = current_pointlight; ++current_pointlight; return temp_id; }
+	unsigned int getCurrentSpotLight() { unsigned int temp_id = current_spotlight; ++current_spotlight; return temp_id; }
+
+
+	unsigned int last_pointlight_num = 0; // How many lights there are
+	unsigned int current_pointlight = 0; // Current light updating
+	unsigned int last_spotlight_num = 0;
+	unsigned int current_spotlight = 0;
 
 private:
 	unsigned int id;

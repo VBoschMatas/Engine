@@ -9,6 +9,8 @@ AmbientLight::AmbientLight()
 
 void AmbientLight::Update(unsigned int program)
 {
+	glUseProgram(program);
+
 	glUniform3fv(glGetUniformLocation(program, "ambientColor"), 1, (const float*)&color);
 	glUniform1f(glGetUniformLocation(program, "ambientStrength"), strength);
 }
