@@ -195,17 +195,21 @@ void Scene::printHierarchy()
 			children[i]->printHierarchy(base_flags);
 		}
 
-		/*if (ImGui::BeginDragDropTarget())
+		if (ImGui::BeginDragDropTarget())
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GameObject"))
+			console->AddLog("BRUG");
+			/*if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GameObject"))
 			{
 				IM_ASSERT(payload->DataSize == sizeof(GameObject*));
 				GameObject* payload_n = (GameObject*)payload->Data;
-				payload_n->getParent()->removeChild(payload_n);
+				if (payload_n->getParent() == nullptr)
+					payload_n->getParent()->removeChild(payload_n);
+				else
+					this->removeChild(payload_n);
 				payload_n->setParent(nullptr);
-			}
+			}*/
 			ImGui::EndDragDropTarget();
-		}*/
+		}
 
 		if (selected_gameObject != nullptr)
 		{

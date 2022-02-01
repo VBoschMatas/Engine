@@ -56,10 +56,25 @@ float4x4 ComponentTransform::getLocalTransform()
 
 void ComponentTransform::setTransform(float4x4 _transform)
 {
-	console->AddLog("POSITION %f  %f  %f", _transform.Row3(0).x, _transform.Row3(0).y, _transform.Row3(0).z);
-	console->AddLog("POSITION %f  %f  %f", _transform.Row3(1).x, _transform.Row3(1).y, _transform.Row3(1).z);
-	console->AddLog("POSITION %f  %f  %f", _transform.Row3(2).x, _transform.Row3(2).y, _transform.Row3(2).z);
-	//setPos(_transform.Row3(0));
-	//setRot(_transform.Row3(1));
-	//setSca(_transform.Row3(2));
+	setPos(_transform[0][3], _transform[1][3], _transform[2][3]);
+
+	Quat q;
+	q.w = math::Sqrt(math::Max(0.0f, 1.0f + _transform[0][0] + _transform[1][1] + _transform[2][2])) / 2.0f;
+	q.x = math::Sqrt(math::Max(0.0f, 1.0f + _transform[0][0] - _transform[1][1] - _transform[2][2])) / 2.0f;
+	q.y = math::Sqrt(math::Max(0.0f, 1.0f - _transform[0][0] + _transform[1][1] - _transform[2][2])) / 2.0f;
+	q.z = math::Sqrt(math::Max(0.0f, 1.0f - _transform[0][0] - _transform[1][1] + _transform[2][2])) / 2.0f;
+	q.x *= math::Sign(q.x * (_transform[2][1] - _transform[1][2]));
+	q.y *= math::Sign(q.y * (_transform[0][2] - _transform[2][0]));
+	q.z *= math::Sign(q.z * (_transform[1][0] - _transform[0][1]));
+	setRot(q.ToEulerXYZ() * RADTODEG);
+	setSca(_transform[0][0], _transform[1][1], _transform[2][2]);
+
+	//console->AddLog("POSITION %f  %f  %f", _transform.Col3(3).x, _transform.Col3(3).y, _transform.Col3(3).z);
+	//console->AddLog("ROTATION %f  %f  %f", q.ToEulerXYZ().x * RADTODEG, q.ToEulerXYZ().y * RADTODEG, q.ToEulerXYZ().z * RADTODEG);
+	//console->AddLog("SCALE %f  %f  %f", _transform[0][0], _transform[1][1], _transform[2][2]);
+
+	console->AddLog("%f  %f  %f  %f", _transform[0][0], _transform[0][1], _transform[0][2], _transform[0][3]);
+	console->AddLog("%f  %f  %f  %f", _transform[1][0], _transform[1][1], _transform[1][2], _transform[1][3]);
+	console->AddLog("%f  %f  %f  %f", _transform[2][0], _transform[2][1], _transform[2][2], _transform[2][3]);
+	console->AddLog("%f  %f  %f  %f", _transform[3][0], _transform[3][1], _transform[3][2], _transform[3][3]);
 }

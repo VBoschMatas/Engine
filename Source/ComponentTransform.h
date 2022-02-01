@@ -23,12 +23,12 @@ public:
 	float4x4 getLocalTransform();
 
 	void setPos(float x, float y, float z) { position[0] = x; position[1] = y; position[2] = z; };
-	void setPos(float3 xyz) { setPos(xyz.z, xyz.y, xyz.z); };
+	void setPos(float3 xyz) { setPos(xyz.x, xyz.y, xyz.z); };
 	void setRot(float x, float y, float z) { rotation[0] = x; rotation[1] = y; rotation[2] = z; };
-	void setRot(float3 xyz) { setRot(xyz.z, xyz.y, xyz.z); };
+	void setRot(float3 xyz) { setRot(xyz.x, xyz.y, xyz.z); };
 	void setRot(float x, float y, float z, float w);
 	void setSca(float x, float y, float z) { scale[0] = x; scale[1] = y; scale[2] = z; };
-	void setSca(float3 xyz) { setRot(xyz.z, xyz.y, xyz.z); };
+	void setSca(float3 xyz) { setSca(xyz.x, xyz.y, xyz.z); };
 	void setTransform(float4x4 _transform);
 
 private:

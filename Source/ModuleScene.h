@@ -105,7 +105,14 @@ public: // Functions that will act on the current scene, used to simplify calls 
 	{ 
 		return  Scenes[current_scene]->getChildren(); 
 	};
-	GameObject* getGameObject();
+	void addChild(GameObject* _gameobject) const
+	{
+		Scenes[current_scene]->addChild(_gameobject);
+	};
+	void removeChild(const GameObject* _gameobject)const
+	{
+		Scenes[current_scene]->removeChild(_gameobject);
+	};
 	GameObject* getSelectedGameObject() const
 	{
 		return  Scenes[current_scene]->selected_gameObject;

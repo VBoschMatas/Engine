@@ -9,8 +9,12 @@
 #include "ModuleEditor.h"
 #include "ModuleEditorCamera.h"
 #include "MathGeoLib.h"
+#include "Math/float3.h"
 #include "Math/float4x4.h"
 #include "debugdraw.h"
+
+#define RADTODEG 180/math::pi
+#define DEGTORAD math::pi/180
 
 GameObject::GameObject(unsigned int _id, GameObject* _parent)
 {
@@ -228,16 +232,21 @@ void GameObject::Update(unsigned int program)
 void GameObject::setParent(GameObject* _parent)
 {
 	parent = _parent;
-	if (_parent != nullptr)
+	if (parent != nullptr)
 	{
-		_parent->addChild(this);
-		this->Transform()->setPos(this->Transform()->getPos() - _parent->Transform()->getPos());
-		this->Transform()->setRot(this->Transform()->getRot() - _parent->Transform()->getRot());
-		this->Transform()->setSca(this->Transform()->getSca() - _parent->Transform()->getSca());
+		parent->addChild(this);
+		this->Transform()->setPos(this->Transform()->getWorldPos() - parent->Transform()->getWorldPos());
+		this->Transform()->setRot(this->Transform()->getWorldRot().ToEulerXYZ()*RADTODEG - parent->Transform()->getWorldRot().ToEulerXYZ() * RADTODEG);
+		float3 temp = this->Transform()->getWorldSca().Div(parent->Transform()->getWorldSca());
+		this->Transform()->setSca(temp);
 	}
 	else
 	{
-
+		App->scene->addChild(this);
+		this->Transform()->setPos(this->Transform()->getWorldPos() - parent->Transform()->getWorldPos());
+		this->Transform()->setRot(this->Transform()->getWorldRot().ToEulerXYZ() * RADTODEG - parent->Transform()->getWorldRot().ToEulerXYZ() * RADTODEG);
+		float3 temp = this->Transform()->getWorldSca().Div(parent->Transform()->getWorldSca());
+		this->Transform()->setSca(temp);
 	}
 }
 
@@ -328,9 +337,12 @@ void GameObject::DragAndDrop()
 		{
 			IM_ASSERT(payload->DataSize == sizeof(std::intptr_t*));
 			GameObject* payload_n = App->scene->getGameObject(*(unsigned int*)payload->Data);
-			payload_n->getParent()->removeChild(payload_n);
+			if (payload_n->getParent() != nullptr)
+				payload_n->getParent()->removeChild(payload_n);
+			else
+				App->scene->removeChild(payload_n);
 			payload_n->setParent(this);
-			payload_n->Transform()->setTransform(this->Transform()->getWorldTransform());
+			//payload_n->Transform()->setTransform(this->Transform()->getWorldTransform());
 		}
 		ImGui::EndDragDropTarget();
 	}

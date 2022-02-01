@@ -59,6 +59,11 @@ public:
 	void RemoveTexture(unsigned int id);
 
 	std::vector<GameObject*> getChildren() { return children; };
+	void addChild(GameObject* _gameobject) { children.push_back(_gameobject); };
+	void removeChild(const GameObject* _gameobject)
+	{
+		children.erase(std::find(children.begin(), children.end(), _gameobject));
+	}
 
 	GameObject* getGameObject(unsigned int id);
 	std::vector<GameObject*> getGameObjects() { return game_objects; };
