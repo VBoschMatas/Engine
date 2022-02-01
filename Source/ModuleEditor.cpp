@@ -421,7 +421,6 @@ void ModuleEditor::SceneWindow()
 	}
 	ImGui::EndChild();
 
-	//we are done working with this window
 	ImGui::End();
 }
 
@@ -437,8 +436,8 @@ void ModuleEditor::SceneMenuBar()
 		DebugDrawMenu();
 		ImGui::NextColumn();
 		ImGui::Columns(1);
-		ImGui::EndChild();
 	}
+	ImGui::EndChild();
 }
 
 void ModuleEditor::GuizmosMenu()
