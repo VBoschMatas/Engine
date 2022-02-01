@@ -71,7 +71,6 @@ std::vector<GameObject*> Model::Load(const std::string &file_name, GameObject* r
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 	{
 		Material* material = new Material(scene->mMaterials[i], directory.c_str());
-		App->scene->AddMaterial(material);
 	}
 
 
@@ -196,7 +195,7 @@ std::pair<ComponentMesh*, ComponentMaterial*> Model::LoadMeshes(const aiMesh* me
 	}
 
 	ComponentMaterial* material = new ComponentMaterial(mesh, material_offset, goParent->getCompId());
-	ComponentMesh* c_mesh = new ComponentMesh(vertices, indices, material->getMaterial(), mesh->mName.C_Str(), comb_vertices, goParent->getCompId());
+	ComponentMesh* c_mesh = new ComponentMesh(vertices, indices, material, mesh->mName.C_Str(), comb_vertices, goParent->getCompId());
 
 	return std::pair<ComponentMesh*, ComponentMaterial*>(c_mesh ,material);
 }

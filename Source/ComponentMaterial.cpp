@@ -17,7 +17,7 @@ Material::Material()
 	id = App->scene->getMaterialId();
 	name = "NewMaterial" + std::to_string(id);
 	textures[1] = nullptr;
-
+	App->scene->AddMaterial(this);
 	ambient = float3(1.0f, 1.0f, 1.0f);
 	diffuse = float3(1.0f, 1.0f, 1.0f);
 	specular = float3(1.0f, 1.0f, 1.0f);
@@ -38,7 +38,7 @@ Material::Material(aiMaterial* material, const char* path)
 	textures[1] = LoadTextures(material, aiTextureType_SPECULAR, path);
 	//textures[2] = LoadTextures(material, aiTextureType_SPECULAR, path);
 	//textures[3] = LoadTextures(material, aiTextureType_LIGHTMAP, path);
-
+	App->scene->AddMaterial(this);
 	ambient = float3(1.0f, 1.0f, 1.0f);
 	diffuse = float3(1.0f, 1.0f, 1.0f);
 	specular = float3(1.0f, 1.0f, 1.0f);

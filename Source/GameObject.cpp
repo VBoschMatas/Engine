@@ -506,7 +506,7 @@ void GameObject::LoadCube()
 	}
 	ComponentMaterial* material = new ComponentMaterial(nullptr, 0, this->getCompId());
 	material->setMaterial(new Material());
-	ComponentMesh* c_mesh = new ComponentMesh(vertices, indices, material->getMaterial(), "Cube", comb_vertices, this->getCompId());
+	ComponentMesh* c_mesh = new ComponentMesh(vertices, indices, material, "Cube", comb_vertices, this->getCompId());
 
 	components.push_back(material);
 	components.push_back(c_mesh);
