@@ -28,7 +28,10 @@ public:
 	float3 ambient;
 	float3 diffuse;
 	float3 specular;
-	float shininess;
+
+	float metallic;
+	float albedo;
+	float smoothness;
 private:
 	unsigned int id;
 	//Texture* textures[4] = { nullptr, nullptr, nullptr, nullptr };

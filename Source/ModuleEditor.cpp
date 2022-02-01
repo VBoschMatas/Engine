@@ -557,9 +557,9 @@ void ModuleEditor::DebugDrawMenu()
 	ImGui::SameLine();
 	ImGui::Checkbox("Grid", &draw_grid);
 	ImGui::SameLine();
-	ImGui::Checkbox("Debug Draw", &debug_draw);
+	ImGui::Checkbox("Dbg Draw", &debug_draw);
 	ImGui::SameLine();
-	ImGui::Checkbox("Check Raycast", &App->dd->check_raycast);
+	ImGui::Checkbox("Check Click", &App->dd->check_raycast);
 }
 
 void ModuleEditor::HierarchyWindow()

@@ -73,7 +73,10 @@ void ComponentMesh::Draw(unsigned int program, const float3& position, const Qua
 	glUniform3fv(glGetUniformLocation(program, "material.ambient"), 1, (const float*)&mesh->getMaterial()->ambient);
 	glUniform3fv(glGetUniformLocation(program, "material.diffuse"), 1, (const float*)&mesh->getMaterial()->diffuse);
 	glUniform3fv(glGetUniformLocation(program, "material.specular"), 1, (const float*)&mesh->getMaterial()->specular);
-	glUniform1f(glGetUniformLocation(program, "material.shininess"), mesh->getMaterial()->shininess);
+
+	glUniform1f(glGetUniformLocation(program, "material.metallic"), mesh->getMaterial()->metallic);
+	glUniform1f(glGetUniformLocation(program, "material.albedo"), mesh->getMaterial()->albedo);
+	glUniform1f(glGetUniformLocation(program, "material.smoothness"), mesh->getMaterial()->smoothness);
 
 	glUniform1i(glGetUniformLocation(program, "material.diffuse_map"), 0);
 	//glUniform1i(glGetUniformLocation(program, "material.normals_map"), 1);

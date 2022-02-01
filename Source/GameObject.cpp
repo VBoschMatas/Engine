@@ -23,15 +23,15 @@ GameObject::GameObject(unsigned int _id, GameObject* _parent)
 
 GameObject::~GameObject()
 {
-	if (App->scene->getSelectedGameObject() == this)
-		App->scene->setSelectedGameObject(nullptr);
-	parent->removeChild(this);
 	App->scene->RemoveGameObjectFromQuadtree(this);
-	App->scene->RemoveGameObject(this);
 	for (GameObject* ch : children)
 		delete(ch);
 	for (Component* c : components)
 		delete(c);
+	if (parent != nullptr)
+		parent->removeChild(this);
+	if (App->scene->getSelectedGameObject() == this)
+		App->scene->setSelectedGameObject(nullptr);
 }
 
 void GameObject::Load(const std::string &file_name, GoType _type)
@@ -153,6 +153,10 @@ void GameObject::UpdateBoundingBox()
 	for (GameObject* ch : children)
 	{
 		ch->UpdateBoundingBox();
+		if (!active)
+		{
+			App->scene->RemoveGameObjectFromQuadtree(ch);
+		}
 	}
 
 	// Bounding box Transform
@@ -164,7 +168,6 @@ void GameObject::UpdateBoundingBox()
 
 	if (!active)
 	{
-		//world_bbox.SetNegativeInfinity();
 		App->scene->RemoveGameObjectFromQuadtree(this);
 		return;
 	}
@@ -257,7 +260,7 @@ void GameObject::printHierarchy(ImGuiTreeNodeFlags flags)
 	{
 		bool is_open = ImGui::TreeNodeEx((void*)this, node_flags, name.c_str());
 
-		if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen())
+		if ((ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) && !ImGui::IsItemToggledOpen())
 			App->scene->setSelectedGameObject(this);
 
 		if (is_open)
