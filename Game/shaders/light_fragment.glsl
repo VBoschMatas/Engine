@@ -123,7 +123,8 @@ void main()
 	Lo += CalcAmbient();
 
 	final_color = vec4(Lo, 1.0);
-	final_color.rgb = pow(final_color.rgb, vec3(1/2.2));  // We apply gamma correction
+	final_color.rgb = final_color.rgb / (final_color.rgb + vec3(1.0));
+	final_color.rgb = pow(final_color.rgb, vec3(1.0/2.2)); 
 } 
 
 vec3 CalcDirLight(DirLight light, vec3 N, vec3 V, vec3 f0, vec3 viewDir, vec3 diffuseColor, vec3 specularColor, float smoothness)
