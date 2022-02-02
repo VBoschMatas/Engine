@@ -41,6 +41,10 @@ ModuleEditor::~ModuleEditor()
 bool ModuleEditor::Init()
 {
 
+	//set inital Gizmo modes
+	transform_op = ImGuizmo::OPERATION::TRANSLATE;
+	gizmoMode = ImGuizmo::MODE::WORLD;
+
 	char buffer[MAX_PATH];
 	_getcwd(buffer, MAX_PATH);
 
@@ -110,6 +114,7 @@ update_status ModuleEditor::Update()
 	//ImGui::ShowDemoWindow();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 
 	return UPDATE_CONTINUE;
 }
@@ -420,22 +425,26 @@ void ModuleEditor::SceneWindow()
 		ImGui::Image((ImTextureID)App->renderer->GetFBTexture(), windowSize, ImVec2(0, 1), ImVec2(1, 0));
 
 		//DrawGuizmo(camera);
-
 		//Gizmo stuff
+
 		GameObject* selected = App->scene->getSelectedGameObject();
 		if (selected) {
-			ImGuizmo::Enable(true);
 			ImGuizmo::SetOrthographic(false); //temp
 			ImGuizmo::SetDrawlist();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowSize.x, windowSize.y);
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
 			float4x4 cameraView = App->editorcamera->getView().Transposed();
 			float4x4 cameraProjection = App->editorcamera->getProjection().Transposed();
 
 			ComponentTransform* transformComponent = selected->Transform();
 			float4x4 transformMatrix = transformComponent->getLocalTransform().Transposed();
-			
-			ImGuizmo::Manipulate(cameraView.ptr(), cameraProjection.ptr(), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::LOCAL, transformMatrix.ptr());
+
+			ImGuizmo::Manipulate(cameraView.ptr(), cameraProjection.ptr(), transform_op, gizmoMode, transformMatrix.ptr());
+
+			if (ImGuizmo::IsUsing() || ImGuizmo::IsOver()) {
+				transformComponent->setTransform(transformMatrix);
+			}
+
 		}
 
 	}

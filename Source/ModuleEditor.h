@@ -12,12 +12,6 @@ enum class Window_Type : unsigned int
 	MAX
 };
 
-enum OPERATION
-{
-	TRANSLATE,
-	ROTATE,
-	SCALE
-};
 enum MODE
 {
 	LOCAL,
@@ -61,7 +55,7 @@ private:
 
 	Game_State game_state = Game_State::STOP;
 
-	OPERATION operation = OPERATION::TRANSLATE;
+	ImGuizmo::MODE gizmoMode;
 
 	std::vector<float> ms;
 	std::vector<float> fps;
