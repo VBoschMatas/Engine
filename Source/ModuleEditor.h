@@ -2,6 +2,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "ImGuizmo.h"
+#include "GameObject.h"
 
 enum class Window_Type : unsigned int
 {
@@ -9,6 +10,18 @@ enum class Window_Type : unsigned int
 	About,
 	Config,
 	MAX
+};
+
+enum OPERATION
+{
+	TRANSLATE,
+	ROTATE,
+	SCALE
+};
+enum MODE
+{
+	LOCAL,
+	WORLD
 };
 
 
@@ -32,6 +45,7 @@ public:
 	float2 scene_size = float2(0.0f, 0.0f);
 
 private:
+
 	//Windows
 	bool console_window = true;
 	bool about_window = false;
@@ -46,6 +60,8 @@ private:
 	bool debug_draw = false;
 
 	Game_State game_state = Game_State::STOP;
+
+	OPERATION operation = OPERATION::TRANSLATE;
 
 	std::vector<float> ms;
 	std::vector<float> fps;

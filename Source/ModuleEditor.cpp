@@ -8,6 +8,7 @@
 #include "ModuleScene.h"
 #include "Model.h"
 #include "ComponentMesh.h"
+#include "ComponentTransform.h"
 #include <iostream>
 #include <fstream>
 #include <direct.h>
@@ -22,6 +23,7 @@
 #include "windows.h"
 #include "debugdraw.h"
 #include "FontAwesome/IconsFontAwesome.h"
+#include <vector>
 
 #define PRINTFREQ 200
 #define MAX_LIGHTS 8
@@ -418,6 +420,23 @@ void ModuleEditor::SceneWindow()
 		ImGui::Image((ImTextureID)App->renderer->GetFBTexture(), windowSize, ImVec2(0, 1), ImVec2(1, 0));
 
 		//DrawGuizmo(camera);
+
+		//Gizmo stuff
+		GameObject* selected = App->scene->getSelectedGameObject();
+		if (selected) {
+			ImGuizmo::Enable(true);
+			ImGuizmo::SetOrthographic(false); //temp
+			ImGuizmo::SetDrawlist();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowSize.x, windowSize.y);
+
+			float4x4 cameraView = App->editorcamera->getView().Transposed();
+			float4x4 cameraProjection = App->editorcamera->getProjection().Transposed();
+
+			ComponentTransform* transformComponent = selected->Transform();
+			float4x4 transformMatrix = transformComponent->getLocalTransform().Transposed();
+			
+			ImGuizmo::Manipulate(cameraView.ptr(), cameraProjection.ptr(), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::LOCAL, transformMatrix.ptr());
+		}
 
 	}
 	ImGui::EndChild();
