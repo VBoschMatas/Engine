@@ -1,9 +1,10 @@
 #include "AmbientLight.h"
 #include "GL/glew.h"
+#include "Archive.h"
 
 AmbientLight::AmbientLight()
 {
-	color = float3(1.0f, 0.4f, 0.4f);
+	color = float3(1.0f, 0.0f, 1.0f);
 	strength = 0.4f;
 }
 
@@ -22,4 +23,10 @@ void AmbientLight::printGameObjectInfo()
 {
 	ImGui::ColorEdit3("Color", (float*)&color, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float);
 	ImGui::DragFloat("Intensity", &strength, 0.05f, 0.0f, FLT_MAX, "%.3f", 1.0f);
+}
+
+void AmbientLight::Save(Archive* archive)
+{
+	archive->json["AmbientLight"]["Color"] = { color.x, color.y, color.z };
+	archive->json["AmbientLight"]["Strength"] = strength;
 }

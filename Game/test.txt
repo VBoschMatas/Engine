@@ -1,0 +1,1 @@
+{"ID":0,"LastGO":0,"LastMat":0,"LastMesh":0,"Name":"Scene name","children":{"ID":[0],"Name":["Hola"]}}

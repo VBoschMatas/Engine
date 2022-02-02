@@ -12,6 +12,7 @@
 #include "Math/float3.h"
 #include "Math/float4x4.h"
 #include "debugdraw.h"
+#include "Archive.h"
 
 #define RADTODEG 180/math::pi
 #define DEGTORAD math::pi/180
@@ -19,6 +20,8 @@
 GameObject::GameObject(unsigned int _id, GameObject* _parent)
 {
 	id = _id;
+	math::LCG math;
+	uuid = math.Int();
 	name = "EmptyObject";
 	parent = _parent;
 	selected = false;
@@ -69,21 +72,21 @@ void GameObject::Load(const std::string &file_name, GoType _type)
 	break;
 	case GoType::DirectionalLight:
 	{
-		name = "Light";
+		name = "Directional Light";
 		ComponentLight* light = new ComponentLight(LightType::Directional);
 		components.push_back(light);
 	}
 	break;
 	case GoType::PointLight:
 	{
-		name = "Light";
+		name = "Point Light";
 		ComponentLight* light = new ComponentLight(LightType::Point);
 		components.push_back(light);
 	}
 	break;
 	case GoType::SpotLight:
 	{
-		name = "Light";
+		name = "Spot Light";
 		ComponentLight* light = new ComponentLight(LightType::Spot);
 		components.push_back(light);
 	}
@@ -351,16 +354,13 @@ void GameObject::DragAndDrop()
 
 void GameObject::DebugDraw()
 {
-	for (Component* c : components)
-	{
-		float3 extreme_points[8];
-		world_bbox.GetCornerPoints(&extreme_points[0]);
-		std::swap(extreme_points[2], extreme_points[5]);
-		std::swap(extreme_points[3], extreme_points[4]);
-		std::swap(extreme_points[4], extreme_points[5]);
-		std::swap(extreme_points[6], extreme_points[7]);
-		dd::box(extreme_points, dd::colors::White);
-	}
+	float3 extreme_points[8];
+	world_bbox.GetCornerPoints(&extreme_points[0]);
+	std::swap(extreme_points[2], extreme_points[5]);
+	std::swap(extreme_points[3], extreme_points[4]);
+	std::swap(extreme_points[4], extreme_points[5]);
+	std::swap(extreme_points[6], extreme_points[7]);
+	dd::box(extreme_points, dd::colors::White);
 
 	for (Component* c : components)
 	{
@@ -394,6 +394,35 @@ std::vector<math::Triangle> GameObject::getTriangles()
 		tris.insert(tris.end(), tris_aux.begin(), tris_aux.end());
 	}
 	return tris;
+}
+
+void GameObject::Save(Archive* archive)
+{
+	archive->json["Children"] += uuid;
+
+	Archive* go_archive = new Archive();
+	go_archive->json = {
+		{"Name", this->name.c_str()},
+		{"UUID", uuid},
+		{"Translation", {Transform()->getPos().x, Transform()->getPos().y, Transform()->getPos().z}},
+		{"Rotation", {Transform()->getRot().x, Transform()->getRot().y, Transform()->getRot().z, Transform()->getRot().w}},
+		{"Scale", {Transform()->getSca().x, Transform()->getSca().y, Transform()->getSca().z}}
+	};
+	if (parent != nullptr) go_archive->json["Parent"] = parent->uuid;
+	else go_archive->json["Parent"] = 0;
+
+	for (Component* c : components)
+	{
+		c->Save(go_archive);
+	}
+
+	for (int i = 0; i < children.size(); ++i)
+	{
+		if (children[i] == nullptr) break;
+		children[i]->Save(go_archive);
+	}
+
+	go_archive->ToFile();
 }
 
 void GameObject::LoadCube()

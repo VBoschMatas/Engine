@@ -2,10 +2,13 @@
 #include "Application.h"
 #include "ModuleScene.h"
 #include "MaterialImporter.h"
+#include "MathGeoLib.h"
 #include <map>
 
 ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset, unsigned int id)
 {
+	math::LCG math;
+	uuid = math.Int();
 	this->id = id;
 	if (mesh != nullptr && mesh->mMaterialIndex >= 0)
 		material = App->scene->GetMaterials()[((size_t)mesh->mMaterialIndex + (size_t)offset)];
@@ -33,6 +36,8 @@ Material::Material()
 
 Material::Material(aiMaterial* material)
 {
+	math::LCG math;
+	uuid = math.Int();
 	id = App->scene->getMaterialId();
 	App->scene->AddMaterial(this);
 	MaterialImporter::Import(material, this);
@@ -243,4 +248,39 @@ void ComponentMaterial::selectTexture(unsigned int tex_id)
 		}
 		ImGui::EndPopup();
 	}
+}
+
+void Material::Save()
+{
+	Archive* go_archive = new Archive();
+	go_archive->json = {
+		{"Name", "Material"},
+		{"UUID", uuid},
+		{"Ambient", {ambient.x, ambient.y, ambient.z}},
+		{"Diffuse", {diffuse.x, diffuse.y, diffuse.z}},
+		{"Specular", {specular.x, specular.y, specular.z}},
+		{"Metallic", metallic},
+		{"Albedo", albedo},
+		{"Smoothness", smoothness}
+	};
+	if (textures[0] != nullptr)
+		go_archive->json["TexDiffuse"] = textures[0]->name.c_str();
+	else go_archive->json["TexDiffuse"] = "";
+	if (textures[1] != nullptr)
+		go_archive->json["TexSpecular"] = textures[0]->name.c_str();
+	else go_archive->json["TexSpecular"] = "";
+	go_archive->ToFile();
+}
+
+void ComponentMaterial::Save(Archive* archive)
+{
+	archive->json["Component"] += {uuid, (int)type};
+	Archive* go_archive = new Archive();
+	go_archive->json = {
+		{"Name", "Material"},
+		{"UUID", uuid},
+		{"Material", material->uuid}
+	};
+	material->Save();
+	go_archive->ToFile();
 }

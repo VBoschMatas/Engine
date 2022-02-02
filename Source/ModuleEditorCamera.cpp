@@ -264,7 +264,7 @@ void ModuleEditorCamera::Controller()
 	{
 		float wheel_speed = move_speed;
 		//When the view is locked the camera will be slower the closest it is from the object
-		if (App->scene->getSelectedGameObject() != nullptr)
+		if (App->scene->getSelectedGameObject() != nullptr && App->scene->getSelectedGameObject()->world_bbox.IsFinite())
 			wheel_speed *= ((App->scene->getSelectedGameObject()->world_bbox.Distance(frustum.Pos()) + 0.5f)/3.0f);
 		position += frustum.Front() * wheel_speed * (float)App->input->GetMouseWheel() * 2;
 	}

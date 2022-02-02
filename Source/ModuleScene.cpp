@@ -63,6 +63,17 @@ void ModuleScene::AddScene(const char* name)
 	scene->Load();
 }
 
+void ModuleScene::LoadScene(const char* path)
+{
+	Scene* scene = new Scene("", scenes_number);
+
+	Scenes.push_back(scene);
+
+	current_scene = Scenes.size() - 1;
+
+	scene->LoadFile(path);
+}
+
 void ModuleScene::RemoveScene(unsigned int id) //for now it deletes all GameObjects
 {
 	Scenes.clear();

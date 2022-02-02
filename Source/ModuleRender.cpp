@@ -54,7 +54,7 @@ void __stdcall OurOpenGLErrorFunction(GLenum source, GLenum type, GLuint id, GLe
 		// case GL_DEBUG_SEVERITY_NOTIFICATION: tmp_severity = "notification"; break;
 	default: return;
 	};
-	DEBUG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
+	//DEBUG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
 }
 
 // Called before render is available
@@ -106,8 +106,9 @@ bool ModuleRender::Init()
 	//model = new Model();
 	//model->Load("BakerHouse.fbx");
 
-	App->scene->AddScene("Scene 1");
-	App->scene->AddGameObject("BakerHouse.fbx", GoType::Model);
+	//App->scene->AddScene("Scene 1");
+	App->scene->LoadScene("Library\\Scene");
+	//App->scene->AddGameObject("BakerHouse.fbx", GoType::Model);
 	//App->scene->getScene(0)->AddGameObject("models/WoodenCrate01.fbx", GoType::Model);
 
 	//App->scene->AddGameObject(GoType::Model, "models/WoodenCrate01.fbx");

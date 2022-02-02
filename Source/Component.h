@@ -4,6 +4,8 @@
 #include "Geometry/Triangle.h"
 #include "Geometry/AABB.h"
 
+class Archive;
+
 enum class CompType
 {
 	Transform = 0,
@@ -29,10 +31,12 @@ public:
 	virtual void getBoundingBox(math::AABB &bbox) {} ;
 	virtual void getTriangles(std::vector<math::Triangle> &triangles) {} ;
 	virtual void printComponentInfo() {};
+	virtual void Save(Archive* archive) {};
 
 	bool render = false;
 	bool selected = false;
 
+	u32 uuid;
 protected:
 	unsigned int id;
 	CompType type;

@@ -20,6 +20,7 @@ enum class GoType
 class Component;
 class Scene;
 class ComponentTransform;
+class Archive;
 
 class GameObject
 {
@@ -81,9 +82,12 @@ public:
 	bool operator > (const GameObject*& str) const;
 
 	bool operator < (const GameObject*& str) const;
+
+	void Save(Archive* archive);
 private:
 
 	unsigned int id;
+	u32 uuid;
 	std::string name;
 	GoType type;
 

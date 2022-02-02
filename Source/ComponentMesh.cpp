@@ -13,6 +13,8 @@
 
 ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, ComponentMaterial* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id)
 {
+	math::LCG math;
+	uuid = math.Int();
 	this->id = id;
 	mesh = new Mesh(vertices, indices, material->getMaterial(), name, obb_vertices);
 	comp_material = material;
@@ -41,6 +43,8 @@ void ComponentMesh::Update(unsigned int program, const float3& position, const Q
 	}
 
 	Draw(program, position, rotation, scale);
+
+	glStencilMask(0xFF);
 
 	if (!selected)
 		return;
@@ -181,7 +185,8 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 	this->name = name;
 	this->id = App->scene->getMeshId();
 	console->AddLog("Creating OBB for the mesh");
-
+	math::LCG math;
+	uuid = math.Int();
 	bounding_box.SetNegativeInfinity();
 	bounding_box.Enclose(&obb_vertices[0], obb_vertices.size());
 
@@ -244,4 +249,54 @@ std::vector<math::Triangle> Mesh::getTriangles()
 		tris.push_back(math::Triangle(p_1, p_2, p_3));
 	}
 	return tris;
+}
+
+void Mesh::Save()
+{
+	Archive* go_archive = new Archive();
+	std::vector<float> vPosx = {};
+	std::vector<float> vPosy = {};
+	std::vector<float> vPosz = {};
+	std::vector<float> vNorx = {};
+	std::vector<float> vNory = {};
+	std::vector<float> vNorz = {};
+	std::vector<float> vUVx = {};
+	std::vector<float> vUVy = {};
+	for (Vertex v : vertices) {
+		vPosx.push_back(v.position.x); vPosy.push_back(v.position.y); vPosz.push_back(v.position.z);
+		vNorx.push_back(v.normal.x); vNory.push_back(v.normal.y); vNorz.push_back(v.normal.z);
+		vUVx.push_back(v.uv.x); vUVy.push_back(v.uv.y);
+	}
+	go_archive->json = {
+		{"Name", "Mesh"},
+		{"UUID", uuid},
+		{"NumVertices", num_vertices},
+		{"NumIndices", num_indices},
+		{"PositionX", vPosx},
+		{"PositionY", vPosy},
+		{"PositionZ", vPosz},
+		{"NormalsX", vNorx},
+		{"NormalsY", vNory},
+		{"NormalsZ", vNorz},
+		{"UVX", vUVx},
+		{"UVZ", vUVy},
+		{"Indices", indices},
+		{"Material", material_index->uuid}
+	};
+
+	go_archive->ToFile();
+}
+
+void ComponentMesh::Save(Archive* archive)
+{
+	archive->json["Component"] += {uuid, (int)type};
+	Archive* go_archive = new Archive();
+	go_archive->json = {
+		{"Name", "Mesh"},
+		{"UUID", uuid},
+		{"Mesh", mesh->uuid},
+		{"ComponentMaterial", comp_material->uuid}
+	};
+	mesh->Save();
+	go_archive->ToFile();
 }

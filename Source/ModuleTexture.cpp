@@ -3,6 +3,7 @@
 #include "IL/ilu.h"
 #include "SDL.h"
 #include "GL/glew.h"
+#include <fstream>
 
 ModuleTexture::ModuleTexture()
 {
@@ -74,6 +75,36 @@ Texture ModuleTexture::LoadTexture(const char *path, bool &texture_found)
 		if (file_type == ".tif" || file_type == ".tiff" || file_type == ".TIF" || file_type == ".TIFF")
 			iluRotate(180.0f);
 	}
+
+	// TESTGROUND
+
+	//ILuint size;
+	//ILubyte* data;
+	//char** fileBuffer = new char*;
+	//ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
+	//size = ilSaveL(IL_DDS, nullptr, 0); // Get the size of the data buffer
+	//if (size > 0)
+	//{
+	//	data = new ILubyte[size]; // allocate data buffer
+	//	if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveL function
+	//		*fileBuffer = (char*)data;
+	//}
+
+	//std::ofstream ofs("Library\\test.dds", std::ofstream::out);
+
+	//ofs << *fileBuffer;
+
+	//ofs.close();
+
+	//ilDeleteImages(1, &img_id);
+
+	//ilGenImages(1, &img_id);
+	//ilBindImage(img_id);
+	//texture_found = ilLoadImage("Library\\test.dds");
+	//if (texture_found) console->AddLog("FOUND!");
+	//else console->AddLog("NOT FOUND!"); // ADD VAR TO TEXTS
+	//ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+	// TESTGROUND
 
 	glGenTextures(1, &tex.id);
 	glBindTexture(GL_TEXTURE_2D, tex.id);

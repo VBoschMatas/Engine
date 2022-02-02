@@ -36,7 +36,6 @@ public:
 	update_status Update();
 	update_status PostUpdate();
 	bool CleanUp();
-	ImGuizmo::OPERATION transform_op = ImGuizmo::TRANSLATE;;
 
 	bool isFocusScene() { return scene_selected; };
 	bool isDebugDraw() { return debug_draw; };
@@ -61,7 +60,7 @@ private:
 
 	Game_State game_state = Game_State::STOP;
 
-	OPERATION operation = OPERATION::TRANSLATE;
+	ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;
 
 	std::vector<float> ms;
 	std::vector<float> fps;

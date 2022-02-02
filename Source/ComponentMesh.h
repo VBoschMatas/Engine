@@ -26,6 +26,8 @@ public:
 	unsigned int getIndicesNum() { return num_indices; };
 	math::AABB getBoundingBox() { return bounding_box; };
 
+	void Save();
+	u32 uuid;
 private:
 	unsigned int id;
 	std::string name;
@@ -65,6 +67,8 @@ public:
 
 	void printComponentInfo() override;
 	void selectMaterial();
+
+	void Save(Archive* archive) override;
 
 	bool visible;
 

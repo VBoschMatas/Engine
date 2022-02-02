@@ -3,7 +3,6 @@
 #include "ModuleScene.h"
 #include "ComponentCamera.h"
 #include "debugdraw.h"
-
 #include "Math/float4x4.h"
 
 #define DEGTORAD pi / 180.0f
@@ -12,7 +11,8 @@
 ComponentCamera::ComponentCamera()
 {
 	type = CompType::Camera;
-
+	math::LCG math;
+	uuid = math.Int();
 	field_of_view = 70.0f;
 	near_distance = 1.0f;
 	far_distance = 20.0f;
@@ -71,4 +71,18 @@ void ComponentCamera::setFOV(float deg)
 {
 	float fov = deg * DEGTORAD;
 	frustum.SetHorizontalFovAndAspectRatio(fov, aspect_ratio);
+}
+
+void ComponentCamera::Save(Archive* archive)
+{
+	archive->json["Component"] += {uuid, (int)type};
+	Archive* go_archive = new Archive();
+	go_archive->json = {
+		{"Name", "Camera"},
+		{"UUID", uuid},
+		{"FOV", field_of_view},
+		{"Near", near_distance},
+		{"Far", far_distance}
+	};
+	go_archive->ToFile();
 }

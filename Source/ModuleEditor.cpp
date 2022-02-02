@@ -150,6 +150,17 @@ void ModuleEditor::MainMenuBar(bool* p_open)
 
 	if (ImGui::BeginMenuBar())
 	{
+		if (ImGui::BeginMenu("File"))
+		{
+
+			if (ImGui::MenuItem("Save", (const char*)0))
+			{
+				App->scene->Save();
+			}
+
+			ImGui::EndMenu();
+		}
+
 		if (ImGui::BeginMenu("Tools"))
 		{
 
@@ -376,10 +387,10 @@ void ModuleEditor::SceneWindow()
 
 	if (ImGui::BeginChild("SceneCanvas", ImVec2(0, 0), true, ImGuiWindowFlags_NoMove))
 	{
-		scene_size = float2(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
 		scene_selected = ImGui::IsWindowFocused();
 		if ((ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)) && ImGui::IsWindowHovered())
 			ImGui::SetWindowFocus();
+
 
 		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered() && !App->input->GetKey(SDL_SCANCODE_LALT))
 		{
@@ -402,24 +413,11 @@ void ModuleEditor::SceneWindow()
 			dd::xzSquareGrid(-500.0f, 500.0f, 0.0f, 2.0f, dd::colors::White);
 		}
 
-		if (debug_draw == true)
-		{
-			//App->DebugDraw();
-		}
-
-		ImVec2 cursor = ImGui::GetCursorScreenPos();
-		ImVec2 mouse = ImGui::GetMousePos();
-		ImVec2 rel_position = ImVec2(mouse.x - cursor.x, mouse.y - cursor.y);
-
-		/*if (focused && ImGui::IsMouseClicked(0, false) && rel_position.x >= 0 && rel_position.x <= width && rel_position.y >= 0 && rel_position.y <= height)
-		{
-			PickSelection(camera, (int)rel_position.x, (int)rel_position.y);
-		}*/
-
 		ImVec2 windowSize = ImGui::GetWindowSize();
 		ImGui::Image((ImTextureID)App->renderer->GetFBTexture(), windowSize, ImVec2(0, 1), ImVec2(1, 0));
 
 		//DrawGuizmo(camera);
+
 
 		//Gizmo stuff
 		GameObject* selected = App->scene->getSelectedGameObject();
@@ -435,8 +433,15 @@ void ModuleEditor::SceneWindow()
 			ComponentTransform* transformComponent = selected->Transform();
 			float4x4 transformMatrix = transformComponent->getLocalTransform().Transposed();
 			
-			ImGuizmo::Manipulate(cameraView.ptr(), cameraProjection.ptr(), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::LOCAL, transformMatrix.ptr());
+			ImGuizmo::Manipulate(cameraView.ptr(), cameraProjection.ptr(), operation, ImGuizmo::MODE::WORLD, transformMatrix.ptr());
+			
+			if (ImGuizmo::IsOver())
+			{
+				console->AddLog("OVER");
+			}
 		}
+
+		
 
 	}
 	ImGui::EndChild();
@@ -463,45 +468,45 @@ void ModuleEditor::SceneMenuBar()
 void ModuleEditor::GuizmosMenu()
 {
 	if (ImGui::IsKeyPressed(90))
-		transform_op = ImGuizmo::TRANSLATE;
+		operation = ImGuizmo::TRANSLATE;
 	if (ImGui::IsKeyPressed(69))
-		transform_op = ImGuizmo::ROTATE;
+		operation = ImGuizmo::ROTATE;
 	if (ImGui::IsKeyPressed(82)) // r Key
-		transform_op = ImGuizmo::SCALE;
+		operation = ImGuizmo::SCALE;
 
-	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::TRANSLATE)));
-	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(transform_op == ImGuizmo::TRANSLATE)));
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(operation == ImGuizmo::TRANSLATE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(operation == ImGuizmo::TRANSLATE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(operation == ImGuizmo::TRANSLATE)));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(operation == ImGuizmo::TRANSLATE)));
 	if (ImGui::Button(ICON_FA_ARROWS))
 	{
-		transform_op = ImGuizmo::TRANSLATE;
+		operation = ImGuizmo::TRANSLATE;
 	}
 	ImGui::PopStyleColor(4);
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Translate");
 
 	ImGui::SameLine();
-	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::ROTATE)));
-	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(transform_op == ImGuizmo::ROTATE)));
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(operation == ImGuizmo::ROTATE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(operation == ImGuizmo::ROTATE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(operation == ImGuizmo::ROTATE)));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(operation == ImGuizmo::ROTATE)));
 	if (ImGui::Button(ICON_FA_UNDO))
 	{
-		transform_op = ImGuizmo::ROTATE;
+		operation = ImGuizmo::ROTATE;
 	}
 	ImGui::PopStyleColor(4);
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Rotate");
 
 	ImGui::SameLine();
-	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(transform_op == ImGuizmo::SCALE)));
-	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(transform_op == ImGuizmo::SCALE)));
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.65f, 0.6f, ToggleButtonColor(operation == ImGuizmo::SCALE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.65f, 0.4f, ToggleButtonColor(operation == ImGuizmo::SCALE)));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.65f, 0.2f, ToggleButtonColor(operation == ImGuizmo::SCALE)));
+	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.65f, 0.0f, ToggleTextColor(operation == ImGuizmo::SCALE)));
 	if (ImGui::Button(ICON_FA_EXPAND))
 	{
-		transform_op = ImGuizmo::SCALE;
+		operation = ImGuizmo::SCALE;
 	}
 	ImGui::PopStyleColor(4);
 	if (ImGui::IsItemHovered())

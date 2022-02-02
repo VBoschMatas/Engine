@@ -2,6 +2,8 @@
 #include "Globals.h"
 #include "imgui.h"
 
+class Archive;
+
 class AmbientLight
 {
 public:
@@ -14,7 +16,8 @@ public:
 	bool selected = false;
 
 	void printGameObjectInfo();
-private:
+	void Save(Archive* archive);
+
 	float3 color;
 	float strength;
 };

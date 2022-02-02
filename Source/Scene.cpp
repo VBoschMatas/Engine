@@ -5,11 +5,18 @@
 #include "Scene.h"
 #include "Skybox.h"
 #include "Model.h"
+#include "MathGeoLib/Algorithm/Random/LCG.h"
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <string>  
+#include <sstream>  
 
-Scene::Scene(unsigned int _id)
+Scene::Scene()
 {
 	name = "New Scene";
-	id = _id;
+	math::LCG math;
+	id = math.Int();
 	last_go_id = 0;
 	last_material_id = 0;
 	last_mesh_id = 0;
@@ -48,7 +55,7 @@ void Scene::Load()
 
 void Scene::DrawSkybox()
 {
-	skybox->Update();
+	//skybox->Update();
 }
 
 void Scene::UpdateTransform()
@@ -88,7 +95,7 @@ void Scene::UpdateBoundingBox()
 
 void Scene::Update(unsigned int program)
 {
-	skybox->Update();
+	//skybox->Update();
 
 	UpdateTransform();
 	UpdateLights(program);
@@ -229,4 +236,58 @@ void Scene::printHierarchy()
 			selected_gameObject->selected = true;
 		}
 	}
+}
+
+void Scene::Save()
+{
+	Archive* archive = new Archive();
+
+	archive->json = {
+		{"Name", this->name.c_str()},
+		{"ID", this->id},
+		{"GoIndex", last_go_id},
+		{"MeshIndex", last_mesh_id},
+		{"MatIndex", last_material_id}
+	};
+	ambient_light->Save(archive);
+
+	for (int i = 0; i < children.size(); ++i)
+	{
+		if (children[i] == nullptr) break;
+		children[i]->Save(archive);
+	}
+
+	archive->ToFile(true);
+	delete(archive);
+}
+
+void Scene::LoadFile(const char* path)
+{
+	std::ifstream ifs(path, std::ifstream::in);
+
+	char c = ifs.get();
+	std::stringstream ss;
+	while (ifs.good()) {
+		ss << c;
+		c = ifs.get();
+	}
+	ifs.close();
+
+	Archive* lector = new Archive();
+	ss >> lector->json;
+
+	this->name = lector->json.at("Name");
+	this->id = lector->json.at("ID");
+	this->last_go_id = lector->json.at("GoIndex");
+	this->last_mesh_id = lector->json.at("MeshIndex");
+	this->last_material_id = lector->json.at("MatIndex");
+
+	ambient_light = new AmbientLight();
+
+	Archive ambJson;
+	ambJson.json = lector->json.at("AmbientLight");
+	Archive ambCol;
+	ambCol.json = ambJson.json.at("Color");
+	ambient_light->strength = ambJson.json.at("Strength");
+	ambient_light->color = float3(ambCol.json[0], ambCol.json[1], ambCol.json[2]);
 }

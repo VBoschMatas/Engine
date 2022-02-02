@@ -7,7 +7,7 @@ enum class LightType
 	Point,
 	Spot
 };
-
+class Archive;
 class ComponentLight : public Component
 {
 
@@ -20,6 +20,7 @@ public:
 	void DebugDraw() override;
 
 	void printComponentInfo() override;
+	void Save(Archive* archive) override;
 
 	float3 color;
 	LightType Ltype;

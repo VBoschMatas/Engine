@@ -14,6 +14,8 @@
 
 ComponentLight::ComponentLight(LightType _type)
 {
+	math::LCG math;
+	uuid = math.Int();
 	type = CompType::Light;
 	Ltype = _type;
 	color = float3(1.0f, 1.0f, 1.0f);
@@ -197,4 +199,23 @@ void ComponentLight::printComponentInfo()
 			}
 		}
 	}
+}
+
+void ComponentLight::Save(Archive* archive)
+{
+	archive->json["Component"] += {uuid, (int)type};
+	Archive* go_archive = new Archive();
+	go_archive->json = {
+		{"Name", "Light"},
+		{"UUID", uuid},
+		{"Color", {color.x, color.y, color.z}},
+		{"LType", (int)Ltype},
+		{"Constant", constant},
+		{"Linear", linear},
+		{"Quadratic", quadratic},
+		{"Intensity", intensity},
+		{"Inner", innerAngle},
+		{"Outer", outerAngle}
+	};
+	go_archive->ToFile();
 }

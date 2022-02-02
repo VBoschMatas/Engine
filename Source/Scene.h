@@ -7,6 +7,7 @@
 #include "ComponentMaterial.h"
 #include "ComponentCamera.h"
 #include "EngineQuadTree.h"
+#include "Archive.h"
 #include <vector>
 #include <map>
 
@@ -16,7 +17,7 @@ class Skybox;
 class Scene
 {
 public:
-	Scene(unsigned int _id);
+	Scene();
 	Scene(const char* _name, unsigned int _id);
 	~Scene() {};
 
@@ -94,8 +95,11 @@ public:
 	unsigned int last_spotlight_num = 0;
 	unsigned int current_spotlight = 0;
 
+	void LoadFile(const char* path);
+	void Save();
+
 private:
-	unsigned int id;
+	u32 id;
 	std::string name;
 	std::vector<GameObject*> children; // GameObjects that are directly attached to the root
 

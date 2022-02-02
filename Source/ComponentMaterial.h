@@ -5,7 +5,7 @@
 #include "assimp/mesh.h"
 #include "assimp/scene.h"
 #include <vector>
-
+class Archive;
 class Material
 {
 public:
@@ -24,6 +24,8 @@ public:
 
 	unsigned int getId() { return id; };
 
+	void Save();
+
 	std::string name;
 	float3 ambient;
 	float3 diffuse;
@@ -32,6 +34,7 @@ public:
 	float metallic;
 	float albedo;
 	float smoothness;
+	u32 uuid;
 private:
 	unsigned int id;
 	//Texture* textures[4] = { nullptr, nullptr, nullptr, nullptr };
@@ -40,6 +43,7 @@ private:
 	//const char* tex_types[4] = { "diffuse", "normals", "specular", "lightmap"};
 	Texture default_texture;
 	Texture* LoadTextures(const char* path);
+
 };
 
 class ComponentMaterial : public Component
@@ -51,6 +55,7 @@ public:
 	//void Update(unsigned int program, float3 & position, Quat & rotation, float3 & scale) override;
 
 	void printComponentInfo() override;
+	void Save(Archive* archive) override;
 	void showImage(unsigned int i);
 
 	void setMaterial(Material* _material) { material = _material; };

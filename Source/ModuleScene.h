@@ -25,6 +25,7 @@ public:
 	bool CleanUp();
 
 	void AddScene(const char* name);
+	void LoadScene(const char* path);
 	void RemoveScene(unsigned int id);
 	Scene* getScene(unsigned int id);
 	//Scene* getCurrentScene() { return getScene(current_scene); };
@@ -167,6 +168,12 @@ public: // Functions that will act on the current scene, used to simplify calls 
 	}
 	void DrawSkybox() const {
 		Scenes[current_scene]->DrawSkybox();
+	}
+	void Save() const {
+		Scenes[current_scene]->Save();
+	}
+	void LoadFile(const char* path) const {
+		Scenes[current_scene]->LoadFile(path);
 	}
 	unsigned int getGoId() const { return Scenes[current_scene]->getGoId(); };
 	unsigned int getMeshId() const { return Scenes[current_scene]->getMeshId(); };
