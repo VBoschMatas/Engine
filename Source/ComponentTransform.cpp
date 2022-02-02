@@ -77,4 +77,6 @@ void ComponentTransform::setTransform(float4x4 _transform)
 	console->AddLog("%f  %f  %f  %f", _transform[1][0], _transform[1][1], _transform[1][2], _transform[1][3]);
 	console->AddLog("%f  %f  %f  %f", _transform[2][0], _transform[2][1], _transform[2][2], _transform[2][3]);
 	console->AddLog("%f  %f  %f  %f", _transform[3][0], _transform[3][1], _transform[3][2], _transform[3][3]);
+	_transform.ptr();
+	console->AddLog("MATRIX: %s", _transform.SerializeToString());
 }

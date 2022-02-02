@@ -10,7 +10,7 @@ class Material
 {
 public:
 	Material();
-	Material(aiMaterial* material, const char* path);
+	Material(aiMaterial* material);
 	~Material() = default;
 
 	Texture* getTexture(TexType type);
@@ -39,7 +39,7 @@ private:
 	const char* tex_types[2] = { "diffuse", "specular"};
 	//const char* tex_types[4] = { "diffuse", "normals", "specular", "lightmap"};
 	Texture default_texture;
-	Texture* LoadTextures(aiMaterial* material, aiTextureType type, const char* path);
+	Texture* LoadTextures(const char* path);
 };
 
 class ComponentMaterial : public Component

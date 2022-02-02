@@ -70,7 +70,7 @@ std::vector<GameObject*> Model::Load(const std::string &file_name, GameObject* r
 	// Load all of the scene materials
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 	{
-		Material* material = new Material(scene->mMaterials[i], directory.c_str());
+		Material* material = new Material(scene->mMaterials[i]);
 	}
 
 

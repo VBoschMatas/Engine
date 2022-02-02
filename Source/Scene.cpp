@@ -3,6 +3,7 @@
 #include "ModuleEditorCamera.h"
 #include "GL/glew.h"
 #include "Scene.h"
+#include "Skybox.h"
 #include "Model.h"
 
 Scene::Scene(unsigned int _id)
@@ -12,6 +13,8 @@ Scene::Scene(unsigned int _id)
 	last_go_id = 0;
 	last_material_id = 0;
 	last_mesh_id = 0;
+	ambient_light = nullptr;
+	skybox = nullptr;
 	GenerateQuadtree();
 };
 
@@ -21,6 +24,9 @@ Scene::Scene(const char* _name, unsigned int _id) {
 	last_go_id = 0;
 	last_material_id = 0;
 	last_mesh_id = 0;
+	ambient_light = nullptr;
+	skybox = nullptr;
+	GenerateQuadtree();
 };
 
 void Scene::Load()
@@ -36,7 +42,13 @@ void Scene::Load()
 	scene_textures = {};
 	scene_materials = {};
 
-	ambient_light = AmbientLight();
+	skybox = new Skybox();
+	ambient_light = new AmbientLight();
+}
+
+void Scene::DrawSkybox()
+{
+	skybox->Update();
 }
 
 void Scene::UpdateTransform()
@@ -53,7 +65,7 @@ void Scene::UpdateLights(unsigned int program)
 	current_pointlight = 0;
 	current_spotlight = 0;
 
-	ambient_light.Update(program);
+	ambient_light->Update(program);
 
 	for (int i = 0; i < children.size(); ++i)
 	{
@@ -76,6 +88,8 @@ void Scene::UpdateBoundingBox()
 
 void Scene::Update(unsigned int program)
 {
+	skybox->Update();
+
 	UpdateTransform();
 	UpdateLights(program);
 	UpdateBoundingBox();
@@ -197,7 +211,6 @@ void Scene::printHierarchy()
 
 		if (ImGui::BeginDragDropTarget())
 		{
-			console->AddLog("BRUG");
 			/*if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GameObject"))
 			{
 				IM_ASSERT(payload->DataSize == sizeof(GameObject*));

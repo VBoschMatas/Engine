@@ -239,6 +239,7 @@ void GameObject::setParent(GameObject* _parent)
 		this->Transform()->setRot(this->Transform()->getWorldRot().ToEulerXYZ()*RADTODEG - parent->Transform()->getWorldRot().ToEulerXYZ() * RADTODEG);
 		float3 temp = this->Transform()->getWorldSca().Div(parent->Transform()->getWorldSca());
 		this->Transform()->setSca(temp);
+		console->AddLog("MATRIX: %s", this->Transform()->getWorldTransform().SerializeToString().c_str());
 	}
 	else
 	{

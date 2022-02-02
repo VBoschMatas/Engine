@@ -12,6 +12,7 @@
 #include "Geometry/Triangle.h"
 #include "DebugDraw.h"
 #include "ModuleDebugDraw.h"
+#include "ComponentTransform.h"
 #include "ModuleProgram.h"
 #include <algorithm>
 #include <functional>
@@ -62,8 +63,10 @@ update_status ModuleEditorCamera::Update()
 
 	if (lock_view) //For now all objects will be at 0, 0, 0. Once object selection is incorporated this will change
 	{
-		lock_distance = frustum.Pos().Distance(float3(0.0f, 0.0f, 0.0f));
-		LookAt(float3(0.0f, 0.0f, 0.0f));
+		if (App->scene->getSelectedGameObject() == nullptr)
+			lock_view = false;
+		lock_distance = frustum.Pos().Distance(App->scene->getSelectedGameObject()->Transform()->getWorldPos());
+		LookAt(App->scene->getSelectedGameObject()->Transform()->getWorldPos());
 	}
 
 	return UPDATE_CONTINUE;
@@ -264,8 +267,8 @@ void ModuleEditorCamera::Controller()
 	{
 		float wheel_speed = move_speed;
 		//When the view is locked the camera will be slower the closest it is from the object
-		if (lock_view)
-			wheel_speed *= ((App->renderer->model->bounding_box.Distance(frustum.Pos()) + 0.5f)/3.0f);
+		if (lock_view && App->scene->getSelectedGameObject() != nullptr)
+			wheel_speed *= ((App->scene->getSelectedGameObject()->world_bbox.Distance(frustum.Pos()) + 0.5f)/3.0f);
 		position += frustum.Front() * wheel_speed * (float)App->input->GetMouseWheel() * 2;
 	}
 

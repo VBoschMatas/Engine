@@ -11,6 +11,7 @@
 #include <map>
 
 class GameObject;
+class Skybox;
 
 class Scene
 {
@@ -72,8 +73,10 @@ public:
 
 	void AmbientLightInfo()
 	{
-		ambient_light.printGameObjectInfo();
+		ambient_light->printGameObjectInfo();
 	}
+
+	void DrawSkybox();
 
 	GameObject* selected_gameObject = nullptr;
 	ComponentCamera* camera_culling = nullptr;
@@ -97,7 +100,8 @@ private:
 	std::vector<GameObject*> children; // GameObjects that are directly attached to the root
 
 	// Resources used in the scene
-	AmbientLight ambient_light;
+	AmbientLight* ambient_light;
+	Skybox* skybox;
 	std::vector<GameObject*> game_objects;
 	std::vector<Mesh*> meshes;
 	std::map<unsigned int, Texture> scene_textures;

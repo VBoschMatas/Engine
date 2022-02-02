@@ -58,7 +58,7 @@ void ComponentMesh::Update(unsigned int program, const float3& position, const Q
 
 void ComponentMesh::Draw(unsigned int program, const float3& position, const Quat& rotation, const float3& scale)
 {
-	const float4x4& view = App->editorcamera->getView();
+	const float4x4 view = App->editorcamera->getView();
 	const float4x4 proj = App->editorcamera->getProjection();
 	const float3 cam_pos = App->editorcamera->GetPosition();
 	float4x4 model = float4x4::FromTRS(position, rotation, scale);
@@ -80,9 +80,7 @@ void ComponentMesh::Draw(unsigned int program, const float3& position, const Qua
 	glUniform1f(glGetUniformLocation(program, "material.smoothness"), mesh->getMaterial()->smoothness);
 
 	glUniform1i(glGetUniformLocation(program, "material.diffuse_map"), 0);
-	//glUniform1i(glGetUniformLocation(program, "material.normals_map"), 1);
 	glUniform1i(glGetUniformLocation(program, "material.specular_map"), 1);
-	//glUniform1i(glGetUniformLocation(program, "material.occlusion_map"), 3);
 
 	for (unsigned int i = 0; i < 2; ++i)
 	{
@@ -132,7 +130,9 @@ void ComponentMesh::printComponentInfo()
 		ImGui::SameLine();
 		if (ImGui::Button(std::string("New Material" + itemid).c_str()))
 		{
-			//material->RemoveTexture(i);
+			Material* m = new Material();
+			mesh->setMaterial(m);
+			this->comp_material->setMaterial(m);
 		}
 		ImGui::Checkbox(std::string("Visible" + itemid).c_str(), &visible);
 	}

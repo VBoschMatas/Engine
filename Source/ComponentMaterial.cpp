@@ -1,6 +1,7 @@
 #include "ComponentMaterial.h"
 #include "Application.h"
 #include "ModuleScene.h"
+#include "MaterialImporter.h"
 #include <map>
 
 ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset, unsigned int id)
@@ -30,52 +31,34 @@ Material::Material()
 	textures[0] = &default_texture;
 }
 
-Material::Material(aiMaterial* material, const char* path)
+Material::Material(aiMaterial* material)
 {
 	id = App->scene->getMaterialId();
-	name = "NewMaterial" + std::to_string(id);
-	textures[0] = LoadTextures(material, aiTextureType_DIFFUSE, path);
-	textures[1] = LoadTextures(material, aiTextureType_SPECULAR, path);
-	//textures[2] = LoadTextures(material, aiTextureType_SPECULAR, path);
-	//textures[3] = LoadTextures(material, aiTextureType_LIGHTMAP, path);
 	App->scene->AddMaterial(this);
-	ambient = float3(1.0f, 1.0f, 1.0f);
-	diffuse = float3(1.0f, 1.0f, 1.0f);
-	specular = float3(1.0f, 1.0f, 1.0f);
-
+	MaterialImporter::Import(material, this);
 	metallic = 0.0f;
 	albedo = 1.0f;
 	smoothness = 0.4f;
 	bool temp;
 	default_texture = App->textures->LoadTexture("textures/default.png", temp);
-
 	if (textures[0] == nullptr)
 	{
 		textures[0] = &default_texture;
 	}
 }
 
-// Move Load Textures to Mesh
-Texture* Material::LoadTextures(aiMaterial* material, aiTextureType type, const char* path)
+
+Texture* Material::LoadTextures(const char* path)
 {
 	unsigned int tex_hash;
 
-	unsigned int n_textures = material->GetTextureCount(type);
-	if (n_textures == 0)
-	{
-		//bool temp;
-		console->AddLog("This model has no textures!");
-		return {};
-	}
-
-	aiString ai_path;
-	material->GetTexture(type, 0, &ai_path);
 	bool texture_found = false;
 	bool already_exists = false;
 	// Searching in described path
-	console->AddLog("		Checking for textures in described path");
+	console->AddLog("		Checking for texture in described path");
 	std::string mat_dir(path);
-	mat_dir.append(ai_path.C_Str());
+
+	console->AddLog(mat_dir.c_str());
 	Texture* texture = nullptr;
 	Texture temp_texture;
 
@@ -93,33 +76,11 @@ Texture* Material::LoadTextures(aiMaterial* material, aiTextureType type, const 
 		temp_texture = App->textures->LoadTexture(mat_dir.c_str(), texture_found);
 
 
-	std::string tex_name(ai_path.C_Str());
-	// Searching in the same dir as the model
-	if (!texture_found && !already_exists)
-	{
-		tex_name = tex_name.substr(0, tex_name.find_last_of('\\'));
-		App->textures->UnloadTexture(1, &temp_texture.id);
-		std::string same_dir(path);
-		same_dir.append(tex_name);
-		console->AddLog("		Checking for textures in same directory as object: %s", same_dir.c_str());
-
-		tex_hash = std::hash<std::string>{}(same_dir);
-		std::map<unsigned int, Texture>::iterator it = App->scene->GetTextures()->find(tex_hash);
-		std::map<unsigned int, Texture>::iterator end_it = App->scene->GetTextures()->end();
-		if (it != end_it)
-		{
-			texture = &App->scene->GetTextures()->find(tex_hash)->second;
-			already_exists = true;
-		}
-
-		if (!already_exists)
-			temp_texture = App->textures->LoadTexture(same_dir.c_str(), texture_found);
-	}
-
+	std::string tex_name(path);
 	// Searching in the Game --> Textures dir
 	if (!texture_found && !already_exists)
 	{
-		console->AddLog("		Checking for textures in textures directory");
+		console->AddLog("		Checking for texture in textures directory");
 		App->textures->UnloadTexture(1, &temp_texture.id);
 		std::string tex_dir;
 		tex_dir = "textures\\";
@@ -140,10 +101,9 @@ Texture* Material::LoadTextures(aiMaterial* material, aiTextureType type, const 
 	// Texture not found
 	if (!texture_found && !already_exists)
 	{
-		console->AddLog("		Textures not found!");
+		console->AddLog("		Texture not found!");
 		App->textures->UnloadTexture(1, &temp_texture.id);
-		return {};
-		//texture = App->textures->LoadTexture("textures/default.png", texture_found);
+		return nullptr;
 	}
 
 	// We save the texture if it is new
@@ -162,10 +122,7 @@ void Material::addTexture(const char* path, unsigned int tex_id)
 	if(textures[tex_id] != nullptr)
 		App->textures->UnloadTexture(1, &textures[tex_id]->id);
 
-	bool temp;
-	Texture temp_texture = App->textures->LoadTexture(path, temp);
-	unsigned int tex_hash = std::hash<std::string>{}(path);
-	textures[tex_id] = App->scene->AddTexture(tex_hash, temp_texture);
+	textures[tex_id] = LoadTextures(path);
 }
 
 void Material::RemoveTexture(unsigned int tex_id)

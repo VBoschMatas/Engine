@@ -101,6 +101,7 @@ bool ModuleRender::Init()
 
 	program = App->program->CreateProgram("shaders/light_vertex.glsl", "shaders/light_fragment.glsl");
 	App->program->CreateOutlineProgram("shaders/outline_vertex.glsl", "shaders/outline_fragment.glsl");
+	App->program->CreateSkyboxProgram("shaders/skybox_vertex.glsl", "shaders/skybox_fragment.glsl");
 
 	//model = new Model();
 	//model->Load("BakerHouse.fbx");
@@ -118,8 +119,10 @@ update_status ModuleRender::PreUpdate()
 {
 	SDL_Surface* screen_surface = App->window->screen_surface;
 	glViewport(0, 0, screen_surface->w, screen_surface->h);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	//App->scene->DrawSkybox();
 	ClearFrameBuffer();
 	
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -205,7 +208,7 @@ void ModuleRender::ClearFrameBuffer()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glViewport(0, 0, App->window->screen_surface->w, App->window->screen_surface->h);
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	//glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // If I say as slides say it does not work
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

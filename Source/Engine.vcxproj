@@ -146,7 +146,11 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="ComponentCamera.cpp" />
     <ClCompile Include="ComponentLight.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="EngineQuadTree.cpp" />
+    <ClCompile Include="MaterialImporter.cpp" />
+    <ClCompile Include="MeshImporter.cpp" />
+    <ClCompile Include="ModuleFilesystem.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="imGui\imgui.cpp" />
     <ClCompile Include="imGui\imgui_demo.cpp" />
@@ -211,6 +215,7 @@
     <ClCompile Include="ModuleScene.cpp" />
     <ClCompile Include="ModuleTexture.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="ComponentTransform.cpp" />
@@ -222,8 +227,12 @@
     <ClInclude Include="ComponentCamera.h" />
     <ClInclude Include="ComponentLight.h" />
     <ClInclude Include="Console.h" />
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="Dummy.h" />
     <ClInclude Include="EngineQuadTree.h" />
+    <ClInclude Include="MaterialImporter.h" />
+    <ClInclude Include="MeshImporter.h" />
+    <ClInclude Include="ModuleFilesystem.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="imGui\imconfig.h" />
@@ -323,6 +332,7 @@
     <ClInclude Include="ModuleTexture.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="ComponentTransform.h" />

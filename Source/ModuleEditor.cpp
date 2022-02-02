@@ -392,11 +392,11 @@ void ModuleEditor::SceneWindow()
 
 		if (draw_axis == true)
 		{
-			dd::axisTriad(float4x4::identity, 0.25f, 2.0f);
+			dd::axisTriad(float4x4::identity, 0.5f, 5.0f);
 		}
 		if (draw_grid == true)
 		{
-			dd::xzSquareGrid(-100.0f, 100.0f, 0.0f, 1.0f, dd::colors::LightGray);
+			dd::xzSquareGrid(-500.0f, 500.0f, 0.0f, 2.0f, dd::colors::White);
 		}
 
 		if (debug_draw == true)

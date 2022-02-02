@@ -165,6 +165,9 @@ public: // Functions that will act on the current scene, used to simplify calls 
 	{
 		return Scenes[current_scene]->getGameObject(id);
 	}
+	void DrawSkybox() const {
+		Scenes[current_scene]->DrawSkybox();
+	}
 	unsigned int getGoId() const { return Scenes[current_scene]->getGoId(); };
 	unsigned int getMeshId() const { return Scenes[current_scene]->getMeshId(); };
 	unsigned int getMaterialId() const { return Scenes[current_scene]->getMaterialId(); };

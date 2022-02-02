@@ -22,9 +22,11 @@ public:
 
 	GLuint program;
 	GLuint outline_program;
+	GLuint skybox_program;
 
 	GLuint CreateProgram(const char* source_1, const char* source_2);
 	GLuint CreateOutlineProgram(const char* source_1, const char* source_2);
+	GLuint CreateSkyboxProgram(const char* source_1, const char* source_2);
 
 private:
 	void* context;

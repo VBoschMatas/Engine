@@ -207,6 +207,21 @@
     <ClCompile Include="AmbientLight.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleFilesystem.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialImporter.cpp">
+      <Filter>Importer</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshImporter.cpp">
+      <Filter>Importer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -523,6 +538,21 @@
     <ClInclude Include="AmbientLight.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleFilesystem.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialImporter.h">
+      <Filter>Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshImporter.h">
+      <Filter>Importer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imGui">
@@ -539,6 +569,9 @@
     </Filter>
     <Filter Include="Entities">
       <UniqueIdentifier>{e59d36f3-acbf-4ce9-9027-411acdfd988c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Importer">
+      <UniqueIdentifier>{e594a43f-2d15-43ed-b182-59b6265d49bb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

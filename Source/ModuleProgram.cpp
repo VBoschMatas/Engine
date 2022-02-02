@@ -133,3 +133,16 @@ GLuint ModuleProgram::CreateOutlineProgram(const char* source_vertex, const char
 
 	return outline_program; // If you want to store the program in an other var for some reason
 }
+
+GLuint ModuleProgram::CreateSkyboxProgram(const char* source_vertex, const char* source_fragment)
+{
+	char* vtx_source = LoadSource(source_vertex);
+	char* frg_source = LoadSource(source_fragment);
+
+	GLuint vtx_shader = CompileShader(GL_VERTEX_SHADER, vtx_source);
+	GLuint frg_shader = CompileShader(GL_FRAGMENT_SHADER, frg_source);
+
+	skybox_program = CreateProgram(vtx_shader, frg_shader);
+
+	return skybox_program; // If you want to store the program in an other var for some reason
+}
