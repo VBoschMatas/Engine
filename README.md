@@ -10,7 +10,7 @@ https://www.talent.upc.edu/ing/
 
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshot](https://github.com/VBoschMatas/Engine/blob/Assigment-2/Screenshot/Screenshot.jpg?raw=true)
 
 
 ## Team
