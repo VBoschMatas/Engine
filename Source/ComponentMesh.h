@@ -12,6 +12,7 @@ class Mesh
 {
 public:
 	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, Material* material, const char* name, const std::vector<float3>& obb_vertices);
+	Mesh();
 	~Mesh() = default;
 
 	std::vector<Vertex> getVertices() { return vertices; };
@@ -44,6 +45,8 @@ private:
 
 	unsigned int num_vertices;
 	unsigned int num_indices;
+	void LoadFile(std::string path);
+	void Load();
 
 	void LoadVBO();
 	void LoadEBO();
@@ -54,6 +57,7 @@ class ComponentMesh : public Component
 {
 public:
 	ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, ComponentMaterial* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id);
+	ComponentMesh();
 	~ComponentMesh();
 
 	void Update(unsigned int program, const float3& position, const Quat& rotation, const float3& scale) override;
@@ -69,10 +73,12 @@ public:
 	void selectMaterial();
 
 	void Save(Archive* archive) override;
+	void LoadFile(std::string path) override;
 
 	bool visible;
 
 private:
+
 	ComponentMaterial* comp_material;
 	Mesh* mesh;
 };

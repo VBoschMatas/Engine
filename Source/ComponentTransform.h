@@ -2,6 +2,8 @@
 #include "Component.h"
 #include "MathGeoLib.h"
 
+#define RADTODEG 180/math::pi
+
 class ComponentTransform : public Component
 {
 public:
@@ -26,6 +28,7 @@ public:
 	void setPos(float3 xyz) { setPos(xyz.x, xyz.y, xyz.z); };
 	void setRot(float x, float y, float z) { rotation[0] = x; rotation[1] = y; rotation[2] = z; };
 	void setRot(float3 xyz) { setRot(xyz.x, xyz.y, xyz.z); };
+	void setRot(Quat quat) { setRot(quat.ToEulerXYZ() * RADTODEG); };
 	void setRot(float x, float y, float z, float w);
 	void setSca(float x, float y, float z) { scale[0] = x; scale[1] = y; scale[2] = z; };
 	void setSca(float3 xyz) { setSca(xyz.x, xyz.y, xyz.z); };

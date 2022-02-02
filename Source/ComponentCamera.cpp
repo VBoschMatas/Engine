@@ -4,6 +4,11 @@
 #include "ComponentCamera.h"
 #include "debugdraw.h"
 #include "Math/float4x4.h"
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <string>  
+#include <sstream>  
 
 #define DEGTORAD pi / 180.0f
 #define RADTODEG 180.0f / pi
@@ -85,4 +90,9 @@ void ComponentCamera::Save(Archive* archive)
 		{"Far", far_distance}
 	};
 	go_archive->ToFile();
+}
+
+void ComponentCamera::LoadFile(std::string path)
+{
+
 }

@@ -8,7 +8,11 @@
 #include "Math/float2.h"
 #include "Math/float4x4.h"
 #include <array>
-
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <string>  
+#include <sstream>  
 #include "debugdraw.h"
 
 ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, ComponentMaterial* material, const char* name, const std::vector<float3>& obb_vertices, unsigned int id)
@@ -20,6 +24,18 @@ ComponentMesh::ComponentMesh(const std::vector<Vertex> &vertices, const std::vec
 	comp_material = material;
 	App->scene->AddMesh(mesh);
 	console->AddLog("NUMBER OF Indices: %d", indices.size());
+	type = CompType::Mesh;
+	visible = true;
+}
+
+ComponentMesh::ComponentMesh()
+{
+	math::LCG math;
+	uuid = math.Int();
+	this->id = id;
+	mesh = new Mesh();
+	comp_material = nullptr;
+	App->scene->AddMesh(mesh);
 	type = CompType::Mesh;
 	visible = true;
 }
@@ -190,6 +206,23 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 	bounding_box.SetNegativeInfinity();
 	bounding_box.Enclose(&obb_vertices[0], obb_vertices.size());
 
+	Load();
+}
+
+Mesh::Mesh()
+{
+	this->vertices = {};
+	this->indices = {};
+	this->material_index = nullptr;
+	this->name = "";
+	this->id = App->scene->getMeshId();
+	math::LCG math;
+	uuid = math.Int();
+	bounding_box.SetNegativeInfinity();
+}
+
+void Mesh::Load()
+{
 	LoadVBO();
 	LoadEBO();
 	CreateVAO();
@@ -299,4 +332,30 @@ void ComponentMesh::Save(Archive* archive)
 	};
 	mesh->Save();
 	go_archive->ToFile();
+}
+
+void ComponentMesh::LoadFile(std::string path)
+{
+	std::ifstream ifs(path, std::ifstream::in);
+
+	char c = ifs.get();
+	std::stringstream ss;
+	while (ifs.good()) {
+		ss << c;
+		c = ifs.get();
+	}
+	ifs.close();
+
+	Archive* lector = new Archive();
+	ss >> lector->json;
+
+	this->uuid = lector->json.at("UUID");
+	int mesh_code = lector->json.at("Mesh");
+	
+
+}
+
+void Mesh::LoadFile(std::string path)
+{
+
 }

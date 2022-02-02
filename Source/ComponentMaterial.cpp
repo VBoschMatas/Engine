@@ -4,6 +4,11 @@
 #include "MaterialImporter.h"
 #include "MathGeoLib.h"
 #include <map>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <string>  
+#include <sstream>  
 
 ComponentMaterial::ComponentMaterial(const aiMesh* mesh, unsigned int offset, unsigned int id)
 {
@@ -283,4 +288,14 @@ void ComponentMaterial::Save(Archive* archive)
 	};
 	material->Save();
 	go_archive->ToFile();
+}
+
+void ComponentMaterial::LoadFile(std::string path)
+{
+
+}
+
+void Material::LoadFile(std::string path)
+{
+
 }

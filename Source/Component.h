@@ -32,6 +32,7 @@ public:
 	virtual void getTriangles(std::vector<math::Triangle> &triangles) {} ;
 	virtual void printComponentInfo() {};
 	virtual void Save(Archive* archive) {};
+	virtual void LoadFile(std::string path) {};
 
 	bool render = false;
 	bool selected = false;

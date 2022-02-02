@@ -103,16 +103,10 @@ bool ModuleRender::Init()
 	App->program->CreateOutlineProgram("shaders/outline_vertex.glsl", "shaders/outline_fragment.glsl");
 	App->program->CreateSkyboxProgram("shaders/skybox_vertex.glsl", "shaders/skybox_fragment.glsl");
 
-	//model = new Model();
-	//model->Load("BakerHouse.fbx");
+	App->scene->AddScene("Scene 1");
+	App->scene->AddGameObject("BakerHouse.fbx", GoType::Model);
 
-	//App->scene->AddScene("Scene 1");
-	App->scene->LoadScene("Library\\Scene");
-	//App->scene->AddGameObject("BakerHouse.fbx", GoType::Model);
-	//App->scene->getScene(0)->AddGameObject("models/WoodenCrate01.fbx", GoType::Model);
-
-	//App->scene->AddGameObject(GoType::Model, "models/WoodenCrate01.fbx");
-	//App->scene->AddGameObject(GoType::Model, "BakerHouse.fbx");
+	//App->scene->LoadScene("Library\\Scene");      // Broke at the las minute...
 	return true;
 }
 

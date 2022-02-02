@@ -5,7 +5,11 @@
 #include "ModuleEditorCamera.h"
 #include "ModuleEditor.h"
 #include "ModuleScene.h"
-
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <string>  
+#include <sstream>  
 #include "Math/float4x4.h"
 #include "Math/Quat.h"
 
@@ -218,4 +222,9 @@ void ComponentLight::Save(Archive* archive)
 		{"Outer", outerAngle}
 	};
 	go_archive->ToFile();
+}
+
+void ComponentLight::LoadFile(std::string path)
+{
+
 }

@@ -16,7 +16,7 @@ public:
 	void DebugDraw() override;
 	void printComponentInfo() override;
 	void Save(Archive* archive) override;
-
+	void LoadFile(std::string path) override;
 	Frustum getFrustum() { return frustum; };
 private:
 	void setFOV(float deg);

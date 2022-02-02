@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include "Component.h"
 #include "ComponentTransform.h"
 #include "ComponentCamera.h"
 #include "ComponentLight.h"
@@ -13,6 +14,11 @@
 #include "Math/float4x4.h"
 #include "debugdraw.h"
 #include "Archive.h"
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <string>  
+#include <sstream>  
 
 #define RADTODEG 180/math::pi
 #define DEGTORAD math::pi/180
@@ -423,6 +429,86 @@ void GameObject::Save(Archive* archive)
 	}
 
 	go_archive->ToFile();
+}
+
+void GameObject::LoadFile(std::string path)
+{
+	std::ifstream ifs(path, std::ifstream::in);
+
+	char c = ifs.get();
+	std::stringstream ss;
+	while (ifs.good()) {
+		ss << c;
+		c = ifs.get();
+	}
+	ifs.close();
+
+	Archive* lector = new Archive();
+	ss >> lector->json;
+
+	this->name = lector->json.at("Name");
+	this->uuid = lector->json.at("UUID");
+	Archive transformsJson;
+	transformsJson.json = lector->json.at("Translation");
+	this->Transform()->setPos(transformsJson.json[0], transformsJson.json[1], transformsJson.json[2]);
+	transformsJson.json = lector->json.at("Rotation");
+	this->Transform()->setRot(Quat(transformsJson.json[0], transformsJson.json[1], transformsJson.json[2], transformsJson.json[3]));
+	transformsJson.json = lector->json.at("Scale");
+	this->Transform()->setSca(transformsJson.json[0], transformsJson.json[1], transformsJson.json[2]);
+
+	Archive childrenJson;
+	try {
+		childrenJson.json = lector->json.at("Children");
+		for (int i = 0; i < childrenJson.json.size(); ++i)
+		{
+			GameObject* child = new GameObject(App->scene->getGoId(), this);
+			child->LoadFile(std::to_string((float)childrenJson.json[i]));
+			addChild(child);
+		}
+	}
+	catch (std::error_code e) {
+		console->AddLog(e.message().c_str());
+	};
+	try {
+		childrenJson.json = lector->json.at("Component");
+		for (int i = 0; i < childrenJson.json.size(); ++i)
+		{
+			switch ((CompType)childrenJson.json[i][1])
+			{
+			case CompType::Light:
+			{
+				ComponentLight* comp = new ComponentLight(LightType::Directional);
+				comp->LoadFile(std::to_string((float)childrenJson.json[i][0]));
+				addComponent(comp);
+			}
+			break;
+			case CompType::Mesh:
+			{
+				ComponentMesh* comp = new ComponentMesh();
+				comp->LoadFile(std::to_string((float)childrenJson.json[i][0]));
+				addComponent(comp);
+			}
+			break;
+			case CompType::Material:
+			{
+				ComponentMaterial* comp = new ComponentMaterial(nullptr, 0, 0);
+				comp->LoadFile(std::to_string((float)childrenJson.json[i][0]));
+				addComponent(comp);
+			}
+			break;
+			case CompType::Camera:
+			{
+				ComponentCamera* comp = new ComponentCamera();
+				comp->LoadFile(std::to_string((float)childrenJson.json[i][0]));
+				addComponent(comp);
+			}
+			break;
+			}
+		}
+	}
+	catch (std::error_code e) {
+		console->AddLog(e.message().c_str());
+	};
 }
 
 void GameObject::LoadCube()

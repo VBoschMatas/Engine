@@ -23,7 +23,7 @@ public:
 	void RemoveTexture(unsigned int tex_id);
 
 	unsigned int getId() { return id; };
-
+	void LoadFile(std::string path);
 	void Save();
 
 	std::string name;
@@ -57,7 +57,7 @@ public:
 	void printComponentInfo() override;
 	void Save(Archive* archive) override;
 	void showImage(unsigned int i);
-
+	void LoadFile(std::string path) override;
 	void setMaterial(Material* _material) { material = _material; };
 	Material* getMaterial() { return material; };
 
