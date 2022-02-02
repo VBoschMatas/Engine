@@ -4,6 +4,7 @@
 #include "ModuleRender.h"
 #include "ModuleEditorCamera.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleInput.h"
 #include "ModuleScene.h"
 #include "Model.h"
 #include "ComponentMesh.h"
@@ -378,7 +379,7 @@ void ModuleEditor::SceneWindow()
 		if ((ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)) && ImGui::IsWindowHovered())
 			ImGui::SetWindowFocus();
 
-		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered() && !App->input->GetKey(SDL_SCANCODE_LALT))
 		{
 			float normalizedX = -1.0 + 2.0 * (ImGui::GetMousePos().x - ImGui::GetWindowPos().x) / ImGui::GetWindowWidth();
 			float normalizedY = 1.0 - 2.0 * (ImGui::GetMousePos().y - ImGui::GetWindowPos().y) / ImGui::GetWindowHeight();

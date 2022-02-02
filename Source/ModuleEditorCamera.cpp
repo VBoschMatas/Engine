@@ -61,12 +61,9 @@ update_status ModuleEditorCamera::Update()
 	frustum.SetViewPlaneDistances(near_distance, far_distance);
 	Controller();
 
-	if (lock_view) //For now all objects will be at 0, 0, 0. Once object selection is incorporated this will change
+	if (App->scene->getSelectedGameObject() != nullptr)
 	{
-		if (App->scene->getSelectedGameObject() == nullptr)
-			lock_view = false;
-		lock_distance = frustum.Pos().Distance(App->scene->getSelectedGameObject()->Transform()->getWorldPos());
-		LookAt(App->scene->getSelectedGameObject()->Transform()->getWorldPos());
+			lock_distance = frustum.Pos().Distance(App->scene->getSelectedGameObject()->Transform()->getWorldPos());
 	}
 
 	return UPDATE_CONTINUE;
@@ -202,13 +199,13 @@ void ModuleEditorCamera::Controller()
 			if (mouse_y != 0)
 				Zoom((float)mouse_y * move_speed);
 		}
-		// Only orbit if the model is focused
-		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) && lock_view)
+		// Only orbit if the model is selected
+		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) && App->scene->getSelectedGameObject() != nullptr)
 		{
 			int mouse_x, mouse_y;
 			App->input->GetMouseMovement(mouse_x, mouse_y);
-			if (mouse_x != 0 || mouse_y != 0) //Orbit now will orbit (0, 0, 0), once objects are selectable this will change
-				Orbit((float)mouse_y * -rotation_speed, (float)mouse_x * -rotation_speed, float3(0.0f, 0.0f, 0.0f));
+			if (mouse_x != 0 || mouse_y != 0)
+				Orbit((float)mouse_y * -rotation_speed, (float)mouse_x * -rotation_speed, App->scene->getSelectedGameObject()->Transform()->getWorldPos());
 		}
 	}
 	else { // Use only mouse controlls if no special keys where used
@@ -267,14 +264,14 @@ void ModuleEditorCamera::Controller()
 	{
 		float wheel_speed = move_speed;
 		//When the view is locked the camera will be slower the closest it is from the object
-		if (lock_view && App->scene->getSelectedGameObject() != nullptr)
+		if (App->scene->getSelectedGameObject() != nullptr)
 			wheel_speed *= ((App->scene->getSelectedGameObject()->world_bbox.Distance(frustum.Pos()) + 0.5f)/3.0f);
 		position += frustum.Front() * wheel_speed * (float)App->input->GetMouseWheel() * 2;
 	}
 
 	if (App->input->GetPressedKey(SDL_SCANCODE_F))
 	{
-		lock_view = !lock_view;
+		LookAt(App->scene->getSelectedGameObject()->Transform()->getWorldPos());
 	}
 
 	frustum.SetPos(position);
