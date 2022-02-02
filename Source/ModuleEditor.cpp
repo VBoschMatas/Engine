@@ -42,7 +42,7 @@ bool ModuleEditor::Init()
 {
 
 	//set inital Gizmo modes
-	transform_op = ImGuizmo::OPERATION::TRANSLATE;
+	//transform_op = ImGuizmo::OPERATION::TRANSLATE;
 	gizmoMode = ImGuizmo::MODE::WORLD;
 
 	char buffer[MAX_PATH];
@@ -436,7 +436,7 @@ void ModuleEditor::SceneWindow()
 			ComponentTransform* transformComponent = selected->Transform();
 			float4x4 transformMatrix = transformComponent->getLocalTransform().Transposed();
 
-			ImGuizmo::Manipulate(cameraView.ptr(), cameraProjection.ptr(), transform_op, gizmoMode, transformMatrix.ptr());
+			ImGuizmo::Manipulate(cameraView.ptr(), cameraProjection.ptr(), operation, gizmoMode, transformMatrix.ptr());
 
 			if (ImGuizmo::IsUsing() || ImGuizmo::IsOver()) {
 				transformComponent->setTransform(transformMatrix);

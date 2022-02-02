@@ -84,6 +84,7 @@ public:
 	bool operator < (const GameObject*& str) const;
 
 	void Save(Archive* archive);
+	void LoadFile(std::string path);
 private:
 
 	unsigned int id;

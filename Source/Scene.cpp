@@ -290,4 +290,13 @@ void Scene::LoadFile(const char* path)
 	ambCol.json = ambJson.json.at("Color");
 	ambient_light->strength = ambJson.json.at("Strength");
 	ambient_light->color = float3(ambCol.json[0], ambCol.json[1], ambCol.json[2]);
+
+	Archive childrenJson;
+	childrenJson.json = lector->json.at("Children");
+	for (auto it = childrenJson.json.begin(); it != childrenJson.json.end(); ++it)
+	{
+		//GameObject* child = new GameObject(getGoId(), nullptr);
+		console->AddLog(std::to_string((int)it.value()).c_str());
+		//child->LoadFile(std::to_string((int)it.value()));
+	}
 }
