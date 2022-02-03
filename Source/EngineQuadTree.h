@@ -4,7 +4,7 @@
 #include <list>
 #include <vector>
 #include "GameObject.h"
-#define QUADTREE_MAX_ITEMS 1
+#define QUADTREE_MAX_ITEMS 8
 class QuadtreeNode
 {
 
