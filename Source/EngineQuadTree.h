@@ -4,7 +4,7 @@
 #include <list>
 #include <vector>
 #include "GameObject.h"
-
+#define QUADTREE_MAX_ITEMS 1
 class QuadtreeNode
 {
 
@@ -27,7 +27,7 @@ public:
 //	void CollectIntersections(std::map<float, GameObject*>& objects, const TYPE& primitive) const;
 	template<typename TYPE>
 	void CollectIntersections(std::vector<GameObject*>& objects, const TYPE& primitive) const;
-
+	void Draw(bool has_obj) const;
 public:
 	AABB box;
 	std::list<GameObject*> objects;
@@ -53,7 +53,6 @@ public:
 //	void CollectIntersections(std::map<float, GameObject*>& objects, const TYPE& primitive) const;
 	template<typename TYPE>
 	void CollectIntersections(std::vector<GameObject*>& objects, const TYPE& primitive) const;
-
 public:
 	QuadtreeNode* root = nullptr;
 };
@@ -93,6 +92,7 @@ inline void EngineQuadtree::CollectIntersections(std::vector<GameObject*>& objec
 template<typename TYPE>
 inline void QuadtreeNode::CollectIntersections(std::vector<GameObject*>& objects, const TYPE& primitive) const
 {
+
 	if (primitive.Intersects(box))
 	{
 
@@ -100,10 +100,12 @@ inline void QuadtreeNode::CollectIntersections(std::vector<GameObject*>& objects
 		{
 			if (primitive.Intersects((*it)->world_bbox))
 				objects.push_back(*it);
+			Draw(true);
 		}
-
+		if(objects.size() == 0) Draw(false);
 		for (int i = 0; i < 4; ++i)
 			if (childs[i] != nullptr) childs[i]->CollectIntersections(objects, primitive);
-	}
-};
 
+	}
+
+};

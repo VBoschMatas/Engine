@@ -1,13 +1,14 @@
 #include "EngineQuadTree.h"
 #include "ComponentTransform.h"
 #include "Math.h"
+#include "debugdraw.h"
 
 #define NE 0
 #define SE 1
 #define SW 2
 #define NW 3
 
-#define QUADTREE_MAX_ITEMS 8
+#define QUADTREE_MAX_ITEMS 1
 #define QUADTREE_MIN_SIZE 10.0f 
 
 QuadtreeNode::QuadtreeNode(const AABB& box) : box(box)
@@ -198,6 +199,20 @@ void EngineQuadtree::CollectObjects(std::vector<GameObject*>& objects) const
 {
 	if (root != nullptr)
 		root->CollectObjects(objects);
+}
+
+void QuadtreeNode::Draw(bool has_obj) const
+{
+	float3 extreme_points[8];
+	box.GetCornerPoints(&extreme_points[0]);
+	std::swap(extreme_points[2], extreme_points[5]);
+	std::swap(extreme_points[3], extreme_points[4]);
+	std::swap(extreme_points[4], extreme_points[5]);
+	std::swap(extreme_points[6], extreme_points[7]);
+	if(has_obj)
+		dd::box(extreme_points, dd::colors::Yellow);
+	else
+		dd::box(extreme_points, dd::colors::White);
 }
 
 //void EngineQuadtree::CollectObjects(std::map<float, GameObject*>& objects, const float3& origin) const
